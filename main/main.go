@@ -12,8 +12,7 @@ import (
 )
 
 const (
-	sessionIdCookieName = "session_id"
-	defSessionDuration  = time.Duration(30) * time.Minute
+	defSessionDuration = time.Duration(30) * time.Minute
 )
 
 var (
@@ -61,17 +60,15 @@ func withSession(sessionStore redissession.SessionStore, f func(http.ResponseWri
 		if !ok {
 
 			// create new session
-			session, err := sessionStore.NewSession(defSessionDuration)
+			sess, err := sessionStore.NewSession(defSessionDuration)
 			if err != nil {
 				return nil, err
 			}
 
 			// create and save cookie with session id
-			sessionCookie := http.Cookie{
-				Name:  sessionIdCookieName,
-				Value: session.ID()}
+			cookie.SaveSessionID(sess.ID(), w)
 
-			http.SetCookie(w, &sessionCookie)
+			session = sess
 
 		} else {
 
@@ -119,15 +116,53 @@ func main() {
 
 	//mux := http.NewServeMux()
 	mux := mux.NewRouter()
-	files := http.FileServer(http.Dir("/public"))
+	files := http.FileServer(http.Dir("/static"))
 
 	mux.Handle("/static/", http.StripPrefix("/static/", files))
 
-	mux.HandleFunc("/", renderHTML("index", withSession(st, Index)))
+	mux.Handle("/", &HttpHandler{
+		View:        "index",
+		HandlerFunc: withSession(st, Index)}) //renderHTML("index", withSession(st, Index)))
 
 	server := &http.Server{Addr: "0.0.0.0:9090", Handler: mux}
 	server.ListenAndServe()
 }
+
+type HttpHandler struct {
+	View        string
+	HandlerFunc func(w http.ResponseWriter, r *http.Request) (map[string]interface{}, error)
+}
+
+func (h *HttpHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	model, err := h.HandlerFunc(w, req)
+	if err != nil {
+		fmt.Fprintf(w, "error: %v", err)
+		return
+	}
+	fmt.Printf("Model: %v\n", model)
+
+	tmpl, err := template.ParseFiles("../static/templates/html/" + h.View + ".html")
+	if err != nil {
+		fmt.Fprintf(w, "error: %v\n", err)
+		return
+	}
+	err = tmpl.ExecuteTemplate(w, h.View, model)
+	if err != nil {
+		fmt.Fprintf(w, "error: %v\n", err)
+		return
+	}
+}
+
+/*
+type Counter struct {
+    n int
+}
+
+func (ctr *Counter) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+    ctr.n++
+    fmt.Fprintf(w, "counter = %d\n", ctr.n)
+}
+*/
 
 func renderHTML(viewName string, f func(w http.ResponseWriter, r *http.Request) (map[string]interface{}, error)) func(w http.ResponseWriter, r *http.Request) {
 
@@ -140,7 +175,7 @@ func renderHTML(viewName string, f func(w http.ResponseWriter, r *http.Request) 
 		}
 		fmt.Printf("Model: %v\n", model)
 
-		tmpl, err := template.ParseFiles("../../static/templates/html/" + viewName + ".html")
+		tmpl, err := template.ParseFiles("../static/templates/html/" + viewName + ".html")
 		if err != nil {
 			fmt.Fprintf(w, "error: %v\n", err)
 			return
