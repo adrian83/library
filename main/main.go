@@ -6,9 +6,11 @@ import (
 	"github.com/gorilla/mux"
 	"net/http"
 	"reflect"
-	"text/template"
 	"time"
 	"web/cookie"
+	"web/handler"
+	myhttp "web/html"
+	"web/session"
 )
 
 const (
@@ -49,7 +51,7 @@ func Index(w http.ResponseWriter, r *http.Request, s redissession.Session) (map[
 	return model, nil
 }
 
-func withSession(sessionStore redissession.SessionStore, f func(http.ResponseWriter, *http.Request, redissession.Session) (map[string]interface{}, error)) func(http.ResponseWriter, *http.Request) (map[string]interface{}, error) {
+func withSession(sessionStore redissession.SessionStore, handler session.SessionHandler) handler.ModelHandler {
 
 	return func(w http.ResponseWriter, r *http.Request) (map[string]interface{}, error) {
 
@@ -81,7 +83,7 @@ func withSession(sessionStore redissession.SessionStore, f func(http.ResponseWri
 		}
 
 		// execute controller function
-		model, err := f(w, r, session)
+		model, err := handler(w, r, session)
 		if err != nil {
 			return nil, err
 		}
@@ -107,12 +109,12 @@ func main() {
 		IDLength: 50,
 	}
 
-	st, err := redissession.NewSessionStore(sessionStoreConfig)
+	sessionStore, err := redissession.NewSessionStore(sessionStoreConfig)
 	if err != nil {
 		panic(fmt.Sprintf("SessionStore cannot be created because of: %v", err))
 	}
 
-	fmt.Println(st)
+	fmt.Println(sessionStore)
 
 	//mux := http.NewServeMux()
 	mux := mux.NewRouter()
@@ -120,70 +122,10 @@ func main() {
 
 	mux.Handle("/static/", http.StripPrefix("/static/", files))
 
-	mux.Handle("/", &HttpHandler{
+	mux.Handle("/", &myhttp.HttpHandler{
 		View:        "index",
-		HandlerFunc: withSession(st, Index)}) //renderHTML("index", withSession(st, Index)))
+		HandlerFunc: withSession(sessionStore, Index)})
 
 	server := &http.Server{Addr: "0.0.0.0:9090", Handler: mux}
 	server.ListenAndServe()
-}
-
-type HttpHandler struct {
-	View        string
-	HandlerFunc func(w http.ResponseWriter, r *http.Request) (map[string]interface{}, error)
-}
-
-func (h *HttpHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	model, err := h.HandlerFunc(w, req)
-	if err != nil {
-		fmt.Fprintf(w, "error: %v", err)
-		return
-	}
-	fmt.Printf("Model: %v\n", model)
-
-	tmpl, err := template.ParseFiles("../static/templates/html/" + h.View + ".html")
-	if err != nil {
-		fmt.Fprintf(w, "error: %v\n", err)
-		return
-	}
-	err = tmpl.ExecuteTemplate(w, h.View, model)
-	if err != nil {
-		fmt.Fprintf(w, "error: %v\n", err)
-		return
-	}
-}
-
-/*
-type Counter struct {
-    n int
-}
-
-func (ctr *Counter) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-    ctr.n++
-    fmt.Fprintf(w, "counter = %d\n", ctr.n)
-}
-*/
-
-func renderHTML(viewName string, f func(w http.ResponseWriter, r *http.Request) (map[string]interface{}, error)) func(w http.ResponseWriter, r *http.Request) {
-
-	return func(w http.ResponseWriter, r *http.Request) {
-
-		model, err := f(w, r)
-		if err != nil {
-			fmt.Fprintf(w, "error: %v", err)
-			return
-		}
-		fmt.Printf("Model: %v\n", model)
-
-		tmpl, err := template.ParseFiles("../static/templates/html/" + viewName + ".html")
-		if err != nil {
-			fmt.Fprintf(w, "error: %v\n", err)
-			return
-		}
-		err = tmpl.ExecuteTemplate(w, viewName, model)
-		if err != nil {
-			fmt.Fprintf(w, "error: %v\n", err)
-			return
-		}
-	}
 }
