@@ -4,16 +4,15 @@ import (
 	"fmt"
 	"net/http"
 	"text/template"
-	"web/handler"
 )
 
 type HttpHandler struct {
-	View        string
-	HandlerFunc handler.ModelHandler
+	View    string
+	Handler func(http.ResponseWriter, *http.Request) (map[string]interface{}, error)
 }
 
 func (h *HttpHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	model, err := h.HandlerFunc(w, req)
+	model, err := h.Handler(w, req)
 	if err != nil {
 		fmt.Fprintf(w, "error: %v", err)
 		return

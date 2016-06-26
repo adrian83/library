@@ -6,15 +6,11 @@ import (
 	"github.com/gorilla/mux"
 	"net/http"
 	"reflect"
-	"time"
-	"web/cookie"
+
 	"web/handler"
 	myhttp "web/html"
+	myjson "web/json"
 	"web/session"
-)
-
-const (
-	defSessionDuration = time.Duration(30) * time.Minute
 )
 
 var (
@@ -51,54 +47,6 @@ func Index(w http.ResponseWriter, r *http.Request, s redissession.Session) (map[
 	return model, nil
 }
 
-func withSession(sessionStore redissession.SessionStore, handler session.SessionHandler) handler.ModelHandler {
-
-	return func(w http.ResponseWriter, r *http.Request) (map[string]interface{}, error) {
-
-		sessionID, ok := cookie.SessionID(r)
-
-		var session redissession.Session
-
-		if !ok {
-
-			// create new session
-			sess, err := sessionStore.NewSession(defSessionDuration)
-			if err != nil {
-				return nil, err
-			}
-
-			// create and save cookie with session id
-			cookie.SaveSessionID(sess.ID(), w)
-
-			session = sess
-
-		} else {
-
-			// get existing session
-			sess, err := sessionStore.FindSession(sessionID)
-			if err != nil {
-				return nil, err
-			}
-			session = sess
-		}
-
-		// execute controller function
-		model, err := handler(w, r, session)
-		if err != nil {
-			return nil, err
-		}
-
-		// save all session changes
-		if err := sessionStore.SaveSession(session); err != nil {
-			return nil, err
-		}
-
-		fmt.Printf("Model: %v\n", model)
-		return model, err
-
-	}
-}
-
 func main() {
 
 	sessionStoreConfig := redissession.Config{
@@ -116,6 +64,8 @@ func main() {
 
 	fmt.Println(sessionStore)
 
+	authorHandler := &handler.AuthorHandler{}
+
 	//mux := http.NewServeMux()
 	mux := mux.NewRouter()
 	files := http.FileServer(http.Dir("/static"))
@@ -123,8 +73,11 @@ func main() {
 	mux.Handle("/static/", http.StripPrefix("/static/", files))
 
 	mux.Handle("/", &myhttp.HttpHandler{
-		View:        "index",
-		HandlerFunc: withSession(sessionStore, Index)})
+		View:    "index",
+		Handler: session.WithSession(sessionStore, Index)})
+
+	mux.Handle("/rest/api/v1.0/authors", &myjson.JsonHandler{
+		Handler: session.WithSession(sessionStore, authorHandler.AddAuthor)}).Methods("POST")
 
 	server := &http.Server{Addr: "0.0.0.0:9090", Handler: mux}
 	server.ListenAndServe()
