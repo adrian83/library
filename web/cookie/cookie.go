@@ -3,6 +3,7 @@ package cookie
 import (
 	"fmt"
 	"net/http"
+	"time"
 )
 
 const (
@@ -24,14 +25,15 @@ func SessionID(request *http.Request) (sessionID string, cookieExists bool) {
 	return ByName(sessionIdCookieName, request)
 }
 
-func Save(name, value string, w http.ResponseWriter) {
+func Save(name, value string, maxAge time.Duration, w http.ResponseWriter) {
 	cookie := http.Cookie{
-		Name:  name,
-		Value: value}
+		Name:   name,
+		Value:  value,
+		MaxAge: int(maxAge.Seconds())}
 
 	http.SetCookie(w, &cookie)
 }
 
-func SaveSessionID(sessionID string, w http.ResponseWriter) {
-	Save(sessionIdCookieName, sessionID, w)
+func SaveSessionID(sessionID string, maxAge time.Duration, w http.ResponseWriter) {
+	Save(sessionIdCookieName, sessionID, maxAge, w)
 }

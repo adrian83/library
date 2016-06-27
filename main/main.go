@@ -10,7 +10,11 @@ import (
 	"web/handler"
 	myhttp "web/html"
 	myjson "web/json"
-	"web/session"
+	mysession "web/session"
+
+	authordal "domain/author/dal"
+
+	"gopkg.in/mgo.v2"
 )
 
 var (
@@ -62,9 +66,25 @@ func main() {
 		panic(fmt.Sprintf("SessionStore cannot be created because of: %v", err))
 	}
 
+	defer sessionStore.Close()
+
+	// mongo
+
+	session, err := mgo.Dial("localhost")
+	if err != nil {
+		panic(err)
+	}
+	defer session.Close()
+
+	// Optional. Switch the session to a monotonic behavior.
+	session.SetMode(mgo.Monotonic, true)
+
+	// dals
+	var authorDal authordal.AuthorDal = authordal.AuthorMongoDal{Session: session}
+
 	fmt.Println(sessionStore)
 
-	authorHandler := &handler.AuthorHandler{}
+	authorHandler := &handler.AuthorHandler{AuthorDal: authorDal}
 
 	//mux := http.NewServeMux()
 	mux := mux.NewRouter()
@@ -74,11 +94,51 @@ func main() {
 
 	mux.Handle("/", &myhttp.HttpHandler{
 		View:    "index",
-		Handler: session.WithSession(sessionStore, Index)})
+		Handler: mysession.WithSession(sessionStore, Index)})
 
 	mux.Handle("/rest/api/v1.0/authors", &myjson.JsonHandler{
-		Handler: session.WithSession(sessionStore, authorHandler.AddAuthor)}).Methods("POST")
+		Handler: mysession.WithSession(sessionStore, authorHandler.AddAuthor)}).Methods("POST")
 
 	server := &http.Server{Addr: "0.0.0.0:9090", Handler: mux}
 	server.ListenAndServe()
 }
+
+/*
+import (
+        "fmt"
+	"log"
+        "gopkg.in/mgo.v2"
+        "gopkg.in/mgo.v2/bson"
+)
+
+type Person struct {
+        Name string
+        Phone string
+}
+
+func main() {
+        session, err := mgo.Dial("server1.example.com,server2.example.com")
+        if err != nil {
+                panic(err)
+        }
+        defer session.Close()
+
+        // Optional. Switch the session to a monotonic behavior.
+        session.SetMode(mgo.Monotonic, true)
+
+        c := session.DB("test").C("people")
+        err = c.Insert(&Person{"Ale", "+55 53 8116 9639"},
+	               &Person{"Cla", "+55 53 8402 8510"})
+        if err != nil {
+                log.Fatal(err)
+        }
+
+        result := Person{}
+        err = c.Find(bson.M{"name": "Ale"}).One(&result)
+        if err != nil {
+                log.Fatal(err)
+        }
+
+        fmt.Println("Phone:", result.Phone)
+}
+*/

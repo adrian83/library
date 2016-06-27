@@ -1,7 +1,6 @@
 package html
 
 import (
-	"fmt"
 	"net/http"
 	"text/template"
 )
@@ -14,19 +13,18 @@ type HttpHandler struct {
 func (h *HttpHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	model, err := h.Handler(w, req)
 	if err != nil {
-		fmt.Fprintf(w, "error: %v", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	fmt.Printf("Model: %v\n", model)
 
 	tmpl, err := template.ParseFiles(h.htmlPath())
 	if err != nil {
-		fmt.Fprintf(w, "error: %v\n", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	if err = tmpl.ExecuteTemplate(w, h.View, model); err != nil {
-		fmt.Fprintf(w, "error: %v\n", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 }

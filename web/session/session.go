@@ -1,7 +1,6 @@
 package session
 
 import (
-	"fmt"
 	"github.com/adrian83/go-redis-session"
 	"net/http"
 	"time"
@@ -9,7 +8,7 @@ import (
 )
 
 const (
-	defSessionDuration = time.Duration(30) * time.Minute
+	defSessionDuration = time.Duration(5) * time.Minute
 )
 
 type SessionHandler func(w http.ResponseWriter, r *http.Request, s redissession.Session) (map[string]interface{}, error)
@@ -28,11 +27,10 @@ func WithSession(sessionStore redissession.SessionStore, handler SessionHandler)
 			sess, err := sessionStore.NewSession(defSessionDuration)
 			if err != nil {
 				return nil, err
-
 			}
 
 			// create and save cookie with session id
-			cookie.SaveSessionID(sess.ID(), w)
+			cookie.SaveSessionID(sess.ID(), defSessionDuration, w)
 
 			session = sess
 
@@ -57,7 +55,6 @@ func WithSession(sessionStore redissession.SessionStore, handler SessionHandler)
 			return nil, err
 		}
 
-		fmt.Printf("Model: %v\n", model)
 		return model, err
 
 	}
