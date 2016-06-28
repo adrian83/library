@@ -5,15 +5,33 @@ import (
 	"gopkg.in/mgo.v2"
 )
 
+const (
+	collectionName = "authors"
+)
+
 type AuthorDal interface {
 	Add(author model.Author) error
+	GetAuthors() ([]model.Author, error)
+}
+
+func NewAuthorMongoDal(database *mgo.Database) *AuthorMongoDal {
+	return &AuthorMongoDal{
+		database:   database,
+		collection: database.C(collectionName),
+	}
 }
 
 type AuthorMongoDal struct {
-	Session *mgo.Session
+	database   *mgo.Database
+	collection *mgo.Collection
 }
 
 func (d AuthorMongoDal) Add(author model.Author) error {
-	authorsColl := d.Session.DB("library").C("authors")
-	return authorsColl.Insert(author)
+	return d.collection.Insert(author)
+}
+
+func (d AuthorMongoDal) GetAuthors() ([]model.Author, error) {
+	authors := make([]model.Author, 0)
+	err := d.collection.Find(nil).All(&authors)
+	return authors, err
 }
