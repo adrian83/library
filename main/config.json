@@ -1,0 +1,16 @@
+{
+	"server":{
+		"port":8080
+	},
+	"session": {
+		"idLength":50,
+		"redis":{
+			"db": 0,
+			"password":"",
+			"host":"localhost",
+			"port":6379
+		
+		}	
+	}
+}
+
