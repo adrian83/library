@@ -78,9 +78,10 @@ func main() {
 
 	// Optional. Switch the session to a monotonic behavior.
 	session.SetMode(mgo.Monotonic, true)
+	database := session.DB("library") // name from conf
 
 	// dals
-	var authorDal authordal.AuthorDal = authordal.AuthorMongoDal{Session: session}
+	var authorDal authordal.AuthorDal = authordal.NewAuthorMongoDal(database)
 
 	fmt.Println(sessionStore)
 
@@ -98,6 +99,8 @@ func main() {
 
 	mux.Handle("/rest/api/v1.0/authors", &myjson.JsonHandler{
 		Handler: mysession.WithSession(sessionStore, authorHandler.AddAuthor)}).Methods("POST")
+	mux.Handle("/rest/api/v1.0/authors", &myjson.JsonHandler{
+		Handler: mysession.WithSession(sessionStore, authorHandler.GetAuthors)}).Methods("GET")
 
 	server := &http.Server{Addr: "0.0.0.0:9090", Handler: mux}
 	server.ListenAndServe()

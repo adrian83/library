@@ -28,3 +28,16 @@ func (h *AuthorHandler) AddAuthor(w http.ResponseWriter, r *http.Request, s redi
 
 	return model, nil
 }
+
+func (h *AuthorHandler) GetAuthors(w http.ResponseWriter, r *http.Request, s redissession.Session) (map[string]interface{}, error) {
+
+	authors, err := h.AuthorDal.GetAuthors()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	model := map[string]interface{}{}
+	model["authors"] = authors
+
+	return model, nil
+}
