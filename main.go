@@ -83,13 +83,12 @@ func main() {
 	if err != nil {
 		panic(fmt.Sprintf("SessionStore cannot be created because of: %v", err))
 	}
-
 	defer sessionStore.Close()
 
 	// ---------------------------------------
 	// main db - mongo
 	// ---------------------------------------
-	session, err := mgo.Dial("localhost")
+	session, err := mgo.Dial(appConfig.Databases.Mongo.Host)
 	if err != nil {
 		panic(err)
 	}
@@ -97,7 +96,7 @@ func main() {
 
 	// Optional. Switch the session to a monotonic behavior.
 	session.SetMode(mgo.Monotonic, true)
-	database := session.DB("library") // name from conf
+	database := session.DB(appConfig.Databases.Mongo.DB)
 
 	// ---------------------------------------
 	// dals
@@ -133,47 +132,6 @@ func main() {
 	// ---------------------------------------
 	// server
 	// ---------------------------------------
-
 	server := &http.Server{Addr: "0.0.0.0:9090", Handler: mux}
 	server.ListenAndServe()
 }
-
-/*
-import (
-        "fmt"
-	"log"
-        "gopkg.in/mgo.v2"
-        "gopkg.in/mgo.v2/bson"
-)
-
-type Person struct {
-        Name string
-        Phone string
-}
-
-func main() {
-        session, err := mgo.Dial("server1.example.com,server2.example.com")
-        if err != nil {
-                panic(err)
-        }
-        defer session.Close()
-
-        // Optional. Switch the session to a monotonic behavior.
-        session.SetMode(mgo.Monotonic, true)
-
-        c := session.DB("test").C("people")
-        err = c.Insert(&Person{"Ale", "+55 53 8116 9639"},
-	               &Person{"Cla", "+55 53 8402 8510"})
-        if err != nil {
-                log.Fatal(err)
-        }
-
-        result := Person{}
-        err = c.Find(bson.M{"name": "Ale"}).One(&result)
-        if err != nil {
-                log.Fatal(err)
-        }
-
-        fmt.Println("Phone:", result.Phone)
-}
-*/

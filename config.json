@@ -14,7 +14,8 @@
 	},
 	"databases":{
 		"mongo": {
-			"host":"localhost"
+			"host":"localhost",
+			"db":"library"
 		}
 	}
 }
