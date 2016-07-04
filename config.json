@@ -11,6 +11,11 @@
 			"port":6379
 		
 		}	
+	},
+	"databases":{
+		"mongo": {
+			"host":"localhost"
+		}
 	}
 }
 

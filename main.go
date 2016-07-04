@@ -5,6 +5,7 @@ import (
 	"github.com/adrian83/go-redis-session"
 	"github.com/gorilla/mux"
 	"net/http"
+	"os"
 	"reflect"
 
 	"web/handler"
@@ -14,6 +15,7 @@ import (
 
 	authordal "domain/author/dal"
 
+	"config"
 	"gopkg.in/mgo.v2"
 )
 
@@ -53,12 +55,28 @@ func Index(w http.ResponseWriter, r *http.Request, s redissession.Session) (map[
 
 func main() {
 
+	// ---------------------------------------
+	// application config
+	// ---------------------------------------
+	configPath := os.Args[1]
+	currentDir, err := os.Getwd()
+	if err != nil {
+		panic(fmt.Sprintf("Cannot get the path to current directory: %v", err))
+	}
+
+	appConfig, err := config.ReadConfig(currentDir + "/" + configPath)
+
+	//fmt.Print("\n", appConfig.Server.Port)
+
+	// ---------------------------------------
+	// session
+	// ---------------------------------------
 	sessionStoreConfig := redissession.Config{
-		DB:       0,
-		Password: "",
-		Host:     "localhost",
-		Port:     6379,
-		IDLength: 50,
+		DB:       appConfig.Session.Redis.DB,
+		Password: appConfig.Session.Redis.Password,
+		Host:     appConfig.Session.Redis.Host,
+		Port:     appConfig.Session.Redis.Port,
+		IDLength: appConfig.Session.IDLength,
 	}
 
 	sessionStore, err := redissession.NewSessionStore(sessionStoreConfig)
@@ -68,8 +86,9 @@ func main() {
 
 	defer sessionStore.Close()
 
-	// mongo
-
+	// ---------------------------------------
+	// main db - mongo
+	// ---------------------------------------
 	session, err := mgo.Dial("localhost")
 	if err != nil {
 		panic(err)
@@ -80,14 +99,20 @@ func main() {
 	session.SetMode(mgo.Monotonic, true)
 	database := session.DB("library") // name from conf
 
+	// ---------------------------------------
 	// dals
+	// ---------------------------------------
 	var authorDal authordal.AuthorDal = authordal.NewAuthorMongoDal(database)
 
-	fmt.Println(sessionStore)
-
+	// ---------------------------------------
+	// handlers (controllers)
+	// ---------------------------------------
+	accountHandler := &handler.AccountHandler{}
 	authorHandler := &handler.AuthorHandler{AuthorDal: authorDal}
 
-	//mux := http.NewServeMux()
+	// ---------------------------------------
+	// routing
+	// ---------------------------------------
 	mux := mux.NewRouter()
 	files := http.FileServer(http.Dir("/static"))
 
@@ -97,10 +122,17 @@ func main() {
 		View:    "index",
 		Handler: mysession.WithSession(sessionStore, Index)})
 
+	mux.Handle("/rest/api/v1.0/auth/login", &myjson.JsonHandler{
+		Handler: mysession.WithSession(sessionStore, accountHandler.Login)}).Methods("POST")
+
 	mux.Handle("/rest/api/v1.0/authors", &myjson.JsonHandler{
 		Handler: mysession.WithSession(sessionStore, authorHandler.AddAuthor)}).Methods("POST")
 	mux.Handle("/rest/api/v1.0/authors", &myjson.JsonHandler{
 		Handler: mysession.WithSession(sessionStore, authorHandler.GetAuthors)}).Methods("GET")
+
+	// ---------------------------------------
+	// server
+	// ---------------------------------------
 
 	server := &http.Server{Addr: "0.0.0.0:9090", Handler: mux}
 	server.ListenAndServe()

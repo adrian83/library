@@ -1,10 +1,34 @@
 package config
 
-import ()
+import (
+	"bytes"
+	"encoding/json"
+	"io/ioutil"
+)
+
+func ReadConfig(configPath string) (*Config, error) {
+
+	config := new(Config)
+
+	configBytes, err := ioutil.ReadFile(configPath)
+	if err != nil {
+		return config, err
+	}
+
+	configReader := bytes.NewReader(configBytes)
+
+	jsonParser := json.NewDecoder(configReader)
+	if err := jsonParser.Decode(config); err != nil {
+		return config, err
+	}
+
+	return config, nil
+}
 
 type Config struct {
-	server  ServerConfig  `json:"server"`
-	session SessionConfig `json:"session"`
+	Server    ServerConfig    `json:"server"`
+	Session   SessionConfig   `json:"session"`
+	Databases DatabasesConfig `json:"databases"`
 }
 
 type SessionConfig struct {
@@ -13,7 +37,7 @@ type SessionConfig struct {
 }
 
 type RedisConfig struct {
-	DB       int    `json:"db"`
+	DB       int64  `json:"db"`
 	Password string `json:"password"`
 	Host     string `json:"host"`
 	Port     int    `json:"port"`
@@ -21,4 +45,12 @@ type RedisConfig struct {
 
 type ServerConfig struct {
 	Port int `json:"port"`
+}
+
+type DatabasesConfig struct {
+	Mongo MongoConfig `json:"mongo"`
+}
+
+type MongoConfig struct {
+	Host string `json:"host"`
 }
