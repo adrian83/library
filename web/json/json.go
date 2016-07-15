@@ -3,6 +3,7 @@ package json
 import (
 	"encoding/json"
 	"net/http"
+	"web/handler"
 )
 
 const (
@@ -11,7 +12,7 @@ const (
 )
 
 type JsonHandler struct {
-	Handler func(http.ResponseWriter, *http.Request) (map[string]interface{}, error)
+	Handler func(http.ResponseWriter, *http.Request) (handler.Model, error)
 }
 
 func (h *JsonHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
@@ -22,7 +23,7 @@ func (h *JsonHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	js, err := json.Marshal(model)
+	js, err := json.Marshal(model.Values)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

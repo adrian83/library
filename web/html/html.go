@@ -3,11 +3,12 @@ package html
 import (
 	"net/http"
 	"text/template"
+	"web/handler"
 )
 
 type HttpHandler struct {
 	View    string
-	Handler func(http.ResponseWriter, *http.Request) (map[string]interface{}, error)
+	Handler func(http.ResponseWriter, *http.Request) (handler.Model, error)
 }
 
 func (h *HttpHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
@@ -23,7 +24,7 @@ func (h *HttpHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if err = tmpl.ExecuteTemplate(w, h.View, model); err != nil {
+	if err = tmpl.ExecuteTemplate(w, h.View, model.Values); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

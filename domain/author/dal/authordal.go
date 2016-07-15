@@ -12,6 +12,7 @@ const (
 type AuthorDal interface {
 	Add(author model.Author) error
 	GetAuthors() ([]model.Author, error)
+	Update(author model.Author) error
 }
 
 func NewAuthorMongoDal(database *mgo.Database) *AuthorMongoDal {
@@ -34,4 +35,9 @@ func (d AuthorMongoDal) GetAuthors() ([]model.Author, error) {
 	authors := make([]model.Author, 0)
 	err := d.collection.Find(nil).All(&authors)
 	return authors, err
+}
+
+func (d AuthorMongoDal) Update(author model.Author) error {
+
+	return nil
 }

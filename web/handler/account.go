@@ -10,7 +10,7 @@ import (
 type AccountHandler struct {
 }
 
-func (h *AccountHandler) Login(w http.ResponseWriter, r *http.Request, s redissession.Session) (map[string]interface{}, error) {
+func (h *AccountHandler) Login(w http.ResponseWriter, r *http.Request, s redissession.Session) (Model, error) {
 
 	decoder := json.NewDecoder(r.Body)
 	var user model.User
@@ -20,8 +20,8 @@ func (h *AccountHandler) Login(w http.ResponseWriter, r *http.Request, s redisse
 
 	s.Add("user", user)
 
-	model := map[string]interface{}{}
-	model["user"] = user
+	model := NewModel()
+	model.Values["user"] = user
 
 	return model, nil
 }

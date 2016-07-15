@@ -11,4 +11,16 @@ type ModelHandler interface {
 }
 */
 
-type Handler func(w http.ResponseWriter, r *http.Request, s redissession.Session) (map[string]interface{}, error)
+type Handler func(w http.ResponseWriter, r *http.Request, s redissession.Session) (Model, error)
+
+type Model struct {
+	Values     map[string]interface{}
+	HttpStatus int
+}
+
+func NewModel() Model {
+	return Model{
+		Values:     make(map[string]interface{}, 0),
+		HttpStatus: http.StatusOK,
+	}
+}

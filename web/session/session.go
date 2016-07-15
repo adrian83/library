@@ -5,17 +5,20 @@ import (
 	"net/http"
 	"time"
 	"web/cookie"
+	"web/handler"
 )
 
 const (
 	defSessionDuration = time.Duration(5) * time.Minute
 )
 
-type SessionHandler func(w http.ResponseWriter, r *http.Request, s redissession.Session) (map[string]interface{}, error)
+type SessionHandler func(w http.ResponseWriter, r *http.Request, s redissession.Session) (handler.Model, error)
 
-func WithSession(sessionStore redissession.SessionStore, handler SessionHandler) func(http.ResponseWriter, *http.Request) (map[string]interface{}, error) {
+func WithSession(sessionStore redissession.SessionStore, sessionHandler SessionHandler) func(http.ResponseWriter, *http.Request) (handler.Model, error) {
 
-	return func(w http.ResponseWriter, r *http.Request) (map[string]interface{}, error) {
+	return func(w http.ResponseWriter, r *http.Request) (handler.Model, error) {
+
+		model := handler.NewModel()
 
 		sessionID, ok := cookie.SessionID(r)
 
@@ -26,7 +29,7 @@ func WithSession(sessionStore redissession.SessionStore, handler SessionHandler)
 			// create new session
 			sess, err := sessionStore.NewSession(defSessionDuration)
 			if err != nil {
-				return nil, err
+				return model, err
 			}
 
 			// create and save cookie with session id
@@ -39,20 +42,20 @@ func WithSession(sessionStore redissession.SessionStore, handler SessionHandler)
 			// get existing session
 			sess, err := sessionStore.FindSession(sessionID)
 			if err != nil {
-				return nil, err
+				return model, err
 			}
 			session = sess
 		}
 
 		// execute controller function
-		model, err := handler(w, r, session)
+		model, err := sessionHandler(w, r, session)
 		if err != nil {
-			return nil, err
+			return model, err
 		}
 
 		// save all session changes
 		if err := sessionStore.SaveSession(session); err != nil {
-			return nil, err
+			return model, err
 		}
 
 		return model, err

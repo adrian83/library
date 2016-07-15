@@ -23,7 +23,7 @@ var (
 	id = 0
 )
 
-func Index(w http.ResponseWriter, r *http.Request, s redissession.Session) (map[string]interface{}, error) {
+func Index(w http.ResponseWriter, r *http.Request, s redissession.Session) (handler.Model, error) {
 
 	var val int = 0
 
@@ -46,7 +46,9 @@ func Index(w http.ResponseWriter, r *http.Request, s redissession.Session) (map[
 
 	}
 
-	model := map[string]interface{}{"idk": val}
+	model := handler.NewModel()
+
+	model.Values["idk"] = val
 
 	s.Add("id", val+1)
 
