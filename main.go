@@ -130,6 +130,8 @@ func main() {
 		Handler: mysession.WithSession(sessionStore, authorHandler.AddAuthor)}).Methods("POST")
 	mux.Handle("/rest/api/v1.0/authors", &myjson.JsonHandler{
 		Handler: mysession.WithSession(sessionStore, authorHandler.GetAuthors)}).Methods("GET")
+	mux.Handle("/rest/api/v1.0/authors/{author_id}", &myjson.JsonHandler{
+		Handler: mysession.WithSession(sessionStore, authorHandler.UpdateAuthor)}).Methods("PUT")
 
 	// ---------------------------------------
 	// server

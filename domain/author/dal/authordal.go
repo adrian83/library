@@ -2,7 +2,9 @@ package dal
 
 import (
 	"domain/author/model"
+	"fmt"
 	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
 const (
@@ -12,7 +14,7 @@ const (
 type AuthorDal interface {
 	Add(author model.Author) error
 	GetAuthors() ([]model.Author, error)
-	Update(author model.Author) error
+	Update(author model.AuthorUpdate) error
 }
 
 func NewAuthorMongoDal(database *mgo.Database) *AuthorMongoDal {
@@ -28,6 +30,7 @@ type AuthorMongoDal struct {
 }
 
 func (d AuthorMongoDal) Add(author model.Author) error {
+
 	return d.collection.Insert(author)
 }
 
@@ -37,7 +40,12 @@ func (d AuthorMongoDal) GetAuthors() ([]model.Author, error) {
 	return authors, err
 }
 
-func (d AuthorMongoDal) Update(author model.Author) error {
+func (d AuthorMongoDal) Update(author model.AuthorUpdate) error {
+	dict := make(map[string]interface{})
 
-	return nil
+	dict["firstname"] = author.FirstName
+
+	dict["lastname"] = *author.LastName
+	fmt.Println("-------------", dict)
+	return d.collection.Update(bson.M{"_id": bson.ObjectIdHex(author.ID)}, dict)
 }

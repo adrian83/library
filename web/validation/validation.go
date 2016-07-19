@@ -21,3 +21,7 @@ type Validator interface {
 func IsStringEmpty(str string) bool {
 	return len(str) == 0
 }
+
+func IsStringPtrNil(str *string) bool {
+	return str == nil
+}
