@@ -15,6 +15,8 @@ type AuthorDal interface {
 	Add(author model.Author) error
 	GetAuthors() ([]model.Author, error)
 	Update(author model.AuthorUpdate) error
+	Delete(authorID string) error
+	GetAuthor(authorID string) (model.Author, error)
 }
 
 func NewAuthorMongoDal(database *mgo.Database) *AuthorMongoDal {
@@ -48,4 +50,14 @@ func (d AuthorMongoDal) Update(author model.AuthorUpdate) error {
 	dict["lastname"] = *author.LastName
 	fmt.Println("-------------", dict)
 	return d.collection.Update(bson.M{"_id": bson.ObjectIdHex(author.ID)}, dict)
+}
+
+func (d AuthorMongoDal) Delete(authorID string) error {
+	return d.collection.RemoveId(bson.ObjectIdHex(authorID))
+}
+
+func (d AuthorMongoDal) GetAuthor(authorID string) (model.Author, error) {
+	author := new(model.Author)
+	err := d.collection.FindId(bson.ObjectIdHex(authorID)).One(author)
+	return *author, err
 }

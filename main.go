@@ -132,6 +132,10 @@ func main() {
 		Handler: mysession.WithSession(sessionStore, authorHandler.GetAuthors)}).Methods("GET")
 	mux.Handle("/rest/api/v1.0/authors/{author_id}", &myjson.JsonHandler{
 		Handler: mysession.WithSession(sessionStore, authorHandler.UpdateAuthor)}).Methods("PUT")
+	mux.Handle("/rest/api/v1.0/authors/{author_id}", &myjson.JsonHandler{
+		Handler: mysession.WithSession(sessionStore, authorHandler.DeleteAuthor)}).Methods("DELETE")
+	mux.Handle("/rest/api/v1.0/authors/{author_id}", &myjson.JsonHandler{
+		Handler: mysession.WithSession(sessionStore, authorHandler.GetAuthor)}).Methods("GET")
 
 	// ---------------------------------------
 	// server

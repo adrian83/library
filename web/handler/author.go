@@ -101,6 +101,37 @@ func (h *AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request, s r
 	return model, nil
 }
 
+func (h *AuthorHandler) DeleteAuthor(w http.ResponseWriter, r *http.Request, s redissession.Session) (Model, error) {
+
+	vars := mux.Vars(r)
+	authorID := vars["author_id"]
+
+	model := NewModel()
+
+	err := h.AuthorDal.Delete(authorID)
+	if err != nil {
+		fmt.Println("-----------err ", err)
+	}
+
+	return model, nil
+}
+
+func (h *AuthorHandler) GetAuthor(w http.ResponseWriter, r *http.Request, s redissession.Session) (Model, error) {
+
+	vars := mux.Vars(r)
+	authorID := vars["author_id"]
+
+	model := NewModel()
+
+	author, err := h.AuthorDal.GetAuthor(authorID)
+	if err != nil {
+		fmt.Println("-----------err ", err)
+	}
+	model.Values["author"] = author
+
+	return model, nil
+}
+
 type AuthorValidator struct {
 }
 
