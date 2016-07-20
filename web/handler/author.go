@@ -8,12 +8,15 @@ import (
 	"net/http"
 
 	authordal "domain/author/dal"
+	authorservice "domain/author/service"
+
 	"fmt"
 	"web/validation"
 )
 
 type AuthorHandler struct {
-	AuthorDal authordal.AuthorDal
+	AuthorDal     authordal.AuthorDal
+	AuthorService authorservice.AuthorService
 }
 
 func (h *AuthorHandler) AddAuthor(w http.ResponseWriter, r *http.Request, s redissession.Session) (Model, error) {

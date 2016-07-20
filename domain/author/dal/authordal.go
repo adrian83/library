@@ -2,13 +2,17 @@ package dal
 
 import (
 	"domain/author/model"
-	"fmt"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
 const (
 	collectionName = "authors"
+
+	firstName = "firstName"
+	lastName  = "lastName"
+
+	id = "_id"
 )
 
 type AuthorDal interface {
@@ -32,7 +36,6 @@ type AuthorMongoDal struct {
 }
 
 func (d AuthorMongoDal) Add(author model.Author) error {
-
 	return d.collection.Insert(author)
 }
 
@@ -44,12 +47,9 @@ func (d AuthorMongoDal) GetAuthors() ([]model.Author, error) {
 
 func (d AuthorMongoDal) Update(author model.AuthorUpdate) error {
 	dict := make(map[string]interface{})
-
-	dict["firstname"] = author.FirstName
-
-	dict["lastname"] = *author.LastName
-	fmt.Println("-------------", dict)
-	return d.collection.Update(bson.M{"_id": bson.ObjectIdHex(author.ID)}, dict)
+	dict[firstName] = author.FirstName
+	dict[lastName] = *author.LastName
+	return d.collection.Update(bson.M{id: bson.ObjectIdHex(author.ID)}, dict)
 }
 
 func (d AuthorMongoDal) Delete(authorID string) error {

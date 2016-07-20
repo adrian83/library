@@ -14,6 +14,7 @@ import (
 	mysession "web/session"
 
 	authordal "domain/author/dal"
+	authorservice "domain/author/service"
 
 	"config"
 	"gopkg.in/mgo.v2"
@@ -106,10 +107,15 @@ func main() {
 	var authorDal authordal.AuthorDal = authordal.NewAuthorMongoDal(database)
 
 	// ---------------------------------------
+	// services
+	// ---------------------------------------
+	var authorService authorservice.AuthorService = authorservice.NewAuthorService(authorDal)
+
+	// ---------------------------------------
 	// handlers (controllers)
 	// ---------------------------------------
 	accountHandler := &handler.AccountHandler{}
-	authorHandler := &handler.AuthorHandler{AuthorDal: authorDal}
+	authorHandler := &handler.AuthorHandler{AuthorDal: authorDal, AuthorService: authorService}
 
 	// ---------------------------------------
 	// routing
