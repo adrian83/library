@@ -12,6 +12,8 @@ import (
 
 	"fmt"
 	"web/validation"
+
+	e "errors"
 )
 
 type AuthorHandler struct {
@@ -26,18 +28,18 @@ func (h *AuthorHandler) AddAuthor(w http.ResponseWriter, r *http.Request, s redi
 	decoder := json.NewDecoder(r.Body)
 	var author mymodel.Author
 	if err := decoder.Decode(&author); err != nil {
-		model.HttpStatus = http.StatusInternalServerError
-		model.Values["error"] = err.Error()
-		//http.Error(w, err.Error(), http.StatusInternalServerError)
+		model.Error500(err)
+		return model, err
 	}
 
 	var validator validation.Validator = &AuthorValidator{}
 	errors, ok := validator.Validate(author)
 	if !ok {
-		model.HttpStatus = http.StatusInternalServerError
-		model.Values["error"] = "type assertion error!"
-		return model, nil
+		err := e.New("type assertion error")
+		model.Error500(err)
+		return model, err
 	}
+
 	if len(errors) > 0 {
 		model.Values["validationErrors"] = errors
 		return model, nil
@@ -51,12 +53,14 @@ func (h *AuthorHandler) AddAuthor(w http.ResponseWriter, r *http.Request, s redi
 
 func (h *AuthorHandler) GetAuthors(w http.ResponseWriter, r *http.Request, s redissession.Session) (Model, error) {
 
+	model := NewModel()
+
 	authors, err := h.AuthorDal.GetAuthors()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		model.Error500(err)
+		return model, err
 	}
 
-	model := NewModel()
 	model.Values["authors"] = authors
 
 	return model, nil

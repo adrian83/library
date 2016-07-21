@@ -11,11 +11,20 @@ type ModelHandler interface {
 }
 */
 
+const (
+	errorProp = "error"
+)
+
 type Handler func(w http.ResponseWriter, r *http.Request, s redissession.Session) (Model, error)
 
 type Model struct {
 	Values     map[string]interface{}
 	HttpStatus int
+}
+
+func (m *Model) Error500(err error) {
+	m.Values[errorProp] = err.Error()
+	m.HttpStatus = http.StatusInternalServerError
 }
 
 func NewModel() Model {
