@@ -78,8 +78,6 @@ func (h *AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request, s r
 		model.Values["error"] = err.Error()
 	}
 
-	//fmt.Println("----------- ", *authorUpdate.LastName, *authorUpdate.FirstName)
-
 	authorUpdate.ID = authorID
 
 	var validator validation.Validator = &AuthorUpdateValidator{}
@@ -90,16 +88,17 @@ func (h *AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request, s r
 		return model, nil
 	}
 	if len(errors) > 0 {
+		model.HttpStatus = http.StatusBadRequest
 		model.Values["validationErrors"] = errors
 		return model, nil
 	}
 
 	err := h.AuthorDal.Update(authorUpdate)
 	if err != nil {
-		fmt.Println("-----------err ", err)
+		model.HttpStatus = http.StatusInternalServerError
+		model.Values["error"] = err.Error()
+		return model, nil
 	}
-
-	//model.Values["author"] = authorUpdate
 
 	return model, nil
 }
@@ -113,7 +112,9 @@ func (h *AuthorHandler) DeleteAuthor(w http.ResponseWriter, r *http.Request, s r
 
 	err := h.AuthorDal.Delete(authorID)
 	if err != nil {
-		fmt.Println("-----------err ", err)
+		model.HttpStatus = http.StatusInternalServerError
+		model.Values["validationErrors"] = err.Error()
+		return model, nil
 	}
 
 	return model, nil
@@ -128,7 +129,9 @@ func (h *AuthorHandler) GetAuthor(w http.ResponseWriter, r *http.Request, s redi
 
 	author, err := h.AuthorDal.GetAuthor(authorID)
 	if err != nil {
-		fmt.Println("-----------err ", err)
+		model.HttpStatus = http.StatusInternalServerError
+		model.Values["error"] = err.Error()
+		return model, nil
 	}
 	model.Values["author"] = author
 
