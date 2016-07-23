@@ -28,21 +28,17 @@ func (h *AuthorHandler) AddAuthor(w http.ResponseWriter, r *http.Request, s redi
 	decoder := json.NewDecoder(r.Body)
 	var author mymodel.Author
 	if err := decoder.Decode(&author); err != nil {
-		model.Error500(err)
-		return model, err
+		return model, Error500(err)
 	}
 
 	var validator validation.Validator = &AuthorValidator{}
 	errors, ok := validator.Validate(author)
 	if !ok {
-		err := e.New("type assertion error")
-		model.Error500(err)
-		return model, err
+		return model, Error500(e.New("type assertion error"))
 	}
 
 	if len(errors) > 0 {
-		model.Values["validationErrors"] = errors
-		return model, nil
+		return model, Error400(errors)
 	}
 
 	h.AuthorDal.Add(author)
