@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"github.com/adrian83/go-redis-session"
+	"github.com/gorilla/mux"
 	"net/http"
 	"web/validation"
 )
@@ -36,14 +37,37 @@ func NewModel() Model {
 	}
 }
 
+func GetPathParam(r *http.Request, name string) string {
+	vars := mux.Vars(r)
+	return vars[name]
+}
+
 type AppError struct {
-	HttpStatus int    `json:"httpStatus"`
-	Code       string `json:"code"`
-	Message    string `json:"message"`
+	HttpStatus int
+	Code       string
+	Message    string
+	model      map[string]interface{}
 }
 
 func (e *AppError) Error() string {
 	return fmt.Sprintf("Error {HttpStatus: %v, Code: %v, Message: %v}", e.HttpStatus, e.Code, e.Message)
+}
+
+func (e *AppError) Dict() map[string]interface{} {
+
+	info := make(map[string]interface{})
+	info["HttpStatus"] = e.HttpStatus
+	info["Code"] = e.Code
+	info["Message"] = e.Message
+
+	model := make(map[string]interface{})
+	model["generalInformation"] = info
+
+	for k, v := range e.model {
+		model[k] = v
+	}
+
+	return model
 }
 
 func Error500(err error) *AppError {
@@ -54,22 +78,11 @@ func Error500(err error) *AppError {
 	}
 }
 
-type ValidationError struct {
-	AppError
-	ValidationErrors []validation.ValidationError `json:"validationErrors"`
-}
-
-func (e *ValidationError) Error() string {
-	return fmt.Sprintf("ValidationError {HttpStatus: %v, Code: %v, Message: %v, ValidationErrors: %v}", e.HttpStatus,
-		e.Code, e.Message, e.ValidationErrors)
-}
-
-func Error400(errors []validation.ValidationError) *ValidationError {
-	appError := AppError{
+func Error400(errors []validation.ValidationError) *AppError {
+	return &AppError{
 		HttpStatus: http.StatusBadRequest,
 		Code:       "error.generic.400",
 		Message:    "problem with validation",
+		model:      map[string]interface{}{"validationErrors": errors},
 	}
-
-	return &ValidationError{appError, errors}
 }

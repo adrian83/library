@@ -10,7 +10,6 @@ import (
 	authordal "domain/author/dal"
 	authorservice "domain/author/service"
 
-	"fmt"
 	"web/validation"
 
 	e "errors"
@@ -53,8 +52,7 @@ func (h *AuthorHandler) GetAuthors(w http.ResponseWriter, r *http.Request, s red
 
 	authors, err := h.AuthorDal.GetAuthors()
 	if err != nil {
-		model.Error500(err)
-		return model, err
+		return model, Error500(err)
 	}
 
 	model.Values["authors"] = authors
@@ -64,18 +62,14 @@ func (h *AuthorHandler) GetAuthors(w http.ResponseWriter, r *http.Request, s red
 
 func (h *AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request, s redissession.Session) (Model, error) {
 
-	vars := mux.Vars(r)
-	authorID := vars["author_id"]
-
-	fmt.Println("-----------", authorID)
+	authorID := GetPathParam(r, "author_id")
 
 	model := NewModel()
 
 	decoder := json.NewDecoder(r.Body)
 	var authorUpdate mymodel.AuthorUpdate
 	if err := decoder.Decode(&authorUpdate); err != nil {
-		model.HttpStatus = http.StatusInternalServerError
-		model.Values["error"] = err.Error()
+		return model, Error500(err)
 	}
 
 	authorUpdate.ID = authorID
@@ -83,21 +77,14 @@ func (h *AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request, s r
 	var validator validation.Validator = &AuthorUpdateValidator{}
 	errors, ok := validator.Validate(authorUpdate)
 	if !ok {
-		model.HttpStatus = http.StatusInternalServerError
-		model.Values["error"] = "type assertion error!"
-		return model, nil
+		return model, Error500(e.New("type assertion error"))
 	}
 	if len(errors) > 0 {
-		model.HttpStatus = http.StatusBadRequest
-		model.Values["validationErrors"] = errors
-		return model, nil
+		return model, Error400(errors)
 	}
 
-	err := h.AuthorDal.Update(authorUpdate)
-	if err != nil {
-		model.HttpStatus = http.StatusInternalServerError
-		model.Values["error"] = err.Error()
-		return model, nil
+	if err := h.AuthorDal.Update(authorUpdate); err != nil {
+		return model, Error500(err)
 	}
 
 	return model, nil
@@ -105,16 +92,13 @@ func (h *AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request, s r
 
 func (h *AuthorHandler) DeleteAuthor(w http.ResponseWriter, r *http.Request, s redissession.Session) (Model, error) {
 
-	vars := mux.Vars(r)
-	authorID := vars["author_id"]
+	authorID := GetPathParam(r, "author_id")
 
 	model := NewModel()
 
 	err := h.AuthorDal.Delete(authorID)
 	if err != nil {
-		model.HttpStatus = http.StatusInternalServerError
-		model.Values["validationErrors"] = err.Error()
-		return model, nil
+		return model, Error500(err)
 	}
 
 	return model, nil
@@ -129,9 +113,7 @@ func (h *AuthorHandler) GetAuthor(w http.ResponseWriter, r *http.Request, s redi
 
 	author, err := h.AuthorDal.GetAuthor(authorID)
 	if err != nil {
-		model.HttpStatus = http.StatusInternalServerError
-		model.Values["error"] = err.Error()
-		return model, nil
+		return model, Error500(err)
 	}
 	model.Values["author"] = author
 
@@ -150,12 +132,7 @@ func (v *AuthorValidator) Validate(entity interface{}) ([]validation.ValidationE
 	}
 
 	if validation.IsStringEmpty(author.LastName) {
-		e := validation.ValidationError{
-			Field:   "LastName",
-			Code:    "author.lastName",
-			Message: "Author's last name cannot be empty"}
-
-		errors = append(errors, e)
+		errors = append(errors, validation.EmptyAuthorLastName)
 	}
 
 	return errors, true
@@ -173,12 +150,7 @@ func (v *AuthorUpdateValidator) Validate(entity interface{}) ([]validation.Valid
 	}
 
 	if validation.IsStringPtrNil(author.LastName) || validation.IsStringEmpty(*author.LastName) {
-		e := validation.ValidationError{
-			Field:   "LastName",
-			Code:    "author.lastName",
-			Message: "Author's last name cannot be empty"}
-
-		errors = append(errors, e)
+		errors = append(errors, validation.EmptyAuthorLastName)
 	}
 
 	return errors, true

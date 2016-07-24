@@ -31,5 +31,5 @@ func (h *HttpHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *HttpHandler) htmlPath() string {
-	return "../static/templates/html/" + h.View + ".html"
+	return "static/templates/html/" + h.View + ".html"
 }

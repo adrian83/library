@@ -22,29 +22,12 @@ func (h *JsonHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	model, err := h.Handler(w, req)
 	if err != nil {
 
-		// validation
-
-		valError, ok := err.(*handler.ValidationError)
-
-		if ok {
-
-			errJSON, err2 := json.Marshal(valError.ValidationErrors)
-			if err2 != nil {
-				http.Error(w, err2.Error(), http.StatusInternalServerError)
-				return
-			}
-
-			http.Error(w, string(errJSON), valError.HttpStatus)
-
-			return
-		}
-
 		appError, ok := err.(*handler.AppError)
 		if !ok {
 			appError = handler.Error500(err)
 		}
 
-		errJSON, err2 := json.Marshal(appError)
+		errJSON, err2 := json.Marshal(appError.Dict())
 		if err2 != nil {
 			http.Error(w, err2.Error(), http.StatusInternalServerError)
 			return
