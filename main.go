@@ -16,6 +16,9 @@ import (
 	authordal "domain/author/dal"
 	authorservice "domain/author/service"
 
+	bookdal "domain/book/dal"
+	bookservice "domain/book/service"
+
 	"config"
 	"gopkg.in/mgo.v2"
 )
@@ -105,17 +108,20 @@ func main() {
 	// dals
 	// ---------------------------------------
 	var authorDal authordal.AuthorDal = authordal.NewAuthorMongoDal(database)
+	var bookDal bookdal.BookDal = bookdal.NewBookMongoDal(database)
 
 	// ---------------------------------------
 	// services
 	// ---------------------------------------
 	var authorService authorservice.AuthorService = authorservice.NewAuthorService(authorDal)
+	var bookService bookservice.BookService = bookservice.NewBookServiceImpl(bookDal)
 
 	// ---------------------------------------
 	// handlers (controllers)
 	// ---------------------------------------
 	accountHandler := &handler.AccountHandler{}
 	authorHandler := &handler.AuthorHandler{AuthorDal: authorDal, AuthorService: authorService}
+	bookHandler := &handler.BookHandler{BookService: bookService}
 
 	// ---------------------------------------
 	// routing
@@ -142,6 +148,11 @@ func main() {
 		Handler: mysession.WithSession(sessionStore, authorHandler.DeleteAuthor)}).Methods("DELETE")
 	mux.Handle("/rest/api/v1.0/authors/{author_id}", &myjson.JsonHandler{
 		Handler: mysession.WithSession(sessionStore, authorHandler.GetAuthor)}).Methods("GET")
+
+	mux.Handle("/rest/api/v1.0/books", &myjson.JsonHandler{
+		Handler: mysession.WithSession(sessionStore, bookHandler.AddBook)}).Methods("POST")
+	mux.Handle("/rest/api/v1.0/books", &myjson.JsonHandler{
+		Handler: mysession.WithSession(sessionStore, bookHandler.GetBooks)}).Methods("GET")
 
 	// ---------------------------------------
 	// server

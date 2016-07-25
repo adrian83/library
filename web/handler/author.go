@@ -4,7 +4,6 @@ import (
 	mymodel "domain/author/model"
 	"encoding/json"
 	"github.com/adrian83/go-redis-session"
-	"github.com/gorilla/mux"
 	"net/http"
 
 	authordal "domain/author/dal"
@@ -106,8 +105,7 @@ func (h *AuthorHandler) DeleteAuthor(w http.ResponseWriter, r *http.Request, s r
 
 func (h *AuthorHandler) GetAuthor(w http.ResponseWriter, r *http.Request, s redissession.Session) (Model, error) {
 
-	vars := mux.Vars(r)
-	authorID := vars["author_id"]
+	authorID := GetPathParam(r, "author_id")
 
 	model := NewModel()
 
