@@ -1,12 +1,13 @@
 package service
 
 import (
+	authordal "domain/author/dal"
 	"domain/book/dal"
 	"domain/book/model"
 )
 
 type BookService interface {
-	Add(book model.Book) error
+	Add(book model.NewBook) error
 	GetBooks() ([]model.Book, error)
 	Update(book model.BookUpdate) error
 	Delete(bookID string) error
@@ -14,14 +15,32 @@ type BookService interface {
 }
 
 type BookServiceImpl struct {
-	bookDal dal.BookDal
+	bookDal   dal.BookDal
+	authorDal authordal.AuthorDal
 }
 
-func NewBookServiceImpl(bookDal dal.BookDal) BookService {
-	return BookServiceImpl{bookDal: bookDal}
+func NewBookServiceImpl(bookDal dal.BookDal, authorDal authordal.AuthorDal) BookService {
+	return BookServiceImpl{
+		bookDal:   bookDal,
+		authorDal: authorDal,
+	}
 }
 
-func (s BookServiceImpl) Add(book model.Book) error {
+func (s BookServiceImpl) Add(newBook model.NewBook) error {
+
+	authors := make([]model.Author, 0)
+	ats, err := s.authorDal.FindAuthorsByIDs(newBook.AuthorID)
+	if err != nil {
+		return err
+	}
+
+	for _, at := range ats {
+		a := model.Author{ID: at.ID, FullName: at.FirstName + " " + at.LastName}
+		authors = append(authors, a)
+	}
+
+	book := model.Book{Title: newBook.Title, Authors: authors}
+
 	return s.bookDal.Add(book)
 }
 

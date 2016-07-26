@@ -1,16 +1,24 @@
 package handler
 
 import (
-	mymodel "domain/book/model"
+	// std lib
 	"encoding/json"
-	"github.com/adrian83/go-redis-session"
+	"errors"
 	"net/http"
 
+	// ours
+	bookmodel "domain/book/model"
 	bookservice "domain/book/service"
-
 	"web/validation"
 
-	e "errors"
+	// 3th party
+	"github.com/adrian83/go-redis-session"
+)
+
+const (
+	bookIDLabel = "book_id"
+	bookLabel   = "book"
+	booksLabel  = "books"
 )
 
 type BookHandler struct {
@@ -22,23 +30,23 @@ func (h *BookHandler) AddBook(w http.ResponseWriter, r *http.Request, s redisses
 	model := NewModel()
 
 	decoder := json.NewDecoder(r.Body)
-	var book mymodel.Book
-	if err := decoder.Decode(&book); err != nil {
+	var newBook bookmodel.NewBook
+	if err := decoder.Decode(&newBook); err != nil {
 		return model, Error500(err)
 	}
 
 	var validator validation.Validator = &BookValidator{}
-	errors, ok := validator.Validate(book)
+	errs, ok := validator.Validate(newBook)
 	if !ok {
-		return model, Error500(e.New("type assertion error"))
+		return model, Error500(errors.New("type assertion error"))
 	}
 
-	if len(errors) > 0 {
-		return model, Error400(errors)
+	if len(errs) > 0 {
+		return model, Error400(errs)
 	}
 
-	h.BookService.Add(book)
-	model.Values["book"] = book
+	h.BookService.Add(newBook)
+	model.Values[bookLabel] = newBook
 
 	return model, nil
 }
@@ -52,7 +60,22 @@ func (h *BookHandler) GetBooks(w http.ResponseWriter, r *http.Request, s redisse
 		return model, Error500(err)
 	}
 
-	model.Values["books"] = books
+	model.Values[booksLabel] = books
+
+	return model, nil
+}
+
+func (h *BookHandler) GetBook(w http.ResponseWriter, r *http.Request, s redissession.Session) (Model, error) {
+
+	bookID := GetPathParam(r, bookIDLabel)
+
+	model := NewModel()
+
+	book, err := h.BookService.GetBook(bookID)
+	if err != nil {
+		return model, Error500(err)
+	}
+	model.Values[bookLabel] = book
 
 	return model, nil
 }
@@ -63,13 +86,17 @@ type BookValidator struct {
 func (v *BookValidator) Validate(entity interface{}) ([]validation.ValidationError, bool) {
 	errors := make([]validation.ValidationError, 0)
 
-	book, ok := entity.(mymodel.Book)
+	book, ok := entity.(bookmodel.NewBook)
 	if !ok {
 		return errors, ok
 	}
 
 	if validation.IsStringEmpty(book.Title) {
 		errors = append(errors, validation.EmptyBookTitle)
+	}
+
+	if len(book.AuthorID) == 0 {
+		errors = append(errors, validation.EmptyAuthorList)
 	}
 
 	return errors, true

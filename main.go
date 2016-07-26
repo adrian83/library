@@ -114,7 +114,7 @@ func main() {
 	// services
 	// ---------------------------------------
 	var authorService authorservice.AuthorService = authorservice.NewAuthorService(authorDal)
-	var bookService bookservice.BookService = bookservice.NewBookServiceImpl(bookDal)
+	var bookService bookservice.BookService = bookservice.NewBookServiceImpl(bookDal, authorDal)
 
 	// ---------------------------------------
 	// handlers (controllers)
@@ -153,7 +153,8 @@ func main() {
 		Handler: mysession.WithSession(sessionStore, bookHandler.AddBook)}).Methods("POST")
 	mux.Handle("/rest/api/v1.0/books", &myjson.JsonHandler{
 		Handler: mysession.WithSession(sessionStore, bookHandler.GetBooks)}).Methods("GET")
-
+	mux.Handle("/rest/api/v1.0/books/{book_id}", &myjson.JsonHandler{
+		Handler: mysession.WithSession(sessionStore, bookHandler.GetBook)}).Methods("GET")
 	// ---------------------------------------
 	// server
 	// ---------------------------------------

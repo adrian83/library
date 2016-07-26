@@ -86,3 +86,11 @@ func Error400(errors []validation.ValidationError) *AppError {
 		model:      map[string]interface{}{"validationErrors": errors},
 	}
 }
+
+func Error404() *AppError {
+	return &AppError{
+		HttpStatus: http.StatusNotFound,
+		Code:       "error.generic.404",
+		Message:    "not found",
+	}
+}
