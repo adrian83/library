@@ -2,6 +2,14 @@ package validation
 
 import (
 	"fmt"
+	"gopkg.in/mgo.v2/bson"
+)
+
+var (
+	InvalidID = ValidationError{
+		Field:   "id",
+		Code:    "id",
+		Message: "Invalid Id"}
 )
 
 type ValidationError struct {
@@ -24,4 +32,8 @@ func IsStringEmpty(str string) bool {
 
 func IsStringPtrNil(str *string) bool {
 	return str == nil
+}
+
+func IsIDValid(id string) bool {
+	return len(id) == 24 && bson.ObjectIdHex(id).Valid()
 }

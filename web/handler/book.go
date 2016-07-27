@@ -45,9 +45,12 @@ func (h *BookHandler) AddBook(w http.ResponseWriter, r *http.Request, s redisses
 		return model, Error400(errs)
 	}
 
-	h.BookService.Add(newBook)
-	model.Values[bookLabel] = newBook
+	book, err := h.BookService.Add(newBook)
+	if err != nil {
+		return model, Error500(err)
+	}
 
+	model.Values[bookLabel] = book
 	return model, nil
 }
 
@@ -67,14 +70,21 @@ func (h *BookHandler) GetBooks(w http.ResponseWriter, r *http.Request, s redisse
 
 func (h *BookHandler) GetBook(w http.ResponseWriter, r *http.Request, s redissession.Session) (Model, error) {
 
-	bookID := GetPathParam(r, bookIDLabel)
-
 	model := NewModel()
 
-	book, err := h.BookService.GetBook(bookID)
+	bookID := GetPathParam(r, bookIDLabel)
+	if !validation.IsIDValid(bookID) {
+		return model, Error400([]validation.ValidationError{validation.InvalidID})
+	}
+
+	book, ok, err := h.BookService.GetBook(bookID)
 	if err != nil {
 		return model, Error500(err)
 	}
+	if !ok {
+		return model, Error404()
+	}
+
 	model.Values[bookLabel] = book
 
 	return model, nil

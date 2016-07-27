@@ -7,11 +7,11 @@ import (
 )
 
 type BookService interface {
-	Add(book model.NewBook) error
+	Add(book model.NewBook) (model.Book, error)
 	GetBooks() ([]model.Book, error)
 	Update(book model.BookUpdate) error
 	Delete(bookID string) error
-	GetBook(bookID string) (model.Book, error)
+	GetBook(bookID string) (model.Book, bool, error)
 }
 
 type BookServiceImpl struct {
@@ -26,12 +26,12 @@ func NewBookServiceImpl(bookDal dal.BookDal, authorDal authordal.AuthorDal) Book
 	}
 }
 
-func (s BookServiceImpl) Add(newBook model.NewBook) error {
+func (s BookServiceImpl) Add(newBook model.NewBook) (model.Book, error) {
 
 	authors := make([]model.Author, 0)
 	ats, err := s.authorDal.FindAuthorsByIDs(newBook.AuthorID)
 	if err != nil {
-		return err
+		return model.Book{}, err
 	}
 
 	for _, at := range ats {
@@ -56,6 +56,6 @@ func (s BookServiceImpl) Delete(bookID string) error {
 	return s.bookDal.Delete(bookID)
 }
 
-func (s BookServiceImpl) GetBook(bookID string) (model.Book, error) {
+func (s BookServiceImpl) GetBook(bookID string) (model.Book, bool, error) {
 	return s.bookDal.GetBook(bookID)
 }

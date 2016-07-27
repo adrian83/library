@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	defSessionDuration = time.Duration(5) * time.Minute
+	defSessionDuration = time.Duration(1000) * time.Minute
 )
 
 type SessionHandler func(w http.ResponseWriter, r *http.Request, s redissession.Session) (handler.Model, error)

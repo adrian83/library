@@ -16,11 +16,11 @@ const (
 )
 
 type BookDal interface {
-	Add(book model.Book) error
+	Add(book model.Book) (model.Book, error)
 	GetBooks() ([]model.Book, error)
 	Update(book model.BookUpdate) error
 	Delete(bookID string) error
-	GetBook(bookID string) (model.Book, error)
+	GetBook(bookID string) (model.Book, bool, error)
 }
 
 func NewBookMongoDal(database *mgo.Database) *BookMongoDal {
@@ -35,8 +35,9 @@ type BookMongoDal struct {
 	collection *mgo.Collection
 }
 
-func (d BookMongoDal) Add(book model.Book) error {
-	return d.collection.Insert(book)
+func (d BookMongoDal) Add(book model.Book) (model.Book, error) {
+	err := d.collection.Insert(book)
+	return book, err
 }
 
 func (d BookMongoDal) GetBooks() ([]model.Book, error) {
@@ -56,8 +57,11 @@ func (d BookMongoDal) Delete(bookID string) error {
 	return d.collection.RemoveId(bson.ObjectIdHex(bookID))
 }
 
-func (d BookMongoDal) GetBook(bookID string) (model.Book, error) {
+func (d BookMongoDal) GetBook(bookID string) (model.Book, bool, error) {
 	book := new(model.Book)
 	err := d.collection.FindId(bson.ObjectIdHex(bookID)).One(book)
-	return *book, err
+	if err != nil && err == mgo.ErrNotFound {
+		return *book, false, nil
+	}
+	return *book, true, err
 }
