@@ -6,7 +6,7 @@ import (
 )
 
 type AuthorService interface {
-	Add(author model.Author) error
+	Add(author model.Author) (model.Author, error)
 	GetAuthors() ([]model.Author, error)
 	Update(author model.AuthorUpdate) error
 	Delete(authorID string) error
@@ -21,7 +21,7 @@ func NewAuthorService(authorDal dal.AuthorDal) AuthorService {
 	return AuthorServiceImpl{authorDal: authorDal}
 }
 
-func (s AuthorServiceImpl) Add(author model.Author) error {
+func (s AuthorServiceImpl) Add(author model.Author) (model.Author, error) {
 	return s.authorDal.Add(author)
 }
 

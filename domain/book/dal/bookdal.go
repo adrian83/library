@@ -36,6 +36,7 @@ type BookMongoDal struct {
 }
 
 func (d BookMongoDal) Add(book model.Book) (model.Book, error) {
+	book.ID = bson.NewObjectId()
 	err := d.collection.Insert(book)
 	return book, err
 }

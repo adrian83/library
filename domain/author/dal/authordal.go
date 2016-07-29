@@ -16,7 +16,7 @@ const (
 )
 
 type AuthorDal interface {
-	Add(author model.Author) error
+	Add(author model.Author) (model.Author, error)
 	GetAuthors() ([]model.Author, error)
 	Update(author model.AuthorUpdate) error
 	Delete(authorID string) error
@@ -36,8 +36,9 @@ type AuthorMongoDal struct {
 	collection *mgo.Collection
 }
 
-func (d AuthorMongoDal) Add(author model.Author) error {
-	return d.collection.Insert(author)
+func (d AuthorMongoDal) Add(author model.Author) (model.Author, error) {
+	author.ID = bson.NewObjectId()
+	return author, d.collection.Insert(author)
 }
 
 func (d AuthorMongoDal) GetAuthors() ([]model.Author, error) {

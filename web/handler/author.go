@@ -39,9 +39,12 @@ func (h *AuthorHandler) AddAuthor(w http.ResponseWriter, r *http.Request, s redi
 		return model, Error400(errors)
 	}
 
-	h.AuthorDal.Add(author)
-	model.Values["author"] = author
+	author, err := h.AuthorDal.Add(author)
+	if err != nil {
+		return model, Error500(err)
+	}
 
+	model.Values["author"] = author
 	return model, nil
 }
 
