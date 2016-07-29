@@ -16,8 +16,7 @@ import (
 	authordal "domain/author/dal"
 	authorservice "domain/author/service"
 
-	bookdal "domain/book/dal"
-	bookservice "domain/book/service"
+	book "domain/book"
 
 	"config"
 	"gopkg.in/mgo.v2"
@@ -108,13 +107,13 @@ func main() {
 	// dals
 	// ---------------------------------------
 	var authorDal authordal.AuthorDal = authordal.NewAuthorMongoDal(database)
-	var bookDal bookdal.BookDal = bookdal.NewBookMongoDal(database)
+	var bookDal book.BookDal = book.NewBookMongoDal(database)
 
 	// ---------------------------------------
 	// services
 	// ---------------------------------------
 	var authorService authorservice.AuthorService = authorservice.NewAuthorService(authorDal)
-	var bookService bookservice.BookService = bookservice.NewBookServiceImpl(bookDal, authorDal)
+	var bookService book.BookService = book.NewBookServiceImpl(bookDal, authorDal)
 
 	// ---------------------------------------
 	// handlers (controllers)

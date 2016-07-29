@@ -1,7 +1,6 @@
-package dal
+package book
 
 import (
-	"domain/book/model"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -16,11 +15,11 @@ const (
 )
 
 type BookDal interface {
-	Add(book model.Book) (model.Book, error)
-	GetBooks() ([]model.Book, error)
-	Update(book model.BookUpdate) error
+	Add(book Book) (Book, error)
+	GetBooks() ([]Book, error)
+	Update(book BookUpdate) error
 	Delete(bookID string) error
-	GetBook(bookID string) (model.Book, bool, error)
+	GetBook(bookID string) (Book, bool, error)
 }
 
 func NewBookMongoDal(database *mgo.Database) *BookMongoDal {
@@ -35,19 +34,19 @@ type BookMongoDal struct {
 	collection *mgo.Collection
 }
 
-func (d BookMongoDal) Add(book model.Book) (model.Book, error) {
+func (d BookMongoDal) Add(book Book) (Book, error) {
 	book.ID = bson.NewObjectId()
 	err := d.collection.Insert(book)
 	return book, err
 }
 
-func (d BookMongoDal) GetBooks() ([]model.Book, error) {
-	books := make([]model.Book, 0)
+func (d BookMongoDal) GetBooks() ([]Book, error) {
+	books := make([]Book, 0)
 	err := d.collection.Find(nil).All(&books)
 	return books, err
 }
 
-func (d BookMongoDal) Update(book model.BookUpdate) error {
+func (d BookMongoDal) Update(book BookUpdate) error {
 	dict := make(map[string]interface{})
 	if book.Title != nil {
 		dict[title] = book.Title
@@ -63,8 +62,8 @@ func (d BookMongoDal) Delete(bookID string) error {
 	return d.collection.RemoveId(bson.ObjectIdHex(bookID))
 }
 
-func (d BookMongoDal) GetBook(bookID string) (model.Book, bool, error) {
-	book := new(model.Book)
+func (d BookMongoDal) GetBook(bookID string) (Book, bool, error) {
+	book := new(Book)
 	err := d.collection.FindId(bson.ObjectIdHex(bookID)).One(book)
 	if err != nil && err == mgo.ErrNotFound {
 		return *book, false, nil

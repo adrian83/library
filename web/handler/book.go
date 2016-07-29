@@ -7,8 +7,7 @@ import (
 	"net/http"
 
 	// ours
-	bookmodel "domain/book/model"
-	bookservice "domain/book/service"
+	book "domain/book"
 	"web/validation"
 
 	// 3th party
@@ -22,7 +21,7 @@ const (
 )
 
 type BookHandler struct {
-	BookService bookservice.BookService
+	BookService book.BookService
 }
 
 func (h *BookHandler) AddBook(w http.ResponseWriter, r *http.Request, s session.Session) (Model, error) {
@@ -30,7 +29,7 @@ func (h *BookHandler) AddBook(w http.ResponseWriter, r *http.Request, s session.
 	model := NewModel()
 
 	decoder := json.NewDecoder(r.Body)
-	var newBook bookmodel.NewBook
+	var newBook book.NewBook
 	if err := decoder.Decode(&newBook); err != nil {
 		return model, Error500(err)
 	}
@@ -113,7 +112,7 @@ func (h *BookHandler) UpdateBook(w http.ResponseWriter, r *http.Request, s sessi
 		return model, Error400([]validation.ValidationError{validation.InvalidID})
 	}
 
-	var bookUpdate bookmodel.BookUpdate
+	var bookUpdate book.BookUpdate
 	if err := json.NewDecoder(r.Body).Decode(&bookUpdate); err != nil {
 		return model, Error500(err)
 	}
@@ -142,7 +141,7 @@ type BookValidator struct {
 func (v *BookValidator) Validate(entity interface{}) ([]validation.ValidationError, bool) {
 	errors := make([]validation.ValidationError, 0)
 
-	book, ok := entity.(bookmodel.NewBook)
+	book, ok := entity.(book.NewBook)
 	if !ok {
 		return errors, ok
 	}
@@ -164,7 +163,7 @@ type BookUpdateValidator struct {
 func (v *BookUpdateValidator) Validate(entity interface{}) ([]validation.ValidationError, bool) {
 	errors := make([]validation.ValidationError, 0)
 
-	book, ok := entity.(bookmodel.BookUpdate)
+	book, ok := entity.(book.BookUpdate)
 	if !ok {
 		return errors, ok
 	}
