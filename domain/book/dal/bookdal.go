@@ -52,6 +52,9 @@ func (d BookMongoDal) Update(book model.BookUpdate) error {
 	if book.Title != nil {
 		dict[title] = book.Title
 	}
+	if len(book.Authors) > 0 {
+		dict[authors] = book.Authors
+	}
 	//dict[authors] = *book.LastName
 	return d.collection.Update(bson.M{id: bson.ObjectIdHex(book.ID)}, dict)
 }

@@ -49,6 +49,19 @@ func (s BookServiceImpl) GetBooks() ([]model.Book, error) {
 }
 
 func (s BookServiceImpl) Update(book model.BookUpdate) error {
+	if book.AuthorID != nil {
+		authors := make([]model.Author, 0)
+		ats, err := s.authorDal.FindAuthorsByIDs(book.AuthorID)
+		if err != nil {
+			return err
+		}
+
+		for _, at := range ats {
+			a := model.Author{ID: at.ID, FullName: at.FirstName + " " + at.LastName}
+			authors = append(authors, a)
+		}
+		book.Authors = authors
+	}
 	return s.bookDal.Update(book)
 }
 
