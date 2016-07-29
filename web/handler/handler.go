@@ -18,7 +18,7 @@ const (
 	errorProp = "error"
 )
 
-type Handler func(w http.ResponseWriter, r *http.Request, s redissession.Session) (Model, error)
+type Handler func(w http.ResponseWriter, r *http.Request, s session.Session) (Model, error)
 
 type Model struct {
 	Values     map[string]interface{}

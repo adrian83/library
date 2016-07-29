@@ -10,7 +10,7 @@ import (
 type AccountHandler struct {
 }
 
-func (h *AccountHandler) Login(w http.ResponseWriter, r *http.Request, s redissession.Session) (Model, error) {
+func (h *AccountHandler) Login(w http.ResponseWriter, r *http.Request, s session.Session) (Model, error) {
 
 	decoder := json.NewDecoder(r.Body)
 	var user model.User

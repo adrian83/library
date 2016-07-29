@@ -19,7 +19,7 @@ type AuthorHandler struct {
 	AuthorService authorservice.AuthorService
 }
 
-func (h *AuthorHandler) AddAuthor(w http.ResponseWriter, r *http.Request, s redissession.Session) (Model, error) {
+func (h *AuthorHandler) AddAuthor(w http.ResponseWriter, r *http.Request, s session.Session) (Model, error) {
 
 	model := NewModel()
 
@@ -48,7 +48,7 @@ func (h *AuthorHandler) AddAuthor(w http.ResponseWriter, r *http.Request, s redi
 	return model, nil
 }
 
-func (h *AuthorHandler) GetAuthors(w http.ResponseWriter, r *http.Request, s redissession.Session) (Model, error) {
+func (h *AuthorHandler) GetAuthors(w http.ResponseWriter, r *http.Request, s session.Session) (Model, error) {
 
 	model := NewModel()
 
@@ -62,7 +62,7 @@ func (h *AuthorHandler) GetAuthors(w http.ResponseWriter, r *http.Request, s red
 	return model, nil
 }
 
-func (h *AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request, s redissession.Session) (Model, error) {
+func (h *AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request, s session.Session) (Model, error) {
 
 	authorID := GetPathParam(r, "author_id")
 
@@ -92,7 +92,7 @@ func (h *AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request, s r
 	return model, nil
 }
 
-func (h *AuthorHandler) DeleteAuthor(w http.ResponseWriter, r *http.Request, s redissession.Session) (Model, error) {
+func (h *AuthorHandler) DeleteAuthor(w http.ResponseWriter, r *http.Request, s session.Session) (Model, error) {
 
 	authorID := GetPathParam(r, "author_id")
 
@@ -106,7 +106,7 @@ func (h *AuthorHandler) DeleteAuthor(w http.ResponseWriter, r *http.Request, s r
 	return model, nil
 }
 
-func (h *AuthorHandler) GetAuthor(w http.ResponseWriter, r *http.Request, s redissession.Session) (Model, error) {
+func (h *AuthorHandler) GetAuthor(w http.ResponseWriter, r *http.Request, s session.Session) (Model, error) {
 
 	authorID := GetPathParam(r, "author_id")
 

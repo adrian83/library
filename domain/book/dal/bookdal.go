@@ -49,7 +49,9 @@ func (d BookMongoDal) GetBooks() ([]model.Book, error) {
 
 func (d BookMongoDal) Update(book model.BookUpdate) error {
 	dict := make(map[string]interface{})
-	dict[title] = book.Title
+	if book.Title != nil {
+		dict[title] = book.Title
+	}
 	//dict[authors] = *book.LastName
 	return d.collection.Update(bson.M{id: bson.ObjectIdHex(book.ID)}, dict)
 }

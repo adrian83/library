@@ -22,6 +22,7 @@ type NewBook struct {
 }
 
 type BookUpdate struct {
-	ID    string
-	Title *string
+	ID       string
+	Title    *string  `json:"title,omitempty"`
+	AuthorID []string `json:"authorId,omitempty"`
 }

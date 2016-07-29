@@ -27,7 +27,7 @@ var (
 	id = 0
 )
 
-func Index(w http.ResponseWriter, r *http.Request, s redissession.Session) (handler.Model, error) {
+func Index(w http.ResponseWriter, r *http.Request, s session.Session) (handler.Model, error) {
 
 	var val int = 0
 
@@ -77,7 +77,7 @@ func main() {
 	// ---------------------------------------
 	// session
 	// ---------------------------------------
-	sessionStoreConfig := redissession.Config{
+	sessionStoreConfig := session.Config{
 		DB:       appConfig.Session.Redis.DB,
 		Password: appConfig.Session.Redis.Password,
 		Host:     appConfig.Session.Redis.Host,
@@ -85,7 +85,7 @@ func main() {
 		IDLength: appConfig.Session.IDLength,
 	}
 
-	sessionStore, err := redissession.NewSessionStore(sessionStoreConfig)
+	sessionStore, err := session.NewSessionStore(sessionStoreConfig)
 	if err != nil {
 		panic(fmt.Sprintf("SessionStore cannot be created because of: %v", err))
 	}
@@ -154,7 +154,12 @@ func main() {
 	mux.Handle("/rest/api/v1.0/books", &myjson.JsonHandler{
 		Handler: mysession.WithSession(sessionStore, bookHandler.GetBooks)}).Methods("GET")
 	mux.Handle("/rest/api/v1.0/books/{book_id}", &myjson.JsonHandler{
+		Handler: mysession.WithSession(sessionStore, bookHandler.UpdateBook)}).Methods("PUT")
+	mux.Handle("/rest/api/v1.0/books/{book_id}", &myjson.JsonHandler{
+		Handler: mysession.WithSession(sessionStore, bookHandler.DeleteBook)}).Methods("DELETE")
+	mux.Handle("/rest/api/v1.0/books/{book_id}", &myjson.JsonHandler{
 		Handler: mysession.WithSession(sessionStore, bookHandler.GetBook)}).Methods("GET")
+
 	// ---------------------------------------
 	// server
 	// ---------------------------------------

@@ -37,7 +37,7 @@ type SessionConfig struct {
 }
 
 type RedisConfig struct {
-	DB       int64  `json:"db"`
+	DB       int    `json:"db"`
 	Password string `json:"password"`
 	Host     string `json:"host"`
 	Port     int    `json:"port"`
