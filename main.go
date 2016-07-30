@@ -126,7 +126,7 @@ func main() {
 	// routing
 	// ---------------------------------------
 	mux := mux.NewRouter()
-	files := http.FileServer(http.Dir("/static"))
+	files := http.FileServer(http.Dir("static/"))
 
 	mux.Handle("/static/", http.StripPrefix("/static/", files))
 
