@@ -18,7 +18,7 @@ const (
 )
 
 const (
-	createAuthorUrl = "http://localhost:8080/rest/api/v1.0/authors"
+	createAuthorUrl = "http://localhost:9090/rest/api/v1.0/authors"
 )
 
 func TestCanary(t *testing.T) {
@@ -43,8 +43,6 @@ func TestCreteAuthor(t *testing.T) {
 		return
 	}
 
-	t.Log(req)
-
 	client := http.Client{}
 
 	resp, err := client.Do(req)
@@ -55,8 +53,28 @@ func TestCreteAuthor(t *testing.T) {
 
 	defer resp.Body.Close()
 
-	t.Log(resp)
+	if resp.StatusCode != http.StatusOK {
+		t.Errorf("Response status should be '%d' but is '%d'", http.StatusOK, resp.StatusCode)
+	}
 
-	// resp.StatusCode
+	respData := new(struct {
+		Author model.Author
+	})
+
+	if err := json.NewDecoder(resp.Body).Decode(&respData); err != nil {
+		t.Error("Cannot decore response")
+	}
+
+	if respData.Author.ID == "" {
+		t.Error("Author's ID cannot be empty")
+	}
+
+	if respData.Author.FirstName != author.FirstName {
+		t.Errorf("Author's first name should be '%s' but is '%s'.", author.FirstName, respData.Author.FirstName)
+	}
+
+	if respData.Author.LastName != author.LastName {
+		t.Errorf("Author's last name should be '%s' but is '%s'.", author.LastName, respData.Author.LastName)
+	}
 
 }

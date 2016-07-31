@@ -23,9 +23,8 @@ func (h *AuthorHandler) AddAuthor(w http.ResponseWriter, r *http.Request, s sess
 
 	model := NewModel()
 
-	decoder := json.NewDecoder(r.Body)
 	var author mymodel.Author
-	if err := decoder.Decode(&author); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&author); err != nil {
 		return model, Error500(err)
 	}
 

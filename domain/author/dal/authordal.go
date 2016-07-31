@@ -37,14 +37,14 @@ type AuthorMongoDal struct {
 }
 
 func (d AuthorMongoDal) Add(author model.Author) (model.Author, error) {
-	author.ID = bson.NewObjectId()
-	return author, d.collection.Insert(author)
+	entity := dtoToEntity(author)
+	return entityToDto(entity), d.collection.Insert(entity)
 }
 
 func (d AuthorMongoDal) GetAuthors() ([]model.Author, error) {
-	authors := make([]model.Author, 0)
-	err := d.collection.Find(nil).All(&authors)
-	return authors, err
+	authorsEntities := make([]model.AuthorEntity, 0)
+	err := d.collection.Find(nil).All(&authorsEntities)
+	return entitiesToDtos(authorsEntities), err
 }
 
 func (d AuthorMongoDal) Update(author model.AuthorUpdate) error {
@@ -59,9 +59,9 @@ func (d AuthorMongoDal) Delete(authorID string) error {
 }
 
 func (d AuthorMongoDal) GetAuthor(authorID string) (model.Author, error) {
-	author := new(model.Author)
-	err := d.collection.FindId(bson.ObjectIdHex(authorID)).One(author)
-	return *author, err
+	authorEntity := new(model.AuthorEntity)
+	err := d.collection.FindId(bson.ObjectIdHex(authorID)).One(authorEntity)
+	return entityToDto(*authorEntity), err
 }
 
 func (d AuthorMongoDal) FindAuthorsByIDs(authorIDs []string) ([]model.Author, error) {
@@ -69,8 +69,24 @@ func (d AuthorMongoDal) FindAuthorsByIDs(authorIDs []string) ([]model.Author, er
 	for _, authorID := range authorIDs {
 		ids = append(ids, bson.ObjectIdHex(authorID))
 	}
-	authors := make([]model.Author, 0)
-	query := d.collection.Find(bson.M{id: map[string]interface{}{"$in": ids}})
-	err := query.All(&authors)
-	return authors, err
+	authorsEntities := make([]model.AuthorEntity, 0)
+	err := d.collection.Find(bson.M{id: map[string]interface{}{"$in": ids}}).All(&authorsEntities)
+	return entitiesToDtos(authorsEntities), err
+}
+
+func dtoToEntity(dto model.Author) model.AuthorEntity {
+	ID := bson.NewObjectId()
+	return model.AuthorEntity{ID: ID, FirstName: dto.FirstName, LastName: dto.LastName}
+}
+
+func entityToDto(entity model.AuthorEntity) model.Author {
+	return model.Author{ID: entity.ID.String(), FirstName: entity.FirstName, LastName: entity.LastName}
+}
+
+func entitiesToDtos(entities []model.AuthorEntity) []model.Author {
+	authors := make([]model.Author, len(entities))
+	for i, entity := range entities {
+		authors[i] = entityToDto(entity)
+	}
+	return authors
 }
