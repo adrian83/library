@@ -58,6 +58,16 @@ func Index(w http.ResponseWriter, r *http.Request, s session.Session) (handler.M
 	return model, nil
 }
 
+func AddAuthor(w http.ResponseWriter, r *http.Request, s session.Session) (handler.Model, error) {
+	model := handler.NewModel()
+	return model, nil
+}
+
+func ListAuthors(w http.ResponseWriter, r *http.Request, s session.Session) (handler.Model, error) {
+	model := handler.NewModel()
+	return model, nil
+}
+
 func main() {
 
 	// ---------------------------------------
@@ -131,6 +141,12 @@ func main() {
 	mux.Handle("/", &myhttp.HttpHandler{
 		View:    "index",
 		Handler: mysession.WithSession(sessionStore, Index)})
+	mux.Handle("/authors/add", &myhttp.HttpHandler{
+		View:    "addAuthor",
+		Handler: mysession.WithSession(sessionStore, AddAuthor)})
+	mux.Handle("/authors/list", &myhttp.HttpHandler{
+		View:    "listAuthors",
+		Handler: mysession.WithSession(sessionStore, ListAuthors)})
 
 	mux.Handle("/rest/api/v1.0/auth/login", &myjson.JsonHandler{
 		Handler: mysession.WithSession(sessionStore, accountHandler.Login)}).Methods("POST")

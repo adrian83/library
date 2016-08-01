@@ -24,7 +24,7 @@ func (h *HttpHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if err = tmpl.ExecuteTemplate(w, h.View, model.Values); err != nil {
+	if err = tmpl.ExecuteTemplate(w, "body", model.Values); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
