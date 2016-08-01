@@ -126,9 +126,7 @@ func main() {
 	// routing
 	// ---------------------------------------
 	mux := mux.NewRouter()
-	files := http.FileServer(http.Dir("/static"))
-
-	mux.Handle("/static/", http.StripPrefix("/static/", files))
+	mux.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
 
 	mux.Handle("/", &myhttp.HttpHandler{
 		View:    "index",
