@@ -80,7 +80,7 @@ func dtoToEntity(dto model.Author) model.AuthorEntity {
 }
 
 func entityToDto(entity model.AuthorEntity) model.Author {
-	return model.Author{ID: entity.ID.String(), FirstName: entity.FirstName, LastName: entity.LastName}
+	return model.Author{ID: entity.ID.Hex(), FirstName: entity.FirstName, LastName: entity.LastName}
 }
 
 func entitiesToDtos(entities []model.AuthorEntity) []model.Author {
