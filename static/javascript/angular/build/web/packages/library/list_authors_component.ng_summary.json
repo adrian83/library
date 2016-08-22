@@ -9,21 +9,21 @@
     ],
     "5": [
       {
-        "1": "AppComponent"
+        "1": "ListAuthorsComponent"
       }
     ],
-    "6": "app_component.dart"
+    "6": "list_authors_component.dart"
   },
   "type": {
-    "AppComponent": {
+    "ListAuthorsComponent": {
       "class": "Directive",
       "isComponent": true,
-      "selector": "my-app",
+      "selector": "list-authors",
       "exportAs": null,
       "type": {
         "class": "Type",
-        "name": "AppComponent",
-        "moduleUrl": "asset:library/lib/app_component.dart",
+        "name": "ListAuthorsComponent",
+        "moduleUrl": "asset:library/lib/list_authors_component.dart",
         "prefix": null,
         "isHost": false,
         "value": null,
@@ -38,8 +38,8 @@
       "lifecycleHooks": [],
       "template": {
         "encapsulation": 2,
-        "template": "<h1>Hello</h1>",
-        "templateUrl": "asset:library/lib/app_component.dart",
+        "template": "<h2>List</h2>",
+        "templateUrl": "asset:library/lib/list_authors_component.dart",
         "styles": [],
         "styleUrls": [],
         "ngContentSelectors": []

@@ -9,6 +9,14 @@
       {
         "1": "../lib/app_component.dart",
         "5": false
+      },
+      {
+        "1": "../lib/add_author_component.dart",
+        "5": false
+      },
+      {
+        "1": "../lib/list_authors_component.dart",
+        "5": false
       }
     ],
     "6": "main.dart",
@@ -20,6 +28,14 @@
       {
         "1": "../lib/app_component.template.dart",
         "4": "i1"
+      },
+      {
+        "1": "../lib/add_author_component.template.dart",
+        "4": "i2"
+      },
+      {
+        "1": "../lib/list_authors_component.template.dart",
+        "4": "i3"
       }
     ]
   },

@@ -9,6 +9,14 @@
       {
         "1": "../lib/app_component.dart",
         "5": false
+      },
+      {
+        "1": "../lib/add_author_component.dart",
+        "5": false
+      },
+      {
+        "1": "../lib/list_authors_component.dart",
+        "5": false
       }
     ],
     "6": "main.dart"
