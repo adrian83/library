@@ -6,6 +6,6 @@ $ mongod --dbpath <path>
 
 
 install dart
-in static/javascript/angular
+in static/dart/angular
 $ pub get
 $ pub build

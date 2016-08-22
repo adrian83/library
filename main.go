@@ -2,12 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/adrian83/go-redis-session"
-	"github.com/gorilla/mux"
 	"net/http"
 	"os"
 	"reflect"
 
+	"config"
 	"web/handler"
 	myhttp "web/html"
 	myjson "web/json"
@@ -16,7 +15,8 @@ import (
 	author "domain/author"
 	book "domain/book"
 
-	"config"
+	"github.com/adrian83/go-redis-session"
+	"github.com/gorilla/mux"
 	"gopkg.in/mgo.v2"
 )
 
