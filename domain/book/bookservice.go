@@ -1,7 +1,7 @@
 package book
 
 import (
-	authordal "domain/author/dal"
+	author "domain/author"
 )
 
 type BookService interface {
@@ -14,10 +14,10 @@ type BookService interface {
 
 type BookServiceImpl struct {
 	bookDal   BookDal
-	authorDal authordal.AuthorDal
+	authorDal author.AuthorDal
 }
 
-func NewBookServiceImpl(bookDal BookDal, authorDal authordal.AuthorDal) BookService {
+func NewBookServiceImpl(bookDal BookDal, authorDal author.AuthorDal) BookService {
 	return BookServiceImpl{
 		bookDal:   bookDal,
 		authorDal: authorDal,

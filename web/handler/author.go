@@ -1,13 +1,10 @@
 package handler
 
 import (
-	mymodel "domain/author/model"
+	author "domain/author"
 	"encoding/json"
 	"github.com/adrian83/go-redis-session"
 	"net/http"
-
-	authordal "domain/author/dal"
-	authorservice "domain/author/service"
 
 	"web/validation"
 
@@ -15,20 +12,20 @@ import (
 )
 
 type AuthorHandler struct {
-	AuthorDal     authordal.AuthorDal
-	AuthorService authorservice.AuthorService
+	AuthorDal     author.AuthorDal
+	AuthorService author.AuthorService
 }
 
 func (h *AuthorHandler) AddAuthor(w http.ResponseWriter, r *http.Request, s session.Session) (Model, error) {
 
 	model := NewModel()
 
-	var author mymodel.Author
-	if err := json.NewDecoder(r.Body).Decode(&author); err != nil {
+	var a author.Author
+	if err := json.NewDecoder(r.Body).Decode(&a); err != nil {
 		return model, Error500(err)
 	}
 
-	errors, ok := (&validation.AuthorValidator{}).Validate(author)
+	errors, ok := (&validation.AuthorValidator{}).Validate(a)
 	if !ok {
 		return model, Error500(e.New("type assertion error"))
 	}
@@ -37,12 +34,12 @@ func (h *AuthorHandler) AddAuthor(w http.ResponseWriter, r *http.Request, s sess
 		return model, Error400(errors)
 	}
 
-	author, err := h.AuthorDal.Add(author)
+	a, err := h.AuthorDal.Add(a)
 	if err != nil {
 		return model, Error500(err)
 	}
 
-	model.Values["author"] = author
+	model.Values["author"] = a
 	return model, nil
 }
 
@@ -66,7 +63,7 @@ func (h *AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request, s s
 
 	model := NewModel()
 
-	var authorUpdate mymodel.AuthorUpdate
+	var authorUpdate author.AuthorUpdate
 	if err := json.NewDecoder(r.Body).Decode(&authorUpdate); err != nil {
 		return model, Error500(err)
 	}

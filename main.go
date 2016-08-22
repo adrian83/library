@@ -13,9 +13,7 @@ import (
 	myjson "web/json"
 	mysession "web/session"
 
-	authordal "domain/author/dal"
-	authorservice "domain/author/service"
-
+	author "domain/author"
 	book "domain/book"
 
 	"config"
@@ -116,13 +114,13 @@ func main() {
 	// ---------------------------------------
 	// dals
 	// ---------------------------------------
-	var authorDal authordal.AuthorDal = authordal.NewAuthorMongoDal(database)
+	var authorDal author.AuthorDal = author.NewAuthorMongoDal(database)
 	var bookDal book.BookDal = book.NewBookMongoDal(database)
 
 	// ---------------------------------------
 	// services
 	// ---------------------------------------
-	var authorService authorservice.AuthorService = authorservice.NewAuthorService(authorDal)
+	var authorService author.AuthorService = author.NewAuthorService(authorDal)
 	var bookService book.BookService = book.NewBookServiceImpl(bookDal, authorDal)
 
 	// ---------------------------------------

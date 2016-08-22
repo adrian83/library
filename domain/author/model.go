@@ -1,4 +1,4 @@
-package model
+package author
 
 import (
 	"gopkg.in/mgo.v2/bson"

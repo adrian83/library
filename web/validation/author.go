@@ -1,7 +1,7 @@
 package validation
 
 import (
-	mymodel "domain/author/model"
+	author "domain/author"
 )
 
 var (
@@ -17,7 +17,7 @@ type AuthorValidator struct {
 func (v *AuthorValidator) Validate(entity interface{}) ([]ValidationError, bool) {
 	errors := make([]ValidationError, 0)
 
-	author, ok := entity.(mymodel.Author)
+	author, ok := entity.(author.Author)
 	if !ok {
 		return errors, ok
 	}
@@ -35,7 +35,7 @@ type AuthorUpdateValidator struct {
 func (v *AuthorUpdateValidator) Validate(entity interface{}) ([]ValidationError, bool) {
 	errors := make([]ValidationError, 0)
 
-	author, ok := entity.(mymodel.AuthorUpdate)
+	author, ok := entity.(author.AuthorUpdate)
 	if !ok {
 		return errors, ok
 	}

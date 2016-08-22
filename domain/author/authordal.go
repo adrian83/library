@@ -1,7 +1,6 @@
-package dal
+package author
 
 import (
-	"domain/author/model"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -16,12 +15,12 @@ const (
 )
 
 type AuthorDal interface {
-	Add(author model.Author) (model.Author, error)
-	GetAuthors() ([]model.Author, error)
-	Update(author model.AuthorUpdate) error
+	Add(author Author) (Author, error)
+	GetAuthors() ([]Author, error)
+	Update(author AuthorUpdate) error
 	Delete(authorID string) error
-	GetAuthor(authorID string) (model.Author, error)
-	FindAuthorsByIDs(authorIDs []string) ([]model.Author, error)
+	GetAuthor(authorID string) (Author, error)
+	FindAuthorsByIDs(authorIDs []string) ([]Author, error)
 }
 
 func NewAuthorMongoDal(database *mgo.Database) *AuthorMongoDal {
@@ -36,18 +35,18 @@ type AuthorMongoDal struct {
 	collection *mgo.Collection
 }
 
-func (d AuthorMongoDal) Add(author model.Author) (model.Author, error) {
+func (d AuthorMongoDal) Add(author Author) (Author, error) {
 	entity := dtoToEntity(author)
 	return entityToDto(entity), d.collection.Insert(entity)
 }
 
-func (d AuthorMongoDal) GetAuthors() ([]model.Author, error) {
-	authorsEntities := make([]model.AuthorEntity, 0)
+func (d AuthorMongoDal) GetAuthors() ([]Author, error) {
+	authorsEntities := make([]AuthorEntity, 0)
 	err := d.collection.Find(nil).All(&authorsEntities)
 	return entitiesToDtos(authorsEntities), err
 }
 
-func (d AuthorMongoDal) Update(author model.AuthorUpdate) error {
+func (d AuthorMongoDal) Update(author AuthorUpdate) error {
 	dict := make(map[string]interface{})
 	dict[firstName] = author.FirstName
 	dict[lastName] = *author.LastName
@@ -58,33 +57,33 @@ func (d AuthorMongoDal) Delete(authorID string) error {
 	return d.collection.RemoveId(bson.ObjectIdHex(authorID))
 }
 
-func (d AuthorMongoDal) GetAuthor(authorID string) (model.Author, error) {
-	authorEntity := new(model.AuthorEntity)
+func (d AuthorMongoDal) GetAuthor(authorID string) (Author, error) {
+	authorEntity := new(AuthorEntity)
 	err := d.collection.FindId(bson.ObjectIdHex(authorID)).One(authorEntity)
 	return entityToDto(*authorEntity), err
 }
 
-func (d AuthorMongoDal) FindAuthorsByIDs(authorIDs []string) ([]model.Author, error) {
+func (d AuthorMongoDal) FindAuthorsByIDs(authorIDs []string) ([]Author, error) {
 	ids := make([]bson.ObjectId, 0)
 	for _, authorID := range authorIDs {
 		ids = append(ids, bson.ObjectIdHex(authorID))
 	}
-	authorsEntities := make([]model.AuthorEntity, 0)
+	authorsEntities := make([]AuthorEntity, 0)
 	err := d.collection.Find(bson.M{id: map[string]interface{}{"$in": ids}}).All(&authorsEntities)
 	return entitiesToDtos(authorsEntities), err
 }
 
-func dtoToEntity(dto model.Author) model.AuthorEntity {
+func dtoToEntity(dto Author) AuthorEntity {
 	ID := bson.NewObjectId()
-	return model.AuthorEntity{ID: ID, FirstName: dto.FirstName, LastName: dto.LastName}
+	return AuthorEntity{ID: ID, FirstName: dto.FirstName, LastName: dto.LastName}
 }
 
-func entityToDto(entity model.AuthorEntity) model.Author {
-	return model.Author{ID: entity.ID.Hex(), FirstName: entity.FirstName, LastName: entity.LastName}
+func entityToDto(entity AuthorEntity) Author {
+	return Author{ID: entity.ID.Hex(), FirstName: entity.FirstName, LastName: entity.LastName}
 }
 
-func entitiesToDtos(entities []model.AuthorEntity) []model.Author {
-	authors := make([]model.Author, len(entities))
+func entitiesToDtos(entities []AuthorEntity) []Author {
+	authors := make([]Author, len(entities))
 	for i, entity := range entities {
 		authors[i] = entityToDto(entity)
 	}
