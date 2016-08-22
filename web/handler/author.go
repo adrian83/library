@@ -12,7 +12,6 @@ import (
 )
 
 type AuthorHandler struct {
-	AuthorDal     author.AuthorDal
 	AuthorService author.AuthorService
 }
 
@@ -34,7 +33,7 @@ func (h *AuthorHandler) AddAuthor(w http.ResponseWriter, r *http.Request, s sess
 		return model, Error400(errors)
 	}
 
-	a, err := h.AuthorDal.Add(a)
+	a, err := h.AuthorService.Add(a)
 	if err != nil {
 		return model, Error500(err)
 	}
@@ -47,7 +46,7 @@ func (h *AuthorHandler) GetAuthors(w http.ResponseWriter, r *http.Request, s ses
 
 	model := NewModel()
 
-	authors, err := h.AuthorDal.GetAuthors()
+	authors, err := h.AuthorService.GetAuthors()
 	if err != nil {
 		return model, Error500(err)
 	}
@@ -78,7 +77,7 @@ func (h *AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request, s s
 		return model, Error400(errors)
 	}
 
-	if err := h.AuthorDal.Update(authorUpdate); err != nil {
+	if err := h.AuthorService.Update(authorUpdate); err != nil {
 		return model, Error500(err)
 	}
 
@@ -91,7 +90,7 @@ func (h *AuthorHandler) DeleteAuthor(w http.ResponseWriter, r *http.Request, s s
 
 	model := NewModel()
 
-	err := h.AuthorDal.Delete(authorID)
+	err := h.AuthorService.Delete(authorID)
 	if err != nil {
 		return model, Error500(err)
 	}
@@ -105,7 +104,7 @@ func (h *AuthorHandler) GetAuthor(w http.ResponseWriter, r *http.Request, s sess
 
 	model := NewModel()
 
-	author, err := h.AuthorDal.GetAuthor(authorID)
+	author, err := h.AuthorService.GetAuthor(authorID)
 	if err != nil {
 		return model, Error500(err)
 	}

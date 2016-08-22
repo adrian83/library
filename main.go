@@ -127,7 +127,7 @@ func main() {
 	// handlers (controllers)
 	// ---------------------------------------
 	accountHandler := &handler.AccountHandler{}
-	authorHandler := &handler.AuthorHandler{AuthorDal: authorDal, AuthorService: authorService}
+	authorHandler := &handler.AuthorHandler{AuthorService: authorService}
 	bookHandler := &handler.BookHandler{BookService: bookService}
 
 	// ---------------------------------------
