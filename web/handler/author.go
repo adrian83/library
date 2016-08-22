@@ -28,8 +28,7 @@ func (h *AuthorHandler) AddAuthor(w http.ResponseWriter, r *http.Request, s sess
 		return model, Error500(err)
 	}
 
-	var validator validation.Validator = &AuthorValidator{}
-	errors, ok := validator.Validate(author)
+	errors, ok := (&validation.AuthorValidator{}).Validate(author)
 	if !ok {
 		return model, Error500(e.New("type assertion error"))
 	}
@@ -67,16 +66,14 @@ func (h *AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request, s s
 
 	model := NewModel()
 
-	decoder := json.NewDecoder(r.Body)
 	var authorUpdate mymodel.AuthorUpdate
-	if err := decoder.Decode(&authorUpdate); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&authorUpdate); err != nil {
 		return model, Error500(err)
 	}
 
 	authorUpdate.ID = authorID
 
-	var validator validation.Validator = &AuthorUpdateValidator{}
-	errors, ok := validator.Validate(authorUpdate)
+	errors, ok := (&validation.AuthorUpdateValidator{}).Validate(authorUpdate)
 	if !ok {
 		return model, Error500(e.New("type assertion error"))
 	}
@@ -118,40 +115,4 @@ func (h *AuthorHandler) GetAuthor(w http.ResponseWriter, r *http.Request, s sess
 	model.Values["author"] = author
 
 	return model, nil
-}
-
-type AuthorValidator struct {
-}
-
-func (v *AuthorValidator) Validate(entity interface{}) ([]validation.ValidationError, bool) {
-	errors := make([]validation.ValidationError, 0)
-
-	author, ok := entity.(mymodel.Author)
-	if !ok {
-		return errors, ok
-	}
-
-	if validation.IsStringEmpty(author.LastName) {
-		errors = append(errors, validation.EmptyAuthorLastName)
-	}
-
-	return errors, true
-}
-
-type AuthorUpdateValidator struct {
-}
-
-func (v *AuthorUpdateValidator) Validate(entity interface{}) ([]validation.ValidationError, bool) {
-	errors := make([]validation.ValidationError, 0)
-
-	author, ok := entity.(mymodel.AuthorUpdate)
-	if !ok {
-		return errors, ok
-	}
-
-	if validation.IsStringPtrNil(author.LastName) || validation.IsStringEmpty(*author.LastName) {
-		errors = append(errors, validation.EmptyAuthorLastName)
-	}
-
-	return errors, true
 }
