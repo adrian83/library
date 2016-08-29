@@ -9,11 +9,25 @@
       {
         "1": "dart:html",
         "5": false
+      },
+      {
+        "1": "../lib/model.dart",
+        "5": false
+      },
+      {
+        "1": "../lib/author_service.dart",
+        "5": false
       }
     ],
     "5": [
       {
-        "1": "AddAuthorComponent"
+        "1": "AddAuthorComponent",
+        "5": [
+          {
+            "1": "AuthorService",
+            "4": "_authorService"
+          }
+        ]
       }
     ],
     "6": "add_author_component.dart",
@@ -21,17 +35,18 @@
       {
         "1": "package:angular2/core.template.dart",
         "4": "i0"
+      },
+      {
+        "1": "../lib/model.template.dart",
+        "4": "i1"
+      },
+      {
+        "1": "../lib/author_service.template.dart",
+        "4": "i2"
       }
     ]
   },
   "type": {
-    "Author": {
-      "class": "Identifier",
-      "name": "Author",
-      "moduleUrl": "asset:library/lib/add_author_component.dart",
-      "prefix": null,
-      "value": null
-    },
     "AddAuthorComponent": {
       "class": "Directive",
       "isComponent": true,
@@ -44,7 +59,30 @@
         "prefix": null,
         "isHost": false,
         "value": null,
-        "diDeps": []
+        "diDeps": [
+          {
+            "token": {
+              "value": null,
+              "identifier": {
+                "class": "Identifier",
+                "name": "AuthorService",
+                "moduleUrl": "asset:library/lib/author_service.dart",
+                "prefix": null,
+                "value": null
+              },
+              "identifierIsInstance": false
+            },
+            "query": null,
+            "viewQuery": null,
+            "value": null,
+            "isAttribute": false,
+            "isSelf": false,
+            "isHost": false,
+            "isSkipSelf": false,
+            "isOptional": false,
+            "isValue": false
+          }
+        ]
       },
       "changeDetection": 5,
       "inputs": {},
@@ -61,7 +99,39 @@
         "styleUrls": [],
         "ngContentSelectors": []
       },
-      "providers": [],
+      "providers": [
+        {
+          "class": "Provider",
+          "token": {
+            "value": null,
+            "identifier": {
+              "class": "Type",
+              "name": "AuthorService",
+              "moduleUrl": "asset:library/lib/author_service.dart",
+              "prefix": null,
+              "isHost": false,
+              "value": null,
+              "diDeps": []
+            },
+            "identifierIsInstance": false
+          },
+          "useClass": {
+            "class": "Type",
+            "name": "AuthorService",
+            "moduleUrl": "asset:library/lib/author_service.dart",
+            "prefix": null,
+            "isHost": false,
+            "value": null,
+            "diDeps": []
+          },
+          "useExisting": null,
+          "useValue": null,
+          "useFactory": null,
+          "useProperty": null,
+          "multi": false,
+          "deps": null
+        }
+      ],
       "viewProviders": [],
       "queries": [],
       "viewQueries": []

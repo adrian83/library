@@ -1,11 +1,8 @@
 import 'package:angular2/core.dart';
 import 'dart:html';
 
-class Author {
-	String firstName = "Henryk";
-	String lastName = "Sienkiewicz";
-}
-
+import '../lib/model.dart';
+import '../lib/author_service.dart';
 
 
 
@@ -20,13 +17,18 @@ class Author {
 	    	<br/>
 	    	<input type="submit" (click)="onSubmit()" />
 	    </div>
-    '''
+    ''',
+    providers: const [AuthorService]
     )
 class AddAuthorComponent {
 	Author author = new Author();
+	AuthorService _authorService;
+	
+	AddAuthorComponent(this._authorService){}
+	
 	
 	onSubmit() {
-		window.alert("- " + author.lastName);
+		_authorService.saveAuthor(author);
 	}
 }
 
