@@ -1,3 +1,5 @@
 static/dart/angular/build/web/**
 static/dart/angular/packages/**
 static/dart/angular/.pub/**
+
+static/dart/angular/.packages

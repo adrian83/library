@@ -1,7 +1,9 @@
 
 
 class Author {
-	String firstName = "Henryk";
-	String lastName = "Sienkiewicz";
+	String firstName;
+	String lastName;
+	
+	Author(this.firstName, this.lastName){}
 }
 
