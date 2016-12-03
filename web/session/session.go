@@ -14,7 +14,7 @@ const (
 
 type SessionHandler func(w http.ResponseWriter, r *http.Request, s session.Session) (handler.Model, error)
 
-func WithSession(sessionStore session.SessionStore, sessionHandler SessionHandler) func(http.ResponseWriter, *http.Request) (handler.Model, error) {
+func WithSession(sessionStore session.Store, sessionHandler SessionHandler) func(http.ResponseWriter, *http.Request) (handler.Model, error) {
 
 	return func(w http.ResponseWriter, r *http.Request) (handler.Model, error) {
 

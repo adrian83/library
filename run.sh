@@ -22,7 +22,7 @@ run-docker() {
 
 run-mongo() {
 	set -e
-		docker run -p 27018:27017 -v $PWD/infrastructure/mongodb:/data/db -d mongo:tag
+		docker run -p 27018:27017 -v $PWD/infrastructure/mongodb:/data/db -d mongo
 		echo "MongoDB is listening on ports: 27018. Data is stored inside 'infrastructure/mongodb' directory"
 	set +e
 }
@@ -37,7 +37,7 @@ run-redis() {
 run-infra() {
 	set -e
 		run-docker
-		run-rethink
+		run-mongo
 		run-redis
 	set +e
 }

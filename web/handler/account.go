@@ -18,7 +18,7 @@ func (h *AccountHandler) Login(w http.ResponseWriter, r *http.Request, s session
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	s.Add("user", user)
+	s.Add("user.Login", user.Login)
 
 	model := NewModel()
 	model.Values["user"] = user

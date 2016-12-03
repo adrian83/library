@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"reflect"
+	"strconv"
 
 	"config"
 	"web/handler"
@@ -26,32 +26,24 @@ var (
 
 func Index(w http.ResponseWriter, r *http.Request, s session.Session) (handler.Model, error) {
 
-	var val int = 0
+	idStr, ok := s.Get("id")
+	fmt.Printf("get val with key 'id': %v %v\n", idStr, ok)
 
-	valI, ok := s.Get("id")
-	fmt.Printf("get val with key 'id': %v %v\n", valI, ok)
-
-	if ok {
-
-		switch i := valI.(type) {
-		case int:
-			val = i
-		case string:
-			val = 666
-		case float64:
-			val = int(i)
-		default:
-			fmt.Println(reflect.TypeOf(valI))
-			val = 777
-		}
-
+	if !ok {
+		idStr = "1"
 	}
 
 	model := handler.NewModel()
 
-	model.Values["idk"] = val
+	model.Values["idk"] = idStr
 
-	s.Add("id", val+1)
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		fmt.Printf("Cannot convert str to int")
+		id = 1
+	}
+
+	s.Add("id", strconv.Itoa(id+1))
 
 	return model, nil
 }
@@ -79,6 +71,8 @@ func main() {
 
 	appConfig, err := config.ReadConfig(currentDir + "/" + configPath)
 
+	fmt.Println("Config - OK")
+
 	//fmt.Print("\n", appConfig.Server.Port)
 
 	// ---------------------------------------
@@ -92,20 +86,18 @@ func main() {
 		IDLength: appConfig.Session.IDLength,
 	}
 
-	sessionStore, err := session.NewSessionStore(sessionStoreConfig)
+	sessionStore, err := session.NewStore(sessionStoreConfig)
 	if err != nil {
 		panic(fmt.Sprintf("SessionStore cannot be created because of: %v", err))
 	}
 	defer sessionStore.Close()
 
+	fmt.Println("Redis - OK")
+
 	// ---------------------------------------
 	// main db - mongo
 	// ---------------------------------------
-	port, err := strconv.Atoi(appConfig.Databases.Mongo.Port)
-	if err != nil {
-		panic(fmt.Sprintf("Cannot connect to mongo. Error: %v", err))
-	}
-	session, err := mgo.Dial(appConfig.Databases.Mongo.Host + ":" + )
+	session, err := mgo.Dial(appConfig.Databases.Mongo.Host + ":" + strconv.Itoa(appConfig.Databases.Mongo.Port))
 	if err != nil {
 		panic(err)
 	}
@@ -115,17 +107,23 @@ func main() {
 	session.SetMode(mgo.Monotonic, true)
 	database := session.DB(appConfig.Databases.Mongo.DB)
 
+	fmt.Println("Mongo - OK")
+
 	// ---------------------------------------
 	// dals
 	// ---------------------------------------
 	var authorDal author.AuthorDal = author.NewAuthorMongoDal(database)
 	var bookDal book.BookDal = book.NewBookMongoDal(database)
 
+	fmt.Println("DALs - OK")
+
 	// ---------------------------------------
 	// services
 	// ---------------------------------------
 	var authorService author.AuthorService = author.NewAuthorService(authorDal)
 	var bookService book.BookService = book.NewBookServiceImpl(bookDal, authorDal)
+
+	fmt.Println("Services - OK")
 
 	// ---------------------------------------
 	// handlers (controllers)
@@ -178,6 +176,7 @@ func main() {
 	// ---------------------------------------
 	// server
 	// ---------------------------------------
-	server := &http.Server{Addr: "0.0.0.0:9090", Handler: mux}
+	server := &http.Server{Addr: "0.0.0.0:" + strconv.Itoa(appConfig.Server.Port), Handler: mux}
+	fmt.Println("Server - OK")
 	server.ListenAndServe()
 }
