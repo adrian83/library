@@ -5,7 +5,7 @@ import '../lib/list_authors_component.dart';
 
 
 void main() {
-	bootstrap(AppComponent);
+	//bootstrap(AppComponent);
 	bootstrap(AddAuthorComponent);
 	bootstrap(ListAuthorsComponent);
 }

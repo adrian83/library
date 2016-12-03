@@ -11,6 +11,12 @@ import (
 	e "errors"
 )
 
+const (
+	authorIDLabel = "author_id"
+	authorLabel   = "author"
+	authorsLabel  = "authors"
+)
+
 type AuthorHandler struct {
 	AuthorService author.AuthorService
 }
@@ -38,7 +44,7 @@ func (h *AuthorHandler) AddAuthor(w http.ResponseWriter, r *http.Request, s sess
 		return model, Error500(err)
 	}
 
-	model.Values["author"] = a
+	model.Values[authorLabel] = a
 	return model, nil
 }
 
@@ -51,14 +57,14 @@ func (h *AuthorHandler) GetAuthors(w http.ResponseWriter, r *http.Request, s ses
 		return model, Error500(err)
 	}
 
-	model.Values["authors"] = authors
+	model.Values[authorsLabel] = authors
 
 	return model, nil
 }
 
 func (h *AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request, s session.Session) (Model, error) {
 
-	authorID := GetPathParam(r, "author_id")
+	authorID := GetPathParam(r, authorIDLabel)
 
 	model := NewModel()
 
@@ -86,7 +92,7 @@ func (h *AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request, s s
 
 func (h *AuthorHandler) DeleteAuthor(w http.ResponseWriter, r *http.Request, s session.Session) (Model, error) {
 
-	authorID := GetPathParam(r, "author_id")
+	authorID := GetPathParam(r, authorIDLabel)
 
 	model := NewModel()
 
@@ -100,7 +106,7 @@ func (h *AuthorHandler) DeleteAuthor(w http.ResponseWriter, r *http.Request, s s
 
 func (h *AuthorHandler) GetAuthor(w http.ResponseWriter, r *http.Request, s session.Session) (Model, error) {
 
-	authorID := GetPathParam(r, "author_id")
+	authorID := GetPathParam(r, authorIDLabel)
 
 	model := NewModel()
 
@@ -108,7 +114,7 @@ func (h *AuthorHandler) GetAuthor(w http.ResponseWriter, r *http.Request, s sess
 	if err != nil {
 		return model, Error500(err)
 	}
-	model.Values["author"] = author
+	model.Values[authorLabel] = author
 
 	return model, nil
 }
