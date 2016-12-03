@@ -101,7 +101,11 @@ func main() {
 	// ---------------------------------------
 	// main db - mongo
 	// ---------------------------------------
-	session, err := mgo.Dial(appConfig.Databases.Mongo.Host)
+	port, err := strconv.Atoi(appConfig.Databases.Mongo.Port)
+	if err != nil {
+		panic(fmt.Sprintf("Cannot connect to mongo. Error: %v", err))
+	}
+	session, err := mgo.Dial(appConfig.Databases.Mongo.Host + ":" + )
 	if err != nil {
 		panic(err)
 	}

@@ -53,5 +53,6 @@ type DatabasesConfig struct {
 
 type MongoConfig struct {
 	Host string `json:"host"`
+	Port int    `json:"port"`
 	DB   string `json:"db"`
 }
