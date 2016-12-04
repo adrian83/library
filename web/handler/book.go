@@ -24,110 +24,116 @@ type BookHandler struct {
 	BookService book.BookService
 }
 
-func (h *BookHandler) AddBook(w http.ResponseWriter, r *http.Request, s session.Session) (Model, error) {
-
-	model := NewModel()
+func (h *BookHandler) AddBook(w http.ResponseWriter, r *http.Request, s session.Session) error {
 
 	var newBook book.NewBook
 	if err := json.NewDecoder(r.Body).Decode(&newBook); err != nil {
-		return model, Error500(err)
+		return Error500(err)
 	}
 
 	errs, ok := (&validation.BookValidator{}).Validate(newBook)
 	if !ok {
-		return model, Error500(errors.New("type assertion error"))
+		return Error500(errors.New("type assertion error"))
 	}
 
 	if len(errs) > 0 {
-		return model, Error400(errs)
+		return Error400(errs)
 	}
 
 	book, err := h.BookService.Add(newBook)
 	if err != nil {
-		return model, Error500(err)
+		return Error500(err)
 	}
 
-	model.Values[bookLabel] = book
-	return model, nil
+	// return book
+	js, err := json.Marshal(book)
+	if err != nil {
+		return Error500(err)
+	}
+	w.Write(js)
+
+	return nil
 }
 
-func (h *BookHandler) GetBooks(w http.ResponseWriter, r *http.Request, s session.Session) (Model, error) {
-
-	model := NewModel()
+func (h *BookHandler) GetBooks(w http.ResponseWriter, r *http.Request, s session.Session) error {
 
 	books, err := h.BookService.GetBooks()
 	if err != nil {
-		return model, Error500(err)
+		return Error500(err)
 	}
 
-	model.Values[booksLabel] = books
+	// return books
+	js, err := json.Marshal(books)
+	if err != nil {
+		return Error500(err)
+	}
+	w.Write(js)
 
-	return model, nil
+	return nil
 }
 
-func (h *BookHandler) GetBook(w http.ResponseWriter, r *http.Request, s session.Session) (Model, error) {
-
-	model := NewModel()
+func (h *BookHandler) GetBook(w http.ResponseWriter, r *http.Request, s session.Session) error {
 
 	bookID := GetPathParam(r, bookIDLabel)
 	if !validation.IsIDValid(bookID) {
-		return model, Error400([]validation.ValidationError{validation.InvalidID})
+		return Error400([]validation.ValidationError{validation.InvalidID})
 	}
 
 	book, ok, err := h.BookService.GetBook(bookID)
 	if err != nil {
-		return model, Error500(err)
+		return Error500(err)
 	}
 	if !ok {
-		return model, Error404()
+		return Error404()
 	}
 
-	model.Values[bookLabel] = book
+	// return book
+	js, err := json.Marshal(book)
+	if err != nil {
+		return Error500(err)
+	}
+	w.Write(js)
 
-	return model, nil
+	return nil
 }
 
-func (h *BookHandler) DeleteBook(w http.ResponseWriter, r *http.Request, s session.Session) (Model, error) {
+func (h *BookHandler) DeleteBook(w http.ResponseWriter, r *http.Request, s session.Session) error {
 
 	bookID := GetPathParam(r, bookIDLabel)
-
-	model := NewModel()
 
 	err := h.BookService.Delete(bookID)
 	if err != nil {
-		return model, Error500(err)
+		return Error500(err)
 	}
 
-	return model, nil
+	return nil
 }
 
-func (h *BookHandler) UpdateBook(w http.ResponseWriter, r *http.Request, s session.Session) (Model, error) {
-
-	model := NewModel()
+func (h *BookHandler) UpdateBook(w http.ResponseWriter, r *http.Request, s session.Session) error {
 
 	bookID := GetPathParam(r, bookIDLabel)
 	if !validation.IsIDValid(bookID) {
-		return model, Error400([]validation.ValidationError{validation.InvalidID})
+		return Error400([]validation.ValidationError{validation.InvalidID})
 	}
 
 	var bookUpdate book.BookUpdate
 	if err := json.NewDecoder(r.Body).Decode(&bookUpdate); err != nil {
-		return model, Error500(err)
+		return Error500(err)
 	}
 
 	bookUpdate.ID = bookID
 
 	errs, ok := (&validation.BookUpdateValidator{}).Validate(bookUpdate)
 	if !ok {
-		return model, Error500(errors.New("type assertion error"))
+		return Error500(errors.New("type assertion error"))
 	}
 	if len(errs) > 0 {
-		return model, Error400(errs)
+		return Error400(errs)
 	}
 
 	if err := h.BookService.Update(bookUpdate); err != nil {
-		return model, Error500(err)
+		return Error500(err)
 	}
 
-	return model, nil
+	return nil
 }

@@ -24,7 +24,7 @@ var (
 	id = 0
 )
 
-func Index(w http.ResponseWriter, r *http.Request, s session.Session) (handler.Model, error) {
+func Index(w http.ResponseWriter, r *http.Request, s session.Session) error {
 
 	idStr, ok := s.Get("id")
 	fmt.Printf("get val with key 'id': %v %v\n", idStr, ok)
@@ -45,17 +45,15 @@ func Index(w http.ResponseWriter, r *http.Request, s session.Session) (handler.M
 
 	s.Add("id", strconv.Itoa(id+1))
 
-	return model, nil
+	return nil
 }
 
-func AddAuthor(w http.ResponseWriter, r *http.Request, s session.Session) (handler.Model, error) {
-	model := handler.NewModel()
-	return model, nil
+func AddAuthor(w http.ResponseWriter, r *http.Request, s session.Session) error {
+	return nil
 }
 
-func ListAuthors(w http.ResponseWriter, r *http.Request, s session.Session) (handler.Model, error) {
-	model := handler.NewModel()
-	return model, nil
+func ListAuthors(w http.ResponseWriter, r *http.Request, s session.Session) error {
+	return nil
 }
 
 func main() {

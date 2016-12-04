@@ -12,14 +12,14 @@ const (
 )
 
 type JsonHandler struct {
-	Handler func(http.ResponseWriter, *http.Request) (handler.Model, error)
+	Handler func(http.ResponseWriter, *http.Request) error
 }
 
 func (h *JsonHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	w.Header().Set(contentTypeHeader, contentTypeValue)
 
-	model, err := h.Handler(w, req)
+	err := h.Handler(w, req)
 	if err != nil {
 
 		appError, ok := err.(*handler.AppError)
@@ -37,11 +37,4 @@ func (h *JsonHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	js, err := json.Marshal(model.Values)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.Write(js)
 }

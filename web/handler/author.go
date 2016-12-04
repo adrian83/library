@@ -21,100 +21,107 @@ type AuthorHandler struct {
 	AuthorService author.AuthorService
 }
 
-func (h *AuthorHandler) AddAuthor(w http.ResponseWriter, r *http.Request, s session.Session) (Model, error) {
-
-	model := NewModel()
+func (h *AuthorHandler) AddAuthor(w http.ResponseWriter, r *http.Request, s session.Session) error {
 
 	var a author.Author
 	if err := json.NewDecoder(r.Body).Decode(&a); err != nil {
-		return model, Error500(err)
+		return Error500(err)
 	}
 
 	errors, ok := (&validation.AuthorValidator{}).Validate(a)
 	if !ok {
-		return model, Error500(e.New("type assertion error"))
+		return Error500(e.New("type assertion error"))
 	}
 
 	if len(errors) > 0 {
-		return model, Error400(errors)
+		return Error400(errors)
 	}
 
 	a, err := h.AuthorService.Add(a)
 	if err != nil {
-		return model, Error500(err)
+		return Error500(err)
 	}
 
-	model.Values[authorLabel] = a
-	return model, nil
+	// return author
+	js, err := json.Marshal(a)
+	if err != nil {
+		return Error500(err)
+	}
+	w.Write(js)
+
+	return nil
 }
 
-func (h *AuthorHandler) GetAuthors(w http.ResponseWriter, r *http.Request, s session.Session) (Model, error) {
-
-	model := NewModel()
+func (h *AuthorHandler) GetAuthors(w http.ResponseWriter, r *http.Request, s session.Session) error {
 
 	authors, err := h.AuthorService.GetAuthors()
 	if err != nil {
-		return model, Error500(err)
+		return Error500(err)
 	}
 
-	model.Values[authorsLabel] = authors
+	// return authors
+	js, err := json.Marshal(authors)
+	if err != nil {
+		return Error500(err)
+	}
+	w.Write(js)
 
-	return model, nil
+	return nil
 }
 
-func (h *AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request, s session.Session) (Model, error) {
+func (h *AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request, s session.Session) error {
 
 	authorID := GetPathParam(r, authorIDLabel)
 
-	model := NewModel()
-
 	var authorUpdate author.AuthorUpdate
 	if err := json.NewDecoder(r.Body).Decode(&authorUpdate); err != nil {
-		return model, Error500(err)
+		return Error500(err)
 	}
 
 	authorUpdate.ID = authorID
 
 	errors, ok := (&validation.AuthorUpdateValidator{}).Validate(authorUpdate)
 	if !ok {
-		return model, Error500(e.New("type assertion error"))
+		return Error500(e.New("type assertion error"))
 	}
 	if len(errors) > 0 {
-		return model, Error400(errors)
+		return Error400(errors)
 	}
 
 	if err := h.AuthorService.Update(authorUpdate); err != nil {
-		return model, Error500(err)
+		return Error500(err)
 	}
 
-	return model, nil
+	return nil
 }
 
-func (h *AuthorHandler) DeleteAuthor(w http.ResponseWriter, r *http.Request, s session.Session) (Model, error) {
+func (h *AuthorHandler) DeleteAuthor(w http.ResponseWriter, r *http.Request, s session.Session) error {
 
 	authorID := GetPathParam(r, authorIDLabel)
-
-	model := NewModel()
 
 	err := h.AuthorService.Delete(authorID)
 	if err != nil {
-		return model, Error500(err)
+		return Error500(err)
 	}
 
-	return model, nil
+	return nil
 }
 
-func (h *AuthorHandler) GetAuthor(w http.ResponseWriter, r *http.Request, s session.Session) (Model, error) {
+func (h *AuthorHandler) GetAuthor(w http.ResponseWriter, r *http.Request, s session.Session) error {
 
 	authorID := GetPathParam(r, authorIDLabel)
 
-	model := NewModel()
-
 	author, err := h.AuthorService.GetAuthor(authorID)
 	if err != nil {
-		return model, Error500(err)
+		return Error500(err)
 	}
-	model.Values[authorLabel] = author
 
-	return model, nil
+	// return author
+	js, err := json.Marshal(author)
+	if err != nil {
+		return Error500(err)
+	}
+	w.Write(js)
+
+	return nil
 }
