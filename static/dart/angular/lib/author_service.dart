@@ -1,4 +1,6 @@
 import 'package:angular2/core.dart';
+import 'package:http/browser_client.dart';
+import 'package:http/http.dart';
 
 import 'dart:html';
 import 'dart:convert';
@@ -12,42 +14,23 @@ class AuthorService {
 	String _listAuthorsUrl = "/rest/api/v1.0/authors";
 	String _createAuthorUrl = "/rest/api/v1.0/authors";
 
-	void saveAuthor(Author author) {
-	
-		HttpRequest request = new HttpRequest(); // create a new XHR
+	final BrowserClient _http;
 
-  		// add an event handler that is called when the request finishes
-  		request.onReadyStateChange.listen((_) {
-    		if (request.readyState == HttpRequest.DONE && (request.status == 200 || request.status == 0)) {
-				print(request.responseText); // output the response from the server
-    		}
-  		});
+  AuthorService(this._http);
 
-  		request.open("POST", _createAuthorUrl, async: false);
-
-  		String jsonData = '{"firstName":"' + author.firstName + '", "lastName":"'+author.lastName+'"}'; // etc...
-  		request.send(jsonData); // perform the async POST
-	}
-	
-	void listAuthors(callback) {
-	
-		
-
-  		// call the web server asynchronously
-  		var request = HttpRequest.getString(_listAuthorsUrl).then((text){
-  			List<Author> authorList = new List<Author>();
-  			
-  			Map parsedMap = JSON.decode(text);
-  			var authors =  parsedMap["authors"];
-  			for (var a in authors) {
-				var author = new Author(a["firstName"], a["lastName"]);
-				authorList.add(author);
-			}
-			
-			
-			callback(authorList);
-  			
-  		});
-
-	}
+	Future<List<Author>> listAuthors() async {
+    try {
+      final response = await _http.get(_listAuthorsUrl);
+      final authors = _extractData(response)
+          .map((value) => new Author.fromJson(value))
+          .toList();
+      return authors;
+    } catch (e) {
+      //throw _handleError(e);
+    }
+  }
+dynamic _extractData(Response res) {
+  var body = JSON.decode(res.body);
+  return body['data'];
+}
 }

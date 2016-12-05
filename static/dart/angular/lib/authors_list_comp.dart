@@ -2,10 +2,12 @@ import 'package:angular2/core.dart';
 import 'package:angular2/router.dart';
 
 @Component(
-		selector: 'a-comp',
+		selector: 'authors-list-comp',
     templateUrl: 'a_comp.template.html',
     directives: const [ROUTER_DIRECTIVES]
     )
-class AComponent {
+class AuthorsListComponent {
+	final AuthorService _authorService;
 
+	AuthorsListComponent(this._heroService);
 }
