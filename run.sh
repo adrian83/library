@@ -9,6 +9,7 @@ usage() {
     run-mongo             Starts MongoDB docker image.
     run-redis             Starts Redis docker image.
     run-infra             Starts Docker, RethinkDB and Redis
+		dart                  Downloads Dart dependencies and rebuilds Dart files
 
 EOF
 	exit 1
@@ -42,6 +43,11 @@ run-infra() {
 	set +e
 }
 
+dart() {
+	set -e
+		cd static/dart/angular && pub get && pub build
+	set +e
+}
 
 CMD="$1"
 shift
@@ -57,6 +63,9 @@ case "$CMD" in
 	;;
 	run-infra)
 		run-infra
+	;;
+	dart)
+		dart
 	;;
 	*)
 		usage
