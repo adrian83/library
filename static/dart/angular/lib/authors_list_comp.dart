@@ -8,4 +8,5 @@ import 'package:angular2/router.dart';
     )
 class AuthorsListComponent {
 
+
 }

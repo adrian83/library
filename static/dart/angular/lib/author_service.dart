@@ -1,4 +1,6 @@
+
 import 'dart:async';
+import 'package:http/browser_client.dart';
 import 'dart:convert';
 import 'package:angular2/platform/browser.dart';
 import 'package:angular2/core.dart';
@@ -13,6 +15,7 @@ class AuthorService {
 	String _listAuthorsUrl = "/rest/api/v1.0/authors";
 	String _createAuthorUrl = "/rest/api/v1.0/authors";
 
+
 	static final _headers = {'Content-Type': 'application/json'};
   static const _heroesUrl = 'app/heroes'; // URL to web API
 
@@ -20,7 +23,8 @@ class AuthorService {
 
   AuthorService(this._http);
 
-  Future<List<Author>> getHeroes() async {
+
+	Future<List<Author>> listAuthors() async {
     try {
       final response = await _http.get(_listAuthorsUrl);
       final authors = _extractData(response)
@@ -38,7 +42,4 @@ class AuthorService {
     print(e); // for demo purposes only
     return new Exception('Server error; cause: $e');
   }
-
-
-
 }

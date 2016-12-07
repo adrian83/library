@@ -9,4 +9,5 @@ class Author {
 
 	factory Author.fromJson(Map<String, dynamic> author) =>
 		new Author(author['id'], author['firstName'], author['lastName']);
+
 }

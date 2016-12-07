@@ -14,7 +14,7 @@ import 'b_comp.dart';
     selector: 'my-app',
     template: '''
       <h1>{{title}}</h1>
-      <a [routerLink]="['AuthorsListC']">acomp</a>
+      <a [routerLink]="['AuthorsListC']">Authors list</a>
       <br/>
       <a [routerLink]="['BComp']">bcomp</a>
       <router-outlet></router-outlet>''',
@@ -25,8 +25,10 @@ import 'b_comp.dart';
   const Route(path: '/books', name: 'BComp', component: BComponent)
 ])
 class AppComponent {
-  String title = 'Tour of Heroes';
+
+  String title = 'Library';
   AuthorService _authorService;
 
   AppComponent(this._authorService);
+
 }
