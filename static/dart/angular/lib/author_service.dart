@@ -36,7 +36,7 @@ class AuthorService {
     }
   }
 
-  dynamic _extractData(Response resp) => JSON.decode(resp.body)['data'];
+  dynamic _extractData(Response resp) => JSON.decode(resp.body);
 
   Exception _handleError(dynamic e) {
     print(e); // for demo purposes only

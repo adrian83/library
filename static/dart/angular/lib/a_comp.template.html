@@ -1,3 +1,8 @@
+<h1>Authors' list</h1>
 <div>
-a-comp
+  <ul>
+    <li *ngFor="let author of authors">
+      {{author.firstName}} {{author.lastName}}
+    </li>
+  </ul>
 </div>
