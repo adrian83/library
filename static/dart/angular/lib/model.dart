@@ -1,4 +1,4 @@
-
+import 'dart:convert';
 
 class Author {
 	String id;
@@ -9,5 +9,10 @@ class Author {
 
 	factory Author.fromJson(Map<String, dynamic> author) =>
 		new Author(author['id'], author['firstName'], author['lastName']);
+
+	toJson() {
+		return JSON.encode({'firstName': firstName, "lastName": lastName});
+	}
+
 
 }

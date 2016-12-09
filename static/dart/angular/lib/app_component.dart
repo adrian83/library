@@ -9,6 +9,7 @@ import 'author_service.dart';
 
 import 'authors_list_comp.dart';
 import 'author_create_comp.dart';
+import 'author_update_comp.dart';
 
 @Component(
     selector: 'my-app',
@@ -21,8 +22,9 @@ import 'author_create_comp.dart';
     directives: const [ROUTER_DIRECTIVES], // components
     providers: const [AuthorService,ROUTER_PROVIDERS]) // services
 @RouteConfig(const [
-  const Route(path: '/authors', name: 'AuthorsListC', component: AuthorsListComponent),
-  const Route(path: '/books', name: 'AuthorCreateC', component: AuthorCreateComponent)
+  const Route(path: '/authors/list', name: 'AuthorsListC', component: AuthorsListComponent),
+  const Route(path: '/authors/new', name: 'AuthorCreateC', component: AuthorCreateComponent),
+  const Route(path: '/authors/show/:id', name: 'AuthorUpdateC', component: AuthorUpdateComponent)
 ])
 class AppComponent {
 

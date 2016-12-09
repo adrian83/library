@@ -1,8 +1,6 @@
-
 import 'dart:async';
-import 'package:http/browser_client.dart';
 import 'dart:convert';
-import 'package:angular2/platform/browser.dart';
+
 import 'package:angular2/core.dart';
 import 'package:http/http.dart';
 
@@ -12,12 +10,10 @@ import 'model.dart';
 @Injectable()
 class AuthorService {
 
-	String _listAuthorsUrl = "/rest/api/v1.0/authors";
-	String _createAuthorUrl = "/rest/api/v1.0/authors";
-
+	static final String _listAuthorsUrl = "/rest/api/v1.0/authors";
+	static final String _createAuthorUrl = "/rest/api/v1.0/authors";
 
 	static final _headers = {'Content-Type': 'application/json'};
-  static const _heroesUrl = 'app/heroes'; // URL to web API
 
   final Client _http;
 
@@ -36,10 +32,21 @@ class AuthorService {
     }
   }
 
+	Future<Author> createAuthor(Author author) async {
+		try {
+	    final response = await _http.post(_createAuthorUrl,
+	        headers: _headers, body: author.toJson());
+	    return new Author.fromJson(_extractData(response));
+	  } catch (e) {
+	    throw _handleError(e);
+	  }
+	}
+
+
   dynamic _extractData(Response resp) => JSON.decode(resp.body);
 
   Exception _handleError(dynamic e) {
-    print(e); // for demo purposes only
+    print(e);
     return new Exception('Server error; cause: $e');
   }
 }
