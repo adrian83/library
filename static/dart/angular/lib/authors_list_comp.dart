@@ -1,5 +1,4 @@
 import 'package:angular2/core.dart';
-import 'package:angular2/router.dart';
 import 'dart:async';
 
 import 'author_service.dart';
@@ -7,9 +6,7 @@ import 'model.dart';
 
 @Component(
 		selector: 'authors_list-comp',
-    templateUrl: 'a_comp.template.html'//,
-    //directives: const [ROUTER_DIRECTIVES],
-		//providers: const [AuthorService]
+    templateUrl: 'authors_list_comp.template.html'
     )
 class AuthorsListComponent implements OnInit {
 	final AuthorService _authorService;
