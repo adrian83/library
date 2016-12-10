@@ -24,9 +24,10 @@ class AuthorsListComponent implements OnInit {
 
 	List<Author> get getAuthors => this.authors;
 
-	Future<Null> showDetails(Author author) => _router.navigate([
+	Future<Null> showDetails(Author author) async {
+		_router.navigate([
 	        'AuthorShowC',
 	        {'id': author.id}
 	      ]);
-
+			}
 }

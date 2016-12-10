@@ -10,7 +10,7 @@ import 'model.dart';
 		selector: 'b-comp',
     templateUrl: 'author_show_comp.template.html'
     )
-class AuthorShowComponent {
+class AuthorShowComponent implements OnInit {
 	Author author = new Author(null, "Henryk", "Sienkiewicz");
 
 	final AuthorService _authorService;
