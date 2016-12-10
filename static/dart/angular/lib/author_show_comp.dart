@@ -8,20 +8,18 @@ import 'model.dart';
 
 @Component(
 		selector: 'b-comp',
-    templateUrl: 'author_update_comp.template.html'
+    templateUrl: 'author_show_comp.template.html'
     )
-class AuthorUpdateComponent implements OnInit {
-
+class AuthorShowComponent {
 	Author author = new Author(null, "Henryk", "Sienkiewicz");
 
 	final AuthorService _authorService;
 	final RouteParams _routeParams;
 
-	AuthorUpdateComponent(this._authorService, this._routeParams);
+	AuthorShowComponent(this._authorService, this._routeParams);
 
 	Future<Null> ngOnInit() async {
 		var _id = _routeParams.get('id');
     this.author = await this._authorService.getAuthor(_id);
   }
-
 }

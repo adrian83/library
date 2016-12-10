@@ -43,6 +43,15 @@ class AuthorService {
 	}
 
 
+Future<Author> getAuthor(String id) async {
+	try {
+		final response = await _http.get(_listAuthorsUrl+"/"+id);
+		return new Author.fromJson(_extractData(response));
+	} catch (e) {
+		throw _handleError(e);
+	}
+}
+
   dynamic _extractData(Response resp) => JSON.decode(resp.body);
 
   Exception _handleError(dynamic e) {

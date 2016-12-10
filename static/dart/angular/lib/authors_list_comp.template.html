@@ -1,7 +1,7 @@
 <h1>Authors' list</h1>
 <div>
   <ul>
-    <li *ngFor="let author of authors">
+    <li *ngFor="let author of authors" (click)="showDetails(author)">
       {{author.firstName}} {{author.lastName}}
     </li>
   </ul>

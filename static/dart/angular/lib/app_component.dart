@@ -1,7 +1,3 @@
-
-
-
-
 import 'package:angular2/core.dart';
 import 'package:angular2/router.dart';
 
@@ -10,6 +6,7 @@ import 'author_service.dart';
 import 'authors_list_comp.dart';
 import 'author_create_comp.dart';
 import 'author_update_comp.dart';
+import 'author_show_comp.dart';
 
 @Component(
     selector: 'my-app',
@@ -24,7 +21,8 @@ import 'author_update_comp.dart';
 @RouteConfig(const [
   const Route(path: '/authors/list', name: 'AuthorsListC', component: AuthorsListComponent),
   const Route(path: '/authors/new', name: 'AuthorCreateC', component: AuthorCreateComponent),
-  const Route(path: '/authors/show/:id', name: 'AuthorUpdateC', component: AuthorUpdateComponent)
+  const Route(path: '/authors/show/:id', name: 'AuthorShowC', component: AuthorShowComponent),
+  const Route(path: '/authors/update/:id', name: 'AuthorUpdateC', component: AuthorUpdateComponent)
 ])
 class AppComponent {
 
