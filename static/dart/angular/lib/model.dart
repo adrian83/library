@@ -13,6 +13,19 @@ class Author {
 	toJson() {
 		return JSON.encode({'firstName': firstName, "lastName": lastName});
 	}
+}
 
+class Book {
+	String id;
+	String title;
+	String authorId;
 
+	Book(this.id, this.title){}
+
+	factory Book.fromJson(Map<String, dynamic> book) =>
+		new Book(book['id'], book['title']);
+
+	toJson() {
+		return JSON.encode({'id': id});
+	}
 }
