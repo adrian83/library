@@ -5,11 +5,13 @@ usage() {
 
     Usage: $(basename $0) <command>
 
-    run-docker            Starts Docker on Arch based GNU Linux.
+    run-docker            Starts Docker daemon.
+    run-zookeeper         Starts Zookeeper localy.
+    run-kafka             Starts Kafka localy.
     run-mongo             Starts MongoDB docker image.
     run-redis             Starts Redis docker image.
     run-infra             Starts Docker, RethinkDB and Redis
-		dart                  Downloads Dart dependencies and rebuilds Dart files
+    dart                  Downloads Dart dependencies and rebuilds Dart files
 
 EOF
 	exit 1
@@ -18,6 +20,34 @@ EOF
 run-docker() {
 	set -e
 		sudo systemctl start docker
+	set +e
+}
+
+run-zookeeper() {
+	set -e
+		if [ -z "$KAFKA_HOME" ]; then
+    			echo "    Please set KAFKA_HOME (e.g. /home/some/path/to/kafka_2.12-0.10.2.1)"
+    			exit 1
+		else
+			echo "    KAFKA_HOME=" $KAFKA_HOME
+		fi
+
+		$KAFKA_HOME/bin/zookeeper-server-start.sh $KAFKA_HOME/config/zookeeper.properties
+
+	set +e
+}
+
+run-kafka() {
+	set -e
+		if [ -z "$KAFKA_HOME" ]; then
+    			echo "    Please set KAFKA_HOME (e.g. /home/some/path/to/kafka_2.12-0.10.2.1)"
+    			exit 1
+		else
+			echo "    KAFKA_HOME=" $KAFKA_HOME
+		fi
+
+		$KAFKA_HOME/bin/kafka-server-start.sh $KAFKA_HOME/config/server.properties
+
 	set +e
 }
 
@@ -54,6 +84,12 @@ shift
 case "$CMD" in
 	run-docker)
 		run-docker
+	;;
+	run-zookeeper)
+		run-zookeeper
+	;;
+	run-kafka)
+		run-kafka
 	;;
 	run-mongo)
 		run-mongo
