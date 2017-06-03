@@ -1,0 +1,9 @@
+<h1>Create author</h1>
+<div>{{book.id}} {{book.title}}</div>
+<div>
+  <input [(ngModel)]="book.title"/>
+  <br/>
+  <input [(ngModel)]="book.authorId"/>
+  <br/>
+  <input type="submit" (click)="onSubmit()" />
+</div>

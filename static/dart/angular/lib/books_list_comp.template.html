@@ -1,0 +1,8 @@
+<h1>Book' list</h1>
+<div>
+  <ul>
+    <li *ngFor="let book of books" (click)="showDetails(book);">
+    {{book.id}} {{book.title}}
+    </li>
+  </ul>
+</div>
