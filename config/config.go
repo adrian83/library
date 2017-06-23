@@ -29,6 +29,7 @@ type Config struct {
 	Server    ServerConfig    `json:"server"`
 	Session   SessionConfig   `json:"session"`
 	Databases DatabasesConfig `json:"databases"`
+	Kafka     KafkaConfig     `json:"kafka"`
 }
 
 type SessionConfig struct {
@@ -55,4 +56,8 @@ type MongoConfig struct {
 	Host string `json:"host"`
 	Port int    `json:"port"`
 	DB   string `json:"db"`
+}
+
+type KafkaConfig struct {
+	Brokers []string `json:"brokers"`
 }

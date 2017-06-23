@@ -1,10 +1,13 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
 	"config"
 	"web/handler"
@@ -15,6 +18,7 @@ import (
 	author "domain/author"
 	book "domain/book"
 
+	"github.com/Shopify/sarama"
 	"github.com/adrian83/go-redis-session"
 	"github.com/gorilla/mux"
 	"gopkg.in/mgo.v2"
@@ -23,6 +27,29 @@ import (
 var (
 	id = 0
 )
+
+type accessampleKafkaMsg struct {
+	ID      string `json:"id"`
+	Text    string `json:"text"`
+	encoded []byte
+	err     error
+}
+
+func (ale *accessampleKafkaMsg) ensureEncoded() {
+	if ale.encoded == nil && ale.err == nil {
+		ale.encoded, ale.err = json.Marshal(ale)
+	}
+}
+
+func (ale *accessampleKafkaMsg) Length() int {
+	ale.ensureEncoded()
+	return len(ale.encoded)
+}
+
+func (ale *accessampleKafkaMsg) Encode() ([]byte, error) {
+	ale.ensureEncoded()
+	return ale.encoded, ale.err
+}
 
 func Index(w http.ResponseWriter, r *http.Request, s session.Session) error {
 
@@ -91,6 +118,33 @@ func main() {
 	defer sessionStore.Close()
 
 	fmt.Println("Redis - OK")
+
+	// ---------------------------------------
+	// kafka
+	// ---------------------------------------
+	config := sarama.NewConfig()
+
+	config.Producer.RequiredAcks = sarama.WaitForLocal       // Only wait for the leader to ack
+	config.Producer.Compression = sarama.CompressionSnappy   // Compress messages
+	config.Producer.Flush.Frequency = 500 * time.Millisecond // Flush batches every 500ms
+
+	producer, err := sarama.NewAsyncProducer(appConfig.Kafka.Brokers, config)
+	if err != nil {
+		log.Fatalln("Failed to start Sarama producer:", err)
+	}
+
+	fmt.Printf("Producer: %v", producer)
+
+	entry := &accessampleKafkaMsg{
+		ID:   "123",
+		Text: "This is text",
+	}
+
+	producer.Input() <- &sarama.ProducerMessage{
+		Topic: "test",
+		Key:   sarama.StringEncoder("abc"),
+		Value: entry,
+	}
 
 	// ---------------------------------------
 	// main db - mongo

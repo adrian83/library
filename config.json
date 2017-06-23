@@ -9,8 +9,8 @@
 			"password":"",
 			"host":"localhost",
 			"port":6380
-		
-		}	
+
+		}
 	},
 	"databases":{
 		"mongo": {
@@ -18,6 +18,8 @@
 			"port":27018,
 			"db":"library"
 		}
+	},
+	"kafka":{
+		"brokers": ["localhost:9092"]
 	}
 }
-
