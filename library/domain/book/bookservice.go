@@ -1,7 +1,7 @@
 package book
 
 import (
-	author "domain/author"
+	author "github.com/adrian83/go-mvc-library/library/domain/author"
 )
 
 type BookService interface {

@@ -1,7 +1,7 @@
 package validation
 
 import (
-	book "domain/book"
+	book "github.com/adrian83/go-mvc-library/library/domain/book"
 )
 
 var (

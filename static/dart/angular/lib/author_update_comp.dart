@@ -24,4 +24,8 @@ class AuthorUpdateComponent implements OnInit {
     this.author = await this._authorService.getAuthor(_id);
   }
 
+	Future<Null> onSubmit() async {
+		print("onSubmit");
+	}
+
 }

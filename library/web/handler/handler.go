@@ -2,10 +2,11 @@ package handler
 
 import (
 	"fmt"
+	"net/http"
+
+	"github.com/adrian83/go-mvc-library/library/web/validation"
 	"github.com/adrian83/go-redis-session"
 	"github.com/gorilla/mux"
-	"net/http"
-	"web/validation"
 )
 
 /*

@@ -3,7 +3,8 @@ package json
 import (
 	"encoding/json"
 	"net/http"
-	"web/handler"
+
+	"github.com/adrian83/go-mvc-library/library/web/handler"
 )
 
 const (

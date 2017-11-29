@@ -5,23 +5,22 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"strconv"
 	"time"
 
-	"config"
-	"web/handler"
-	myhttp "web/html"
-	myjson "web/json"
-	mysession "web/session"
+	"github.com/adrian83/go-mvc-library/library/config"
+	"github.com/adrian83/go-mvc-library/library/db"
+	"github.com/adrian83/go-mvc-library/library/web/handler"
+	myhttp "github.com/adrian83/go-mvc-library/library/web/html"
+	myjson "github.com/adrian83/go-mvc-library/library/web/json"
+	mysession "github.com/adrian83/go-mvc-library/library/web/session"
 
-	author "domain/author"
-	book "domain/book"
+	author "github.com/adrian83/go-mvc-library/library/domain/author"
+	book "github.com/adrian83/go-mvc-library/library/domain/book"
 
 	"github.com/Shopify/sarama"
 	"github.com/adrian83/go-redis-session"
 	"github.com/gorilla/mux"
-	"gopkg.in/mgo.v2"
 )
 
 var (
@@ -88,17 +87,11 @@ func main() {
 	// ---------------------------------------
 	// application config
 	// ---------------------------------------
-	configPath := os.Args[1]
-	currentDir, err := os.Getwd()
+	appConfig, err := config.FromArg(1)
 	if err != nil {
 		panic(fmt.Sprintf("Cannot get the path to current directory: %v", err))
 	}
-
-	appConfig, err := config.ReadConfig(currentDir + "/" + configPath)
-
 	fmt.Println("Config - OK")
-
-	//fmt.Print("\n", appConfig.Server.Port)
 
 	// ---------------------------------------
 	// session
@@ -117,7 +110,7 @@ func main() {
 	}
 	defer sessionStore.Close()
 
-	fmt.Println("Redis - OK")
+	fmt.Println("Session - OK")
 
 	// ---------------------------------------
 	// kafka
@@ -149,15 +142,13 @@ func main() {
 	// ---------------------------------------
 	// main db - mongo
 	// ---------------------------------------
-	session, err := mgo.Dial(appConfig.Databases.Mongo.Host + ":" + strconv.Itoa(appConfig.Databases.Mongo.Port))
+	mongo, err := db.NewMongo(&appConfig.Databases.Mongo)
 	if err != nil {
-		panic(err)
+		panic(fmt.Sprintf("Mongo connection cannot be created because of: %v", err))
 	}
-	defer session.Close()
+	defer mongo.Close()
 
-	// Optional. Switch the session to a monotonic behavior.
-	session.SetMode(mgo.Monotonic, true)
-	database := session.DB(appConfig.Databases.Mongo.DB)
+	database := mongo.Library()
 
 	fmt.Println("Mongo - OK")
 
@@ -172,8 +163,8 @@ func main() {
 	// ---------------------------------------
 	// services
 	// ---------------------------------------
-	var authorService author.AuthorService = author.NewAuthorService(authorDal)
-	var bookService book.BookService = book.NewBookServiceImpl(bookDal, authorDal)
+	var authorService = author.NewAuthorService(authorDal)
+	var bookService = book.NewBookServiceImpl(bookDal, authorDal)
 
 	fmt.Println("Services - OK")
 
@@ -188,7 +179,7 @@ func main() {
 	// routing
 	// ---------------------------------------
 	mux := mux.NewRouter()
-	mux.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
+	mux.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("../static/"))))
 
 	mux.Handle("/", &myhttp.HttpHandler{
 		View:    "index",

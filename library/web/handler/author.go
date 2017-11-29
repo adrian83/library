@@ -1,12 +1,13 @@
 package handler
 
 import (
-	author "domain/author"
 	"encoding/json"
-	"github.com/adrian83/go-redis-session"
 	"net/http"
 
-	"web/validation"
+	author "github.com/adrian83/go-mvc-library/library/domain/author"
+	"github.com/adrian83/go-redis-session"
+
+	"github.com/adrian83/go-mvc-library/library/web/validation"
 
 	e "errors"
 )

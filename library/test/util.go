@@ -5,7 +5,8 @@ import (
 	"io"
 	"net/http"
 	"testing"
-	"web/validation"
+
+	"github.com/adrian83/go-mvc-library/library/web/validation"
 )
 
 const (

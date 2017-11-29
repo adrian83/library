@@ -7,8 +7,8 @@ import (
 	"net/http"
 
 	// ours
-	book "domain/book"
-	"web/validation"
+	book "github.com/adrian83/go-mvc-library/library/domain/book"
+	"github.com/adrian83/go-mvc-library/library/web/validation"
 
 	// 3th party
 	"github.com/adrian83/go-redis-session"

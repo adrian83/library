@@ -1,10 +1,11 @@
 package session
 
 import (
-	"github.com/adrian83/go-redis-session"
 	"net/http"
 	"time"
-	"web/cookie"
+
+	"github.com/adrian83/go-mvc-library/library/web/cookie"
+	"github.com/adrian83/go-redis-session"
 )
 
 const (

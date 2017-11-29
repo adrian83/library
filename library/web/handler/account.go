@@ -1,10 +1,11 @@
 package handler
 
 import (
-	"domain/user/model"
 	"encoding/json"
-	"github.com/adrian83/go-redis-session"
 	"net/http"
+
+	"github.com/adrian83/go-mvc-library/library/domain/user/model"
+	"github.com/adrian83/go-redis-session"
 )
 
 type AccountHandler struct {
