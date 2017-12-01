@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/adrian83/go-mvc-library/library/web/handler"
+	liberrors "github.com/adrian83/go-mvc-library/library/web/errors"
 )
 
 const (
@@ -23,9 +23,9 @@ func (h *JsonHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	err := h.Handler(w, req)
 	if err != nil {
 
-		appError, ok := err.(*handler.AppError)
+		appError, ok := err.(*liberrors.AppError)
 		if !ok {
-			appError = handler.Error500(err)
+			appError = liberrors.Error500(err)
 		}
 
 		errJSON, err2 := json.Marshal(appError.Dict())

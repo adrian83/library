@@ -8,6 +8,7 @@ import (
 
 	// ours
 	book "github.com/adrian83/go-mvc-library/library/domain/book"
+	liberrors "github.com/adrian83/go-mvc-library/library/web/errors"
 	"github.com/adrian83/go-mvc-library/library/web/validation"
 
 	// 3th party
@@ -24,31 +25,36 @@ type BookHandler struct {
 	BookService book.BookService
 }
 
+// Routes implements Controller interface.
+func (bh *BookHandler) Routes() []Route {
+	return []Route{}
+}
+
 func (h *BookHandler) AddBook(w http.ResponseWriter, r *http.Request, s session.Session) error {
 
 	var newBook book.NewBook
 	if err := json.NewDecoder(r.Body).Decode(&newBook); err != nil {
-		return Error500(err)
+		return liberrors.Error500(err)
 	}
 
 	errs, ok := (&validation.BookValidator{}).Validate(newBook)
 	if !ok {
-		return Error500(errors.New("type assertion error"))
+		return liberrors.Error500(errors.New("type assertion error"))
 	}
 
 	if len(errs) > 0 {
-		return Error400(errs)
+		return liberrors.Error400(errs)
 	}
 
 	book, err := h.BookService.Add(newBook)
 	if err != nil {
-		return Error500(err)
+		return liberrors.Error500(err)
 	}
 
 	// return book
 	js, err := json.Marshal(book)
 	if err != nil {
-		return Error500(err)
+		return liberrors.Error500(err)
 	}
 	w.Write(js)
 
@@ -59,13 +65,13 @@ func (h *BookHandler) GetBooks(w http.ResponseWriter, r *http.Request, s session
 
 	books, err := h.BookService.GetBooks()
 	if err != nil {
-		return Error500(err)
+		return liberrors.Error500(err)
 	}
 
 	// return books
 	js, err := json.Marshal(books)
 	if err != nil {
-		return Error500(err)
+		return liberrors.Error500(err)
 	}
 	w.Write(js)
 
@@ -76,21 +82,21 @@ func (h *BookHandler) GetBook(w http.ResponseWriter, r *http.Request, s session.
 
 	bookID := GetPathParam(r, bookIDLabel)
 	if !validation.IsIDValid(bookID) {
-		return Error400([]validation.ValidationError{validation.InvalidID})
+		return liberrors.Error400([]validation.ValidationError{validation.InvalidID})
 	}
 
 	book, ok, err := h.BookService.GetBook(bookID)
 	if err != nil {
-		return Error500(err)
+		return liberrors.Error500(err)
 	}
 	if !ok {
-		return Error404()
+		return liberrors.Error404()
 	}
 
 	// return book
 	js, err := json.Marshal(book)
 	if err != nil {
-		return Error500(err)
+		return liberrors.Error500(err)
 	}
 	w.Write(js)
 
@@ -103,7 +109,7 @@ func (h *BookHandler) DeleteBook(w http.ResponseWriter, r *http.Request, s sessi
 
 	err := h.BookService.Delete(bookID)
 	if err != nil {
-		return Error500(err)
+		return liberrors.Error500(err)
 	}
 
 	return nil
@@ -113,26 +119,26 @@ func (h *BookHandler) UpdateBook(w http.ResponseWriter, r *http.Request, s sessi
 
 	bookID := GetPathParam(r, bookIDLabel)
 	if !validation.IsIDValid(bookID) {
-		return Error400([]validation.ValidationError{validation.InvalidID})
+		return liberrors.Error400([]validation.ValidationError{validation.InvalidID})
 	}
 
 	var bookUpdate book.BookUpdate
 	if err := json.NewDecoder(r.Body).Decode(&bookUpdate); err != nil {
-		return Error500(err)
+		return liberrors.Error500(err)
 	}
 
 	bookUpdate.ID = bookID
 
 	errs, ok := (&validation.BookUpdateValidator{}).Validate(bookUpdate)
 	if !ok {
-		return Error500(errors.New("type assertion error"))
+		return liberrors.Error500(errors.New("type assertion error"))
 	}
 	if len(errs) > 0 {
-		return Error400(errs)
+		return liberrors.Error400(errs)
 	}
 
 	if err := h.BookService.Update(bookUpdate); err != nil {
-		return Error500(err)
+		return liberrors.Error500(err)
 	}
 
 	return nil

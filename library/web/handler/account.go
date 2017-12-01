@@ -5,17 +5,31 @@ import (
 	"net/http"
 
 	"github.com/adrian83/go-mvc-library/library/domain/user/model"
+	myjson "github.com/adrian83/go-mvc-library/library/web/json"
+	mysession "github.com/adrian83/go-mvc-library/library/web/session"
 	"github.com/adrian83/go-redis-session"
 )
 
+// AccountHandler is a handler for everything account-related.
 type AccountHandler struct {
+	SessionStore session.Store
 }
 
-func (h *AccountHandler) Login(w http.ResponseWriter, r *http.Request, s session.Session) error {
+// Routes implements Controller interface.
+func (ah *AccountHandler) Routes() []Route {
+	return []Route{
+		Route{
+			Path:    apiV1 + "auth/login",
+			Handler: &myjson.JsonHandler{Handler: mysession.WithSession(ah.SessionStore, ah.login)},
+			Method:  "POST",
+		},
+	}
+}
 
-	decoder := json.NewDecoder(r.Body)
+func (ah *AccountHandler) login(w http.ResponseWriter, r *http.Request, s session.Session) error {
+
 	var user model.User
-	if err := decoder.Decode(&user); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
