@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/adrian83/go-mvc-library/library/web/validation"
+	"github.com/adrian83/go-mvc-library/library/domain/common/model"
 )
 
 type AppError struct {
@@ -35,7 +35,7 @@ func (e *AppError) Dict() map[string]interface{} {
 	return model
 }
 
-func Error400(errors []validation.ValidationError) *AppError {
+func Error400(errors model.ValidationErrors) *AppError {
 	return &AppError{
 		HttpStatus: http.StatusBadRequest,
 		Code:       "error.generic.400",

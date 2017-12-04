@@ -2,15 +2,13 @@ package handler
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 
-	author "github.com/adrian83/go-mvc-library/library/domain/author"
-
+	libauthor "github.com/adrian83/go-mvc-library/library/domain/author"
 	liberrors "github.com/adrian83/go-mvc-library/library/web/errors"
+	libforms "github.com/adrian83/go-mvc-library/library/web/forms"
 	libjson "github.com/adrian83/go-mvc-library/library/web/json"
 	libsession "github.com/adrian83/go-mvc-library/library/web/session"
-	libvalidation "github.com/adrian83/go-mvc-library/library/web/validation"
 
 	"github.com/adrian83/go-redis-session"
 )
@@ -24,7 +22,7 @@ const (
 // AuthorHandler is a handler for everything author-related.
 type AuthorHandler struct {
 	SessionStore  session.Store
-	AuthorService author.AuthorService
+	AuthorService libauthor.AuthorService
 }
 
 // Routes implements Controller interface.
@@ -60,27 +58,28 @@ func (ah *AuthorHandler) Routes() []Route {
 
 func (ah *AuthorHandler) addAuthor(w http.ResponseWriter, r *http.Request, s session.Session) error {
 
-	var a author.Author
+	var a libforms.AuthorForm
 	if err := json.NewDecoder(r.Body).Decode(&a); err != nil {
 		return liberrors.Error500(err)
 	}
 
-	validationErrs, ok := (&libvalidation.AuthorValidator{}).Validate(a)
-	if !ok {
-		return liberrors.Error500(errors.New("type assertion error"))
-	}
-
-	if len(validationErrs) > 0 {
+	if validationErrs := a.Validate(); !validationErrs.Empty() {
 		return liberrors.Error400(validationErrs)
 	}
 
-	a, err := ah.AuthorService.Add(a)
+	author := libauthor.Author{
+		ID:        a.ID,
+		FirstName: a.FirstName,
+		LastName:  a.LastName,
+	}
+
+	newAuthor, err := ah.AuthorService.Add(&author)
 	if err != nil {
 		return liberrors.Error500(err)
 	}
 
 	// return author
-	js, err := json.Marshal(a)
+	js, err := json.Marshal(newAuthor)
 	if err != nil {
 		return liberrors.Error500(err)
 	}
@@ -110,22 +109,24 @@ func (ah *AuthorHandler) updateAuthor(w http.ResponseWriter, r *http.Request, s 
 
 	authorID := GetPathParam(r, authorIDLabel)
 
-	var authorUpdate author.AuthorUpdate
-	if err := json.NewDecoder(r.Body).Decode(&authorUpdate); err != nil {
+	var a libforms.AuthorForm
+	if err := json.NewDecoder(r.Body).Decode(&a); err != nil {
 		return liberrors.Error500(err)
 	}
 
-	authorUpdate.ID = authorID
+	a.ID = authorID
 
-	validationErrs, ok := (&libvalidation.AuthorUpdateValidator{}).Validate(authorUpdate)
-	if !ok {
-		return liberrors.Error500(errors.New("type assertion error"))
-	}
-	if len(validationErrs) > 0 {
+	if validationErrs := a.Validate(); !validationErrs.Empty() {
 		return liberrors.Error400(validationErrs)
 	}
 
-	if err := ah.AuthorService.Update(authorUpdate); err != nil {
+	au := libauthor.Author{
+		ID:        a.ID,
+		FirstName: a.FirstName,
+		LastName:  a.LastName,
+	}
+
+	if err := ah.AuthorService.Update(&au); err != nil {
 		return liberrors.Error500(err)
 	}
 
@@ -148,13 +149,13 @@ func (ah *AuthorHandler) getAuthor(w http.ResponseWriter, r *http.Request, s ses
 
 	authorID := GetPathParam(r, authorIDLabel)
 
-	author, err := ah.AuthorService.GetAuthor(authorID)
+	a, err := ah.AuthorService.GetAuthor(authorID)
 	if err != nil {
 		return liberrors.Error500(err)
 	}
 
 	// return author
-	js, err := json.Marshal(author)
+	js, err := json.Marshal(a)
 	if err != nil {
 		return liberrors.Error500(err)
 	}

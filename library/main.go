@@ -3,10 +3,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/adrian83/go-mvc-library/library/config"
 	"github.com/adrian83/go-mvc-library/library/db"
@@ -16,7 +14,7 @@ import (
 	author "github.com/adrian83/go-mvc-library/library/domain/author"
 	book "github.com/adrian83/go-mvc-library/library/domain/book"
 
-	"github.com/Shopify/sarama"
+	//"github.com/Shopify/sarama"
 	"github.com/adrian83/go-redis-session"
 )
 
@@ -80,30 +78,31 @@ func main() {
 	// ---------------------------------------
 	// kafka
 	// ---------------------------------------
-	config := sarama.NewConfig()
+	/*
+		config := sarama.NewConfig()
 
-	config.Producer.RequiredAcks = sarama.WaitForLocal       // Only wait for the leader to ack
-	config.Producer.Compression = sarama.CompressionSnappy   // Compress messages
-	config.Producer.Flush.Frequency = 500 * time.Millisecond // Flush batches every 500ms
+		config.Producer.RequiredAcks = sarama.WaitForLocal       // Only wait for the leader to ack
+		config.Producer.Compression = sarama.CompressionSnappy   // Compress messages
+		config.Producer.Flush.Frequency = 500 * time.Millisecond // Flush batches every 500ms
 
-	producer, err := sarama.NewAsyncProducer(appConfig.Kafka.Brokers, config)
-	if err != nil {
-		log.Fatalln("Failed to start Sarama producer:", err)
-	}
+		producer, err := sarama.NewAsyncProducer(appConfig.Kafka.Brokers, config)
+		if err != nil {
+			log.Fatalln("Failed to start Sarama producer:", err)
+		}
 
-	fmt.Printf("Producer: %v", producer)
+		fmt.Printf("Producer: %v", producer)
 
-	entry := &accessampleKafkaMsg{
-		ID:   "123",
-		Text: "This is text",
-	}
+		entry := &accessampleKafkaMsg{
+			ID:   "123",
+			Text: "This is text",
+		}
 
-	producer.Input() <- &sarama.ProducerMessage{
-		Topic: "test",
-		Key:   sarama.StringEncoder("abc"),
-		Value: entry,
-	}
-
+		producer.Input() <- &sarama.ProducerMessage{
+			Topic: "test",
+			Key:   sarama.StringEncoder("abc"),
+			Value: entry,
+		}
+	*/
 	// ---------------------------------------
 	// main db - mongo
 	// ---------------------------------------
@@ -120,7 +119,7 @@ func main() {
 	// ---------------------------------------
 	// dals
 	// ---------------------------------------
-	var authorDal author.AuthorDal = author.NewAuthorMongoDal(database)
+	var authorDal author.Dal = author.NewAuthorMongoDal(database)
 	var bookDal book.BookDal = book.NewBookMongoDal(database)
 
 	fmt.Println("DALs - OK")
@@ -136,14 +135,16 @@ func main() {
 	// ---------------------------------------
 	// handlers (controllers)
 	// ---------------------------------------
+	viewHandler := &handler.ViewHandler{SessionStore: sessionStore}
 	accountHandler := &handler.AccountHandler{SessionStore: sessionStore}
-	authorHandler := &handler.AuthorHandler{AuthorService: authorService}
-	bookHandler := &handler.BookHandler{BookService: bookService}
+	authorHandler := &handler.AuthorHandler{SessionStore: sessionStore, AuthorService: authorService}
+	bookHandler := &handler.BookHandler{SessionStore: sessionStore, BookService: bookService}
 
 	// ---------------------------------------
 	// routing
 	// ---------------------------------------
 	mux := router.CreateRouter(
+		viewHandler,
 		accountHandler,
 		authorHandler,
 		bookHandler,

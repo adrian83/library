@@ -16,8 +16,8 @@ const (
 
 type BookDal interface {
 	Add(book Book) (Book, error)
-	GetBooks() ([]Book, error)
-	Update(book BookUpdate) error
+	GetBooks() ([]*Book, error)
+	Update(book Book) error
 	Delete(bookID string) error
 	GetBook(bookID string) (Book, bool, error)
 }
@@ -35,27 +35,31 @@ type BookMongoDal struct {
 }
 
 func (d BookMongoDal) Add(book Book) (Book, error) {
-	book.ID = bson.NewObjectId()
-	err := d.collection.Insert(book)
+	err := d.collection.Insert(book.ToEntity())
 	return book, err
 }
 
-func (d BookMongoDal) GetBooks() ([]Book, error) {
-	books := make([]Book, 0)
-	err := d.collection.Find(nil).All(&books)
-	return books, err
+func (d BookMongoDal) GetBooks() ([]*Book, error) {
+	entities := make([]Entity, 0)
+	err := d.collection.Find(nil).All(&entities)
+	if err != nil {
+		return nil, err
+	}
+
+	books := make([]*Book, 0)
+	for _, b := range entities {
+		books = append(books, b.ToBook())
+	}
+
+	return books, nil
 }
 
-func (d BookMongoDal) Update(book BookUpdate) error {
+func (d BookMongoDal) Update(book Book) error {
 	dict := make(map[string]interface{})
-	if book.Title != nil {
-		dict[title] = book.Title
-	}
-	if len(book.Authors) > 0 {
-		dict[authors] = book.Authors
-	}
-	//dict[authors] = *book.LastName
-	return d.collection.Update(bson.M{id: bson.ObjectIdHex(book.ID)}, dict)
+	dict[title] = book.Title
+	dict[authors] = book.Authors
+
+	return d.collection.Update(bson.M{id: book.ID}, dict)
 }
 
 func (d BookMongoDal) Delete(bookID string) error {

@@ -5,8 +5,9 @@ import (
 	"net/http"
 
 	"github.com/adrian83/go-mvc-library/library/domain/user/model"
-	myjson "github.com/adrian83/go-mvc-library/library/web/json"
-	mysession "github.com/adrian83/go-mvc-library/library/web/session"
+	libjson "github.com/adrian83/go-mvc-library/library/web/json"
+	libsession "github.com/adrian83/go-mvc-library/library/web/session"
+
 	"github.com/adrian83/go-redis-session"
 )
 
@@ -20,7 +21,7 @@ func (ah *AccountHandler) Routes() []Route {
 	return []Route{
 		Route{
 			Path:    apiV1 + "auth/login",
-			Handler: &myjson.JsonHandler{Handler: mysession.WithSession(ah.SessionStore, ah.login)},
+			Handler: &libjson.JsonHandler{Handler: libsession.WithSession(ah.SessionStore, ah.login)},
 			Method:  "POST",
 		},
 	}

@@ -14,78 +14,66 @@ const (
 	id = "_id"
 )
 
-type AuthorDal interface {
-	Add(author Author) (Author, error)
-	GetAuthors() ([]Author, error)
-	Update(author AuthorUpdate) error
-	Delete(authorID string) error
-	GetAuthor(authorID string) (Author, error)
-	FindAuthorsByIDs(authorIDs []string) ([]Author, error)
+// Dal is a data access layer for authors.
+type Dal interface {
+	Add(author *Entity) (*Entity, error)
+	GetAuthors() ([]*Entity, error)
+	Update(author *Entity) error
+	Delete(authorID bson.ObjectId) error
+	GetAuthor(authorID bson.ObjectId) (*Entity, error)
+	FindAuthorsByIDs(authorIDs []bson.ObjectId) ([]*Entity, error)
 }
 
-func NewAuthorMongoDal(database *mgo.Database) *AuthorMongoDal {
-	return &AuthorMongoDal{
+// NewAuthorMongoDal returns Author Dal implementation which stores data in MongoDB.
+func NewAuthorMongoDal(database *mgo.Database) *MongoDal {
+	return &MongoDal{
 		database:   database,
 		collection: database.C(collectionName),
 	}
 }
 
-type AuthorMongoDal struct {
+// MongoDal implementation of AuthorDal that stores data in MongoDB.
+type MongoDal struct {
 	database   *mgo.Database
 	collection *mgo.Collection
 }
 
-func (d AuthorMongoDal) Add(author Author) (Author, error) {
-	entity := dtoToEntity(author)
-	return entityToDto(entity), d.collection.Insert(entity)
+// Add stores author data into MongoDB.
+func (d MongoDal) Add(author *Entity) (*Entity, error) {
+	return author, d.collection.Insert(author)
 }
 
-func (d AuthorMongoDal) GetAuthors() ([]Author, error) {
-	authorsEntities := make([]AuthorEntity, 0)
+// GetAuthors returns slice of authors fetched from MongoDB.
+func (d MongoDal) GetAuthors() ([]*Entity, error) {
+	authorsEntities := make([]*Entity, 0)
 	err := d.collection.Find(nil).All(&authorsEntities)
-	return entitiesToDtos(authorsEntities), err
+	return authorsEntities, err
 }
 
-func (d AuthorMongoDal) Update(author AuthorUpdate) error {
-	dict := make(map[string]interface{})
-	dict[firstName] = author.FirstName
-	dict[lastName] = *author.LastName
-	return d.collection.Update(bson.M{id: bson.ObjectIdHex(author.ID)}, dict)
-}
-
-func (d AuthorMongoDal) Delete(authorID string) error {
-	return d.collection.RemoveId(bson.ObjectIdHex(authorID))
-}
-
-func (d AuthorMongoDal) GetAuthor(authorID string) (Author, error) {
-	authorEntity := new(AuthorEntity)
-	err := d.collection.FindId(bson.ObjectIdHex(authorID)).One(authorEntity)
-	return entityToDto(*authorEntity), err
-}
-
-func (d AuthorMongoDal) FindAuthorsByIDs(authorIDs []string) ([]Author, error) {
-	ids := make([]bson.ObjectId, 0)
-	for _, authorID := range authorIDs {
-		ids = append(ids, bson.ObjectIdHex(authorID))
+// Update updates author's data into MongoDB.
+func (d MongoDal) Update(author *Entity) error {
+	dict := map[string]interface{}{
+		firstName: author.FirstName,
+		lastName:  author.LastName,
 	}
-	authorsEntities := make([]AuthorEntity, 0)
-	err := d.collection.Find(bson.M{id: map[string]interface{}{"$in": ids}}).All(&authorsEntities)
-	return entitiesToDtos(authorsEntities), err
+	return d.collection.Update(bson.M{id: author.ID}, dict)
 }
 
-func dtoToEntity(dto Author) AuthorEntity {
-	ID := bson.NewObjectId()
-	return AuthorEntity{ID: ID, FirstName: dto.FirstName, LastName: dto.LastName}
+// Delete removes author with given ID from MongoDB.
+func (d MongoDal) Delete(authorID bson.ObjectId) error {
+	return d.collection.RemoveId(authorID)
 }
 
-func entityToDto(entity AuthorEntity) Author {
-	return Author{ID: entity.ID.Hex(), FirstName: entity.FirstName, LastName: entity.LastName}
+// GetAuthor returns author stored in MongoDB with given ID.
+func (d MongoDal) GetAuthor(authorID bson.ObjectId) (*Entity, error) {
+	entity := new(Entity)
+	err := d.collection.FindId(authorID).One(entity)
+	return entity, err
 }
 
-func entitiesToDtos(entities []AuthorEntity) []Author {
-	authors := make([]Author, len(entities))
-	for i, entity := range entities {
-		authors[i] = entityToDto(entity)
-	}
-	return authors
+// FindAuthorsByIDs returns slice of Authors with given IDs.
+func (d MongoDal) FindAuthorsByIDs(authorIDs []bson.ObjectId) ([]*Entity, error) {
+	entities := make([]*Entity, 0)
+	err := d.collection.Find(bson.M{id: map[string]interface{}{"$in": authorIDs}}).All(&entities)
+	return entities, err
 }
