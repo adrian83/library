@@ -14,63 +14,63 @@ const (
 	id = "_id"
 )
 
-type BookDal interface {
-	Add(book Book) (Book, error)
-	GetBooks() ([]*Book, error)
-	Update(book Book) error
-	Delete(bookID string) error
-	GetBook(bookID string) (Book, bool, error)
+// Dal is an interface for book data access layer.
+type Dal interface {
+	Add(book *Entity) (*Entity, error)
+	GetBooks() ([]*Entity, error)
+	Update(book *Entity) error
+	Delete(bookID bson.ObjectId) error
+	GetBook(bookID bson.ObjectId) (*Entity, error)
 }
 
-func NewBookMongoDal(database *mgo.Database) *BookMongoDal {
-	return &BookMongoDal{
+// NewBookMongoDal returns new instance of Dal implementation backed by MongoDB.
+func NewBookMongoDal(database *mgo.Database) *MongoDal {
+	return &MongoDal{
 		database:   database,
 		collection: database.C(collectionName),
 	}
 }
 
-type BookMongoDal struct {
+// MongoDal is a Dal implementation backed by MongoDB.
+type MongoDal struct {
 	database   *mgo.Database
 	collection *mgo.Collection
 }
 
-func (d BookMongoDal) Add(book Book) (Book, error) {
-	err := d.collection.Insert(book.ToEntity())
+// Add persists new book to MongoDB.
+func (d MongoDal) Add(book *Entity) (*Entity, error) {
+	err := d.collection.Insert(book)
 	return book, err
 }
 
-func (d BookMongoDal) GetBooks() ([]*Book, error) {
-	entities := make([]Entity, 0)
-	err := d.collection.Find(nil).All(&entities)
-	if err != nil {
+// GetBooks returns slice of books.
+func (d MongoDal) GetBooks() ([]*Entity, error) {
+	entities := make([]*Entity, 0)
+	if err := d.collection.Find(nil).All(&entities); err != nil {
 		return nil, err
 	}
-
-	books := make([]*Book, 0)
-	for _, b := range entities {
-		books = append(books, b.ToBook())
-	}
-
-	return books, nil
+	return entities, nil
 }
 
-func (d BookMongoDal) Update(book Book) error {
+// Update updates book in MongoDB.
+func (d MongoDal) Update(book *Entity) error {
 	dict := make(map[string]interface{})
 	dict[title] = book.Title
 	dict[authors] = book.Authors
-
 	return d.collection.Update(bson.M{id: book.ID}, dict)
 }
 
-func (d BookMongoDal) Delete(bookID string) error {
-	return d.collection.RemoveId(bson.ObjectIdHex(bookID))
+// Delete removes book with given id from MongoDb.
+func (d MongoDal) Delete(bookID bson.ObjectId) error {
+	return d.collection.RemoveId(bookID)
 }
 
-func (d BookMongoDal) GetBook(bookID string) (Book, bool, error) {
-	book := new(Book)
-	err := d.collection.FindId(bson.ObjectIdHex(bookID)).One(book)
-	if err != nil && err == mgo.ErrNotFound {
-		return *book, false, nil
+// GetBook returns book with given id or error.
+func (d MongoDal) GetBook(bookID bson.ObjectId) (*Entity, error) {
+	entity := new(Entity)
+	// && err == mgo.ErrNotFound
+	if err := d.collection.FindId(bookID).One(entity); err != nil {
+		return nil, err
 	}
-	return *book, true, err
+	return entity, nil
 }

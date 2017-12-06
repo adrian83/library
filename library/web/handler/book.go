@@ -71,7 +71,7 @@ func (bh *BookHandler) addBook(w http.ResponseWriter, r *http.Request, s session
 		return liberrors.Error400(validationErrs)
 	}
 
-	book, err := bh.BookService.Add(*newBook.ToBook())
+	book, err := bh.BookService.Add(newBook.ToBook())
 	if err != nil {
 		return liberrors.Error500(err)
 	}
@@ -110,13 +110,12 @@ func (bh *BookHandler) getBook(w http.ResponseWriter, r *http.Request, s session
 		return liberrors.Error400([]*model.ValidationError{&model.InvalidID})
 	}
 
-	book, ok, err := bh.BookService.GetBook(bookID)
+	book, err := bh.BookService.GetBook(bookID)
 	if err != nil {
 		return liberrors.Error500(err)
 	}
-	if !ok {
-		return liberrors.Error404()
-	}
+
+	//return liberrors.Error404()
 
 	// return book
 	js, err := json.Marshal(book)
@@ -158,7 +157,7 @@ func (bh *BookHandler) updateBook(w http.ResponseWriter, r *http.Request, s sess
 		return liberrors.Error400(validationErrs)
 	}
 
-	if err := bh.BookService.Update(*bookUpdate.ToBook()); err != nil {
+	if err := bh.BookService.Update(bookUpdate.ToBook()); err != nil {
 		return liberrors.Error500(err)
 	}
 

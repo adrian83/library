@@ -12,6 +12,10 @@ type Entity struct {
 	Authors []*author.Entity `json:"authors,omitempty" bson:"authors,omitempty"`
 }
 
+// Entities is just a slice of Entities.
+type Entities []*Entity
+
+// ToBook transforms Entity to Book.
 func (e *Entity) ToBook() *Book {
 	authors := make([]*author.Author, 0)
 	for _, a := range e.Authors {
@@ -25,12 +29,14 @@ func (e *Entity) ToBook() *Book {
 	}
 }
 
+// Book is a struct used in service layer.
 type Book struct {
-	ID      string           `json:"id" bson:"_id,omitempty"`
-	Title   string           `json:"title,omitempty" bson:"title,omitempty"`
-	Authors []*author.Author `json:"authors,omitempty" bson:"authors,omitempty"`
+	ID      string           `json:"id"`
+	Title   string           `json:"title,omitempty"`
+	Authors []*author.Author `json:"authors,omitempty"`
 }
 
+// ToEntity transforms Book to Entity.
 func (b Book) ToEntity() *Entity {
 	newID := bson.NewObjectId()
 	if b.ID == "" {

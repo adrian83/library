@@ -17,11 +17,11 @@ const (
 // Dal is a data access layer for authors.
 type Dal interface {
 	Add(author *Entity) (*Entity, error)
-	GetAuthors() ([]*Entity, error)
+	GetAuthors() (Entities, error)
 	Update(author *Entity) error
 	Delete(authorID bson.ObjectId) error
 	GetAuthor(authorID bson.ObjectId) (*Entity, error)
-	FindAuthorsByIDs(authorIDs []bson.ObjectId) ([]*Entity, error)
+	FindAuthorsByIDs(authorIDs []bson.ObjectId) (Entities, error)
 }
 
 // NewAuthorMongoDal returns Author Dal implementation which stores data in MongoDB.

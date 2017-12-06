@@ -11,6 +11,9 @@ type Entity struct {
 	LastName  string        `json:"lastName,omitempty" bson:"lastName,omitempty"`
 }
 
+// Entities is just a slice of Entities.
+type Entities []*Entity
+
 // ToAuthor transforms Entity struct to Author struct.
 func (e *Entity) ToAuthor() *Author {
 	return &Author{
