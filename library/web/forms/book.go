@@ -1,6 +1,8 @@
 package forms
 
 import (
+	"fmt"
+
 	"github.com/adrian83/go-mvc-library/library/domain/author"
 	"github.com/adrian83/go-mvc-library/library/domain/book"
 	"github.com/adrian83/go-mvc-library/library/domain/common/model"
@@ -23,6 +25,11 @@ type BookForm struct {
 	ID      string       `json:"id,omitempty"`
 	Title   string       `json:"title,omitempty"`
 	Authors []AuthorForm `json:"authors,omitempty"`
+}
+
+// String returns struct's string representation.
+func (b *BookForm) String() string {
+	return fmt.Sprintf("BookForm {ID: %v, Title: %v, Authors: %v}", b.ID, b.Title, b.Authors)
 }
 
 // Validate implements Validable interface.

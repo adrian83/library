@@ -44,7 +44,7 @@ func (d MongoDal) Add(author *Entity) (*Entity, error) {
 }
 
 // GetAuthors returns slice of authors fetched from MongoDB.
-func (d MongoDal) GetAuthors() ([]*Entity, error) {
+func (d MongoDal) GetAuthors() (Entities, error) {
 	authorsEntities := make([]*Entity, 0)
 	err := d.collection.Find(nil).All(&authorsEntities)
 	return authorsEntities, err
@@ -72,7 +72,7 @@ func (d MongoDal) GetAuthor(authorID bson.ObjectId) (*Entity, error) {
 }
 
 // FindAuthorsByIDs returns slice of Authors with given IDs.
-func (d MongoDal) FindAuthorsByIDs(authorIDs []bson.ObjectId) ([]*Entity, error) {
+func (d MongoDal) FindAuthorsByIDs(authorIDs []bson.ObjectId) (Entities, error) {
 	entities := make([]*Entity, 0)
 	err := d.collection.Find(bson.M{id: map[string]interface{}{"$in": authorIDs}}).All(&entities)
 	return entities, err

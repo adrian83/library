@@ -3,6 +3,7 @@ package handler
 import (
 	// std lib
 	"encoding/json"
+	"log"
 	"net/http"
 
 	// ours
@@ -67,6 +68,17 @@ func (bh *BookHandler) addBook(w http.ResponseWriter, r *http.Request, s session
 		return liberrors.Error500(err)
 	}
 
+	// temporary for testing
+	newBook.Authors = []forms.AuthorForm{
+		forms.AuthorForm{
+			ID:        "5a1f1d84e0880e12fd32199a",
+			FirstName: "Henryk",
+			LastName:  "Sienkiewicz",
+		},
+	}
+
+	log.Printf("Create new book. Form: %v", newBook)
+
 	if validationErrs := newBook.Validate(); !validationErrs.Empty() {
 		return liberrors.Error400(validationErrs)
 	}
@@ -90,15 +102,16 @@ func (bh *BookHandler) getBooks(w http.ResponseWriter, r *http.Request, s sessio
 
 	books, err := bh.BookService.GetBooks()
 	if err != nil {
+		log.Printf("Error while getting books. Error: %v", err)
 		return liberrors.Error500(err)
 	}
 
 	// return books
-	js, err := json.Marshal(books)
+	err = json.NewEncoder(w).Encode(books)
 	if err != nil {
+		log.Printf("Error while marshalling books to JSON. Error: %v", err)
 		return liberrors.Error500(err)
 	}
-	w.Write(js)
 
 	return nil
 }

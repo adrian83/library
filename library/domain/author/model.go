@@ -17,7 +17,7 @@ type Entities []*Entity
 // ToAuthor transforms Entity struct to Author struct.
 func (e *Entity) ToAuthor() *Author {
 	return &Author{
-		ID:        e.ID.String(),
+		ID:        e.ID.Hex(),
 		FirstName: e.FirstName,
 		LastName:  e.LastName,
 	}
@@ -33,7 +33,7 @@ type Author struct {
 // ToEntity transforms Author struct to Entity struct.
 func (a *Author) ToEntity() *Entity {
 	newID := bson.NewObjectId()
-	if a.ID == "" {
+	if a.ID != "" {
 		newID = bson.ObjectIdHex(a.ID)
 	}
 

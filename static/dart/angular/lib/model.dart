@@ -26,6 +26,6 @@ class Book {
 		new Book(book['id'], book['title']);
 
 	toJson() {
-		return JSON.encode({'id': id});
+		return JSON.encode({'title': title});
 	}
 }

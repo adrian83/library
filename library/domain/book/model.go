@@ -23,7 +23,7 @@ func (e *Entity) ToBook() *Book {
 	}
 
 	return &Book{
-		ID:      e.ID.String(),
+		ID:      e.ID.Hex(),
 		Title:   e.Title,
 		Authors: authors,
 	}
@@ -39,7 +39,7 @@ type Book struct {
 // ToEntity transforms Book to Entity.
 func (b Book) ToEntity() *Entity {
 	newID := bson.NewObjectId()
-	if b.ID == "" {
+	if b.ID != "" {
 		newID = bson.ObjectIdHex(b.ID)
 	}
 
