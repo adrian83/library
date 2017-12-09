@@ -1,7 +1,25 @@
-<h1>Create author</h1>
+<h1>Create book</h1>
 <div>{{book.id}} {{book.title}}</div>
 <div>
   <input [(ngModel)]="book.title"/>
+
+  <div>
+    <ul>
+      <li *ngFor="let author of book.authors">
+      {{author.id}} {{author.firstName}} {{author.lastName}}
+      </li>
+    </ul>
+  </div>
   <br/>
+
   <input type="submit" (click)="onSubmit()" />
+</div>
+
+<h1>Authors' list</h1>
+<div>
+  <ul>
+    <li *ngFor="let author of authors" (click)="addAuthor(author);">
+    {{author.id}} {{author.firstName}} {{author.lastName}}
+    </li>
+  </ul>
 </div>

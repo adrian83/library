@@ -3,11 +3,15 @@ import 'dart:convert';
 
 import 'package:angular2/core.dart';
 import 'package:http/http.dart';
+import 'package:logging/logging.dart';
 
 import 'model.dart';
 
 @Injectable()
 class AuthorService {
+
+  static final Logger LOGGER = new Logger('AuthorService');
+
   static final String _listAuthorsUrl = "/rest/api/v1.0/authors";
   static final String _createAuthorUrl = "/rest/api/v1.0/authors";
 
@@ -18,6 +22,7 @@ class AuthorService {
   AuthorService(this._http);
 
   Future<List<Author>> listAuthors() async {
+    LOGGER.info("Get authors");
     try {
       final response = await _http.get(_listAuthorsUrl);
       final authors = _extractData(response)

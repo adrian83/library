@@ -7,3 +7,6 @@ static/web/packages
 static/dart/angular/**
 
 infrastructure/
+
+static/dart/angular/pubspec.lock
+static/dart/angular/.packages

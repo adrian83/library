@@ -11,6 +11,10 @@ import 'author_show_comp.dart';
 import 'books_list_comp.dart';
 import 'book_create_comp.dart';
 
+import 'package:logging/logging.dart';
+
+
+
 @Component(
     selector: 'my-app',
     template: '''
@@ -41,6 +45,11 @@ class AppComponent {
   AuthorService _authorService;
   BookService _bookService;
 
-  AppComponent(this._authorService, this._bookService);
+  AppComponent(this._authorService, this._bookService){
+    Logger.root.level = Level.ALL;
+    Logger.root.onRecord.listen((LogRecord rec) {
+      print('${rec.level.name}: ${rec.time}: ${rec.message}');
+    });
+  }
 
 }

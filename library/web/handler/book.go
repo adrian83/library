@@ -68,15 +68,6 @@ func (bh *BookHandler) addBook(w http.ResponseWriter, r *http.Request, s session
 		return liberrors.Error500(err)
 	}
 
-	// temporary for testing
-	newBook.Authors = []forms.AuthorForm{
-		forms.AuthorForm{
-			ID:        "5a1f1d84e0880e12fd32199a",
-			FirstName: "Henryk",
-			LastName:  "Sienkiewicz",
-		},
-	}
-
 	log.Printf("Create new book. Form: %v", newBook)
 
 	if validationErrs := newBook.Validate(); !validationErrs.Empty() {
