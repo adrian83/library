@@ -8,6 +8,7 @@ import (
 
 	"github.com/adrian83/go-mvc-library/library/config"
 	"github.com/adrian83/go-mvc-library/library/db"
+	//"github.com/adrian83/go-mvc-library/library/queue"
 	"github.com/adrian83/go-mvc-library/library/web/handler"
 	"github.com/adrian83/go-mvc-library/library/web/router"
 
@@ -79,19 +80,15 @@ func main() {
 	// kafka
 	// ---------------------------------------
 	/*
-		config := sarama.NewConfig()
+		kafka := queue.NewKafka(&appConfig.Kafka)
 
-		config.Producer.RequiredAcks = sarama.WaitForLocal       // Only wait for the leader to ack
-		config.Producer.Compression = sarama.CompressionSnappy   // Compress messages
-		config.Producer.Flush.Frequency = 500 * time.Millisecond // Flush batches every 500ms
-
-		producer, err := sarama.NewAsyncProducer(appConfig.Kafka.Brokers, config)
+		_, err = kafka.AsyncProducer()
 		if err != nil {
-			log.Fatalln("Failed to start Sarama producer:", err)
+			panic(fmt.Sprintf("Failed to create Kafka producer: %v", err))
 		}
-
-		fmt.Printf("Producer: %v", producer)
-
+		fmt.Println("Kafka - OK")
+	*/
+	/*
 		entry := &accessampleKafkaMsg{
 			ID:   "123",
 			Text: "This is text",
@@ -103,6 +100,7 @@ func main() {
 			Value: entry,
 		}
 	*/
+
 	// ---------------------------------------
 	// main db - mongo
 	// ---------------------------------------

@@ -30,6 +30,13 @@ class AuthorsListComponent implements OnInit {
     ]);
   }
 
+  Future<Null> edit(Author author) async {
+    _router.navigate([
+      'AuthorUpdateC',
+      {'id': author.id}
+    ]);
+  }
+
   Future<Null> deleteAuthor(Author author) async {
     await this._authorService.deleteAuthor(author.id);
   }

@@ -3,6 +3,8 @@ package book
 import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+
+	"github.com/adrian83/go-mvc-library/library/domain/common/model"
 )
 
 const (
@@ -68,9 +70,9 @@ func (d MongoDal) Delete(bookID bson.ObjectId) error {
 // GetBook returns book with given id or error.
 func (d MongoDal) GetBook(bookID bson.ObjectId) (*Entity, error) {
 	entity := new(Entity)
-	// && err == mgo.ErrNotFound
-	if err := d.collection.FindId(bookID).One(entity); err != nil {
-		return nil, err
+	err := d.collection.FindId(bookID).One(entity)
+	if err == mgo.ErrNotFound {
+		return nil, &model.NotFoundError{Type: "book"}
 	}
-	return entity, nil
+	return entity, err
 }

@@ -1,8 +1,9 @@
 <h1>Authors' list</h1>
 <div>
   <ul>
-    <li *ngFor="let author of authors" (click)="showDetails(author);">
-    {{author.id}} {{author.firstName}} {{author.lastName}}
+    <li style="cursor: pointer;" *ngFor="let author of authors"  >
+    <span (click)="showDetails(author);">{{author.id}} {{author.firstName}} {{author.lastName}}</span>
+    <i class="fa fa-pencil-square-o fa-2" aria-hidden="true" (click)="edit(author);"></i>
     </li>
   </ul>
 </div>

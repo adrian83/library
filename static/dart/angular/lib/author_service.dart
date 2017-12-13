@@ -14,6 +14,7 @@ class AuthorService {
 
   static final String _listAuthorsUrl = "/rest/api/v1.0/authors";
   static final String _createAuthorUrl = "/rest/api/v1.0/authors";
+  static final String _updateAuthorUrl = "/rest/api/v1.0/authors";
 
   static final _headers = {'Content-Type': 'application/json'};
 
@@ -37,6 +38,16 @@ class AuthorService {
   Future<Author> createAuthor(Author author) async {
     try {
       final response = await _http.post(_createAuthorUrl,
+          headers: _headers, body: author.toJson());
+      return new Author.fromJson(_extractData(response));
+    } catch (e) {
+      throw _handleError(e);
+    }
+  }
+
+  Future<Author> updateAuthor(Author author) async {
+    try {
+      final response = await _http.put(_updateAuthorUrl + "/" + author.id,
           headers: _headers, body: author.toJson());
       return new Author.fromJson(_extractData(response));
     } catch (e) {

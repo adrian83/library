@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	// ours
-	book "github.com/adrian83/go-mvc-library/library/domain/book"
+	libbook "github.com/adrian83/go-mvc-library/library/domain/book"
 	"github.com/adrian83/go-mvc-library/library/domain/common/model"
 	liberrors "github.com/adrian83/go-mvc-library/library/web/errors"
 	"github.com/adrian83/go-mvc-library/library/web/forms"
@@ -27,7 +27,7 @@ const (
 // BookHandler is a handler for everything book-related.
 type BookHandler struct {
 	SessionStore session.Store
-	BookService  book.BookService
+	BookService  libbook.BookService
 }
 
 // Routes implements Controller interface.

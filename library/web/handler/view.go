@@ -37,10 +37,6 @@ func (vh *ViewHandler) index(w http.ResponseWriter, r *http.Request, s session.S
 		idStr = "1"
 	}
 
-	model := NewModel()
-
-	model.Values["idk"] = idStr
-
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		fmt.Printf("Cannot convert str to int")

@@ -36,8 +36,8 @@ func (ah *AccountHandler) login(w http.ResponseWriter, r *http.Request, s sessio
 
 	s.Add("user.Login", user.Login)
 
-	model := NewModel()
-	model.Values["user"] = user
+	//model := NewModel()
+	//model.Values["user"] = user
 
 	return nil
 }

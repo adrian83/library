@@ -6,6 +6,16 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+// NotFoundError represents struct returned when entity cannot be found.
+type NotFoundError struct {
+	Type string
+}
+
+// Error implements error interface.
+func (nfe *NotFoundError) Error() string {
+	return fmt.Sprintf("%v cannot be found.", nfe.Type)
+}
+
 var (
 	InvalidID = ValidationError{
 		Field:   "id",
