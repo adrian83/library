@@ -23,13 +23,16 @@ class BooksListComponent implements OnInit {
 
   List<Book> get getBooks => this.books;
 
-  Future<Null> showDetails(Book book) async {
+  Future<Null> show(Book book) async {
   //  _router.navigate([
   //    'BookShowC',
   //    {'id': book.id}
   //  ]);
   }
-
+Future<Null> delete(Book book) async {
+}
+  Future<Null> edit(Book book) async {
+  }
   Future<Null> deleteBook(Book book) async {
     await this._bookService.deleteBook(book.id);
   }

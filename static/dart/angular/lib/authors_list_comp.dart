@@ -23,7 +23,7 @@ class AuthorsListComponent implements OnInit {
 
   List<Author> get getAuthors => this.authors;
 
-  Future<Null> showDetails(Author author) async {
+  Future<Null> show(Author author) async {
     _router.navigate([
       'AuthorShowC',
       {'id': author.id}
@@ -37,7 +37,8 @@ class AuthorsListComponent implements OnInit {
     ]);
   }
 
-  Future<Null> deleteAuthor(Author author) async {
+  Future<Null> delete(Author author) async {
     await this._authorService.deleteAuthor(author.id);
+    this.authors = await this._authorService.listAuthors();
   }
 }

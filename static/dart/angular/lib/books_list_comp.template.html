@@ -1,8 +1,11 @@
 <h1>Book' list</h1>
 <div>
   <ul>
-    <li *ngFor="let book of books" (click)="showDetails(book);">
-    {{book.id}} {{book.title}}
+    <li style="cursor: pointer;" *ngFor="let book of books">
+      <span (click)="show(book);">{{book.id}} {{book.title}}</span>
+
+    <i class="fa fa-pencil-square-o fa-2" aria-hidden="true" (click)="edit(book);"></i>
+    <i class="fa fa-times fa-2" aria-hidden="true" (click)="delete(book);"></i>
     </li>
   </ul>
 </div>

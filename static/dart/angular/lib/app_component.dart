@@ -5,7 +5,7 @@ import 'author_service.dart';
 import 'book_service.dart';
 
 import 'authors_list_comp.dart';
-import 'author_create_comp.dart';
+import 'author/author_create_comp.dart';
 import 'author_update_comp.dart';
 import 'author_show_comp.dart';
 import 'books_list_comp.dart';
