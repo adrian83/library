@@ -8,7 +8,7 @@ import (
 )
 
 // CreateRouter creates new Router.
-func CreateRouter(controllers ...handler.Controller) *mux.Router {
+func CreateRouter(notFound http.Handler, controllers ...handler.Controller) *mux.Router {
 	mux := mux.NewRouter()
 	mux.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("../static/"))))
 
@@ -17,6 +17,8 @@ func CreateRouter(controllers ...handler.Controller) *mux.Router {
 			mux.Handle(route.Path, route.Handler).Methods(route.Method)
 		}
 	}
+
+	mux.NotFoundHandler = notFound
 
 	return mux
 }

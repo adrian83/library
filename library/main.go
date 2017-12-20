@@ -137,11 +137,13 @@ func main() {
 	accountHandler := &handler.AccountHandler{SessionStore: sessionStore}
 	authorHandler := &handler.AuthorHandler{SessionStore: sessionStore, AuthorService: authorService}
 	bookHandler := &handler.BookHandler{SessionStore: sessionStore, BookService: bookService}
+	notFoundHandler := &handler.NotFoundHandler{SessionStore: sessionStore}
 
 	// ---------------------------------------
 	// routing
 	// ---------------------------------------
 	mux := router.CreateRouter(
+		notFoundHandler.Handler(),
 		viewHandler,
 		accountHandler,
 		authorHandler,
