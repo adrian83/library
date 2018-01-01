@@ -10,8 +10,9 @@ usage() {
     run-kafka             Starts Kafka localy.
     run-mongo             Starts MongoDB docker image.
     run-redis             Starts Redis docker image.
-    run-infra             Starts Docker, RethinkDB and Redis
-    dart                  Downloads Dart dependencies and rebuilds Dart files
+    run-infra             Starts Docker, RethinkDB and Redis.
+    run-app               Starts application.
+    dart                  Downloads Dart dependencies and rebuilds Dart files.
 
 EOF
 	exit 1
@@ -73,6 +74,12 @@ run-infra() {
 	set +e
 }
 
+run-app() {
+	set -e
+		cd library && go run main.go config.json
+	set +e
+}
+
 dart() {
 	set -e
 		cd static/dart/angular && pub get && pub build
@@ -99,6 +106,9 @@ case "$CMD" in
 	;;
 	run-infra)
 		run-infra
+	;;
+	run-app)
+		run-app
 	;;
 	dart)
 		dart
