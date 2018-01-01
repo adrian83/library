@@ -4,7 +4,6 @@ static/packages/**
 static/.pub/**
 static/pubspec.lock
 static/web/packages
-static/dart/angular/**
 
 infrastructure/
 
