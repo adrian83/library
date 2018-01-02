@@ -13,6 +13,7 @@ import 'info/info_comp.dart';
 
 import 'book/books_list_comp.dart';
 import 'book/book_create_comp.dart';
+import 'book/book_update_comp.dart';
 
 import 'package:logging/logging.dart';
 
@@ -42,9 +43,9 @@ import 'package:logging/logging.dart';
   const Route(path: '/authors/update/:id', name: 'AuthorUpdateC', component: AuthorUpdateComponent),
   const Route(path: '/books/list', name: 'BooksListC', component: BooksListComponent),
   const Route(path: '/books/new', name: 'BookCreateC', component: BookCreateComponent),
-  const Route(path: '/info', name: 'InfoC', component: InfoComponent)//,
+  const Route(path: '/info', name: 'InfoC', component: InfoComponent),
   //const Route(path: '/books/show/:id', name: 'BookShowC', component: BookShowComponent),
-  //const Route(path: '/books/update/:id', name: 'BookUpdateC', component: BookUpdateComponent)
+  const Route(path: '/books/update/:id', name: 'BookUpdateC', component: BookUpdateComponent)
 ])
 
 class AppComponent {

@@ -5,6 +5,7 @@ import 'package:angular/angular.dart';
 import 'package:http/http.dart';
 
 import 'model.dart';
+import '../common/errors.dart';
 
 @Injectable()
 class BookService {
@@ -31,19 +32,19 @@ class BookService {
 
   Future<Book> createBook(Book book) async {
     print(book.title);
-    try {
-      final response = await _http.post(_createBookUrl,
-          headers: _headers, body: JSON.encode(book));
 
-    //  if (response.statusCode == 400) {
+    final response = await _http.post(_createBookUrl,
+        headers: _headers, body: JSON.encode(book));
 
-    //  } else {
-      var jsonn = _extractData(response);
-      print(jsonn);
-        return new Book.fromJson(jsonn);
-    //  }
-    } catch (e) {
-      throw _handleError(e);
+    var json = _extractData(response);
+    print(json);
+
+    if (response.statusCode == 400) {
+      var valErrors = new ValidationErrors.fromJson(json);
+      print(valErrors);
+      throw valErrors;
+    } else {
+      return new Book.fromJson(json);
     }
   }
 
