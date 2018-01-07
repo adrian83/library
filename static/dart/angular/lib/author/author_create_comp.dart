@@ -17,7 +17,7 @@ class AuthorCreateComponent {
 
 	final AuthorService _authorService;
 	final Router _router;
-	String error = null;
+
 
 	AuthorCreateComponent(this._authorService, this._router);
 
@@ -26,10 +26,10 @@ class AuthorCreateComponent {
 		print("onSubmit");
 
 		this.author = await this._authorService.createAuthor(this.author);
-		error = "errorrrr";
-	/*	_router.navigate([
+
+		_router.navigate([
 		        'AuthorUpdateC',
 		        {'id': author.id}
-		      ]);*/
+		      ]);
 	}
 }

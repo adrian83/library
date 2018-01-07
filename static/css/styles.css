@@ -48,6 +48,15 @@ body {
   font-size: 85%;
 }
 
+.lib-icon {
+  margin-left: 2rem;
+  margin-right: 1rem;
+}
+
+app {
+  width: 100%;
+}
+
 footer {
   padding-top: 3rem;
   padding-bottom: 3rem;

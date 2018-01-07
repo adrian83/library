@@ -19,7 +19,7 @@ import 'package:logging/logging.dart';
 
 
 @Component(
-    selector: 'my-app',
+    selector: 'app',
     template: '''
       <h1>{{title}}</h1>
       <a [routerLink]="['AuthorsListC']">Authors list</a>
