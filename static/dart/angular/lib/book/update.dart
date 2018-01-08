@@ -6,7 +6,7 @@ import 'package:angular_forms/angular_forms.dart';
 
 import 'package:logging/logging.dart';
 
-import 'book_service.dart';
+import 'service.dart';
 import 'model.dart';
 
 import '../author/author_service.dart';
@@ -16,23 +16,28 @@ import '../common/errors.dart';
 
 @Component(
     selector: 'b-comp',
-    templateUrl: 'book_create_comp.template.html',
+    templateUrl: 'update.template.html',
     directives: const [formDirectives, CORE_DIRECTIVES])
-class BookCreateComponent implements OnInit {
-  static final Logger LOGGER = new Logger('BookCreateComponent');
+class BookUpdateComponent implements OnInit {
+  static final Logger LOGGER = new Logger('BookUpdateComponent');
 
   final BookService _bookService;
   final AuthorService _authorService;
   final Router _router;
+  final RouteParams _routeParams;
 
-  Book book = new Book(null, "");
+  Book book = new Book(null, "", new List<Author>());
   List<Author> authors = new List<Author>();
   List<ValidationError> validationErrors;
 
-  BookCreateComponent(this._bookService, this._authorService, this._router);
+  BookUpdateComponent(this._bookService, this._authorService, this._router, this._routeParams);
 
   Future<Null> ngOnInit() async {
     LOGGER.info("Init BookCreateComponent");
+
+    var _id = _routeParams.get('id');
+    this.book = await this._bookService.getBook(_id);
+    LOGGER.info("Edited book: $book");
     this.authors = await this._authorService.listAuthors();
   }
 
@@ -50,7 +55,7 @@ class BookCreateComponent implements OnInit {
     book.authors.remove(author);
   }
 
-  Future<Null> createBook() async {
+  Future<Null> updateBook() async {
     this._bookService.createBook(this.book).then((book) => this.book = book,
         onError: (e) {
       if (e is ValidationErrors) {
@@ -59,17 +64,8 @@ class BookCreateComponent implements OnInit {
       } else {
         LOGGER.info("Error while book creation: $e");
       }
-    }).whenComplete(() {
-      if (this.book.id != null) {
-        showEditPage();
-      }
     });
   }
 
-  void showEditPage() {
-    _router.navigate([
-      'BookUpdateC',
-      {'id': this.book.id}
-    ]);
-  }
+
 }

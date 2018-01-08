@@ -3,12 +3,12 @@ import 'dart:async';
 import 'package:angular/angular.dart';
 import 'package:angular_router/angular_router.dart';
 
-import 'book_service.dart';
+import 'service.dart';
 import 'model.dart';
 
 @Component(
     selector: 'books_list-comp',
-    templateUrl: 'books_list_comp.template.html',
+    templateUrl: 'list.template.html',
 		directives: const[CORE_DIRECTIVES]
   )
 class BooksListComponent implements OnInit {

@@ -2,7 +2,7 @@ import 'package:angular/angular.dart';
 import 'package:angular_router/angular_router.dart';
 
 import 'author/author_service.dart';
-import 'book/book_service.dart';
+import 'book/service.dart';
 
 import 'author/authors_list_comp.dart';
 import 'author/author_create_comp.dart';
@@ -11,9 +11,9 @@ import 'author/author_show_comp.dart';
 
 import 'info/info_comp.dart';
 
-import 'book/books_list_comp.dart';
-import 'book/book_create_comp.dart';
-import 'book/book_update_comp.dart';
+import 'book/list.dart';
+import 'book/create.dart';
+import 'book/update.dart';
 
 import 'package:logging/logging.dart';
 
