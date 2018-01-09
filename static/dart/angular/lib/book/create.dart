@@ -9,7 +9,7 @@ import 'package:logging/logging.dart';
 import 'service.dart';
 import 'model.dart';
 
-import '../author/author_service.dart';
+import '../author/service.dart';
 import '../author/model.dart';
 
 import '../common/errors.dart';

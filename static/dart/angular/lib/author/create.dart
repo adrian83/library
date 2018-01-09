@@ -4,12 +4,12 @@ import 'package:angular/angular.dart';
 import 'package:angular_router/angular_router.dart';
 import 'package:angular_forms/angular_forms.dart';
 
-import 'author_service.dart';
+import 'service.dart';
 import 'model.dart';
 
 @Component(
 		selector: 'b-comp',
-    templateUrl: 'author_create_comp.template.html',
+    templateUrl: 'create.template.html',
 		directives: const[formDirectives, CORE_DIRECTIVES]
     )
 class AuthorCreateComponent {

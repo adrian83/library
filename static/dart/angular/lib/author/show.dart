@@ -3,12 +3,12 @@ import 'dart:async';
 import 'package:angular/angular.dart';
 import 'package:angular_router/angular_router.dart';
 
-import 'author_service.dart';
+import 'service.dart';
 import 'model.dart';
 
 @Component(
 		selector: 'b-comp',
-    templateUrl: 'author_show_comp.template.html'
+    templateUrl: 'show.template.html'
     )
 class AuthorShowComponent implements OnInit {
 	Author author = new Author();

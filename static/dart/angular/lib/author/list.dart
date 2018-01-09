@@ -3,12 +3,12 @@ import 'dart:async';
 import 'package:angular/angular.dart';
 import 'package:angular_router/angular_router.dart';
 
-import 'author_service.dart';
+import 'service.dart';
 import 'model.dart';
 
 @Component(
     selector: 'authors_list-comp',
-    templateUrl: 'authors_list_comp.template.html',
+    templateUrl: 'list.template.html',
 		directives: const[CORE_DIRECTIVES]
   )
 class AuthorsListComponent implements OnInit {

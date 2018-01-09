@@ -1,13 +1,13 @@
 import 'package:angular/angular.dart';
 import 'package:angular_router/angular_router.dart';
 
-import 'author/author_service.dart';
+import 'author/service.dart';
 import 'book/service.dart';
 
-import 'author/authors_list_comp.dart';
-import 'author/author_create_comp.dart';
-import 'author/author_update_comp.dart';
-import 'author/author_show_comp.dart';
+import 'author/list.dart';
+import 'author/create.dart';
+import 'author/update.dart';
+import 'author/show.dart';
 
 import 'info/info_comp.dart';
 
