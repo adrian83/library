@@ -56,7 +56,7 @@ class BookUpdateComponent implements OnInit {
   }
 
   Future<Null> updateBook() async {
-    this._bookService.createBook(this.book).then((book) => this.book = book,
+    this._bookService.updateBook(this.book).then((book) => this.book = book,
         onError: (e) {
       if (e is ValidationErrors) {
         LOGGER.info("Invalid book: ${e.validationErrors}");

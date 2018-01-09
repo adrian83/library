@@ -30,6 +30,24 @@ class BookService {
     }
   }
 
+  Future<Book> updateBook(Book book) async {
+    print(book.title);
+
+    final response = await _http.put(_listBooksUrl + "/" + book.id,
+        headers: _headers, body: JSON.encode(book));
+
+    var json = _extractData(response);
+    print(json);
+
+    if (response.statusCode == 400) {
+      var valErrors = new ValidationErrors.fromJson(json);
+      print(valErrors);
+      throw valErrors;
+    } else {
+      return new Book.fromJson(json);
+    }
+  }
+
   Future<Book> createBook(Book book) async {
     print(book.title);
 

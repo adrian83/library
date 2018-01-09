@@ -11,7 +11,10 @@ class Book extends Serializable {
   factory Book.fromJson(Map<String, dynamic> json) {
     var authorsJson = json['authors'];
     List<Author> atrs = new List<Author>();
+
+    if(authorsJson != null) {
     authorsJson.forEach((j) => atrs.add(new Author.fromJson(j)));
+  }
 
     return new Book(json['id'], json['title'], atrs);
   }

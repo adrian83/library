@@ -158,12 +158,23 @@ func (bh *BookHandler) updateBook(w http.ResponseWriter, r *http.Request, s sess
 	bookUpdate.ID = bookID
 
 	if validationErrs := bookUpdate.Validate(); !validationErrs.Empty() {
+		log.Printf("Book %v cannot be updated because of validation errors %v", bookUpdate, validationErrs)
 		return liberrors.Error400(validationErrs)
 	}
 
 	if err := bh.BookService.Update(bookUpdate.ToBook()); err != nil {
+		log.Printf("Error while updating book %v. Error: %v", bookUpdate, err)
 		return liberrors.Error500(err)
 	}
+
+	log.Printf("Book %v successfully updated", bookUpdate)
+
+	js, err := json.Marshal(bookUpdate)
+	if err != nil {
+		log.Printf("Error while marshaling book %v to JSON. Error: %v", bookUpdate, err)
+		return liberrors.Error500(err)
+	}
+	w.Write(js)
 
 	return nil
 }

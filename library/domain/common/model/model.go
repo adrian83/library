@@ -40,6 +40,10 @@ func (e *ValidationError) Error() string {
 	return fmt.Sprintf("ValidationError {Field: '%s', Code: '%s', Msg: '%s'}", e.Field, e.Code, e.Message)
 }
 
+func (e *ValidationError) String() string {
+	return e.Error()
+}
+
 // ValidationErrors is a slice of ValidationErrors.
 type ValidationErrors []*ValidationError
 
