@@ -1,9 +1,12 @@
 package book
 
 import (
+	"log"
+
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 
+	"github.com/adrian83/go-mvc-library/library/domain/author"
 	"github.com/adrian83/go-mvc-library/library/domain/common/model"
 )
 
@@ -21,6 +24,7 @@ type Dal interface {
 	Add(book *Entity) (*Entity, error)
 	GetBooks() ([]*Entity, error)
 	Update(book *Entity) error
+	UpdateAuthor(author *author.Entity) error
 	Delete(bookID bson.ObjectId) error
 	GetBook(bookID bson.ObjectId) (*Entity, error)
 }
@@ -60,6 +64,15 @@ func (d MongoDal) Update(book *Entity) error {
 	dict[title] = book.Title
 	dict[authors] = book.Authors
 	return d.collection.Update(bson.M{id: book.ID}, dict)
+}
+
+//.update(Authors:{$elemMatch:{Slug:"slug"}}, {$set: {'Authors.$.Name':"zzz"}});
+func (d MongoDal) UpdateAuthor(author *author.Entity) error {
+	info, err := d.collection.UpdateAll(
+		bson.M{authors: bson.M{"$elemMatch": bson.M{id: author.ID}}},
+		bson.M{"$set": bson.M{"authors.$.firstName": author.FirstName, "authors.$.lastName": author.LastName}})
+	log.Printf("UpdateAll info %v", info)
+	return err
 }
 
 // Delete removes book with given id from MongoDb.

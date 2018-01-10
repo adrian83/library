@@ -135,7 +135,7 @@ func main() {
 	// ---------------------------------------
 	viewHandler := &handler.ViewHandler{SessionStore: sessionStore}
 	accountHandler := &handler.AccountHandler{SessionStore: sessionStore}
-	authorHandler := &handler.AuthorHandler{SessionStore: sessionStore, AuthorService: authorService}
+	authorHandler := &handler.AuthorHandler{SessionStore: sessionStore, AuthorService: authorService, BookService: bookService}
 	bookHandler := &handler.BookHandler{SessionStore: sessionStore, BookService: bookService}
 	notFoundHandler := &handler.NotFoundHandler{SessionStore: sessionStore}
 

@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	libauthor "github.com/adrian83/go-mvc-library/library/domain/author"
+	libbook "github.com/adrian83/go-mvc-library/library/domain/book"
 	liberrors "github.com/adrian83/go-mvc-library/library/web/errors"
 	libforms "github.com/adrian83/go-mvc-library/library/web/forms"
 	libjson "github.com/adrian83/go-mvc-library/library/web/json"
@@ -23,6 +24,7 @@ const (
 type AuthorHandler struct {
 	SessionStore  session.Store
 	AuthorService libauthor.AuthorService
+	BookService   libbook.BookService
 }
 
 // Routes implements Controller interface.
@@ -127,6 +129,10 @@ func (ah *AuthorHandler) updateAuthor(w http.ResponseWriter, r *http.Request, s 
 	}
 
 	if err := ah.AuthorService.Update(&au); err != nil {
+		return liberrors.Error500(err)
+	}
+
+	if err := ah.BookService.UpdateAuthor(&au); err != nil {
 		return liberrors.Error500(err)
 	}
 
