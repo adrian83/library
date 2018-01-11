@@ -31,9 +31,16 @@ class BooksListComponent implements OnInit {
     ]);
   }
 
-  Future<Null> delete(Book book) async {}
-  Future<Null> edit(Book book) async {}
-  Future<Null> deleteBook(Book book) async {
+  Future<Null> delete(Book book) async {
     await this._bookService.deleteBook(book.id);
+    books.remove(book);
   }
+
+  Future<Null> edit(Book book) async {
+    _router.navigate([
+      'BookUpdateC',
+      {'id': book.id}
+    ]);
+  }
+
 }

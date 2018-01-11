@@ -143,8 +143,11 @@ func (ah *AuthorHandler) deleteAuthor(w http.ResponseWriter, r *http.Request, s 
 
 	authorID := GetPathParam(r, authorIDLabel)
 
-	err := ah.AuthorService.Delete(authorID)
-	if err != nil {
+	if err := ah.AuthorService.Delete(authorID); err != nil {
+		return liberrors.Error500(err)
+	}
+
+	if err := ah.BookService.DeleteAuthor(authorID); err != nil {
 		return liberrors.Error500(err)
 	}
 

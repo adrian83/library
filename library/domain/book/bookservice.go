@@ -9,9 +9,11 @@ type BookService interface {
 	Add(book *Book) (*Book, error)
 	GetBooks() ([]*Book, error)
 	Update(book *Book) error
-	UpdateAuthor(author *author.Author) error
 	Delete(bookID string) error
 	GetBook(bookID string) (*Book, error)
+
+	UpdateAuthor(author *author.Author) error
+	DeleteAuthor(authorID string) error
 }
 
 type BookServiceImpl struct {
@@ -48,6 +50,10 @@ func (s BookServiceImpl) Update(book *Book) error {
 
 func (s BookServiceImpl) UpdateAuthor(author *author.Author) error {
 	return s.bookDal.UpdateAuthor(author.ToEntity())
+}
+
+func (s BookServiceImpl) DeleteAuthor(authorID string) error {
+	return s.bookDal.DeleteAuthor(bson.ObjectIdHex(authorID))
 }
 
 func (s BookServiceImpl) Delete(bookID string) error {

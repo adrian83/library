@@ -24,9 +24,11 @@ type Dal interface {
 	Add(book *Entity) (*Entity, error)
 	GetBooks() ([]*Entity, error)
 	Update(book *Entity) error
-	UpdateAuthor(author *author.Entity) error
 	Delete(bookID bson.ObjectId) error
 	GetBook(bookID bson.ObjectId) (*Entity, error)
+
+	UpdateAuthor(author *author.Entity) error
+	DeleteAuthor(authorID bson.ObjectId) error
 }
 
 // NewBookMongoDal returns new instance of Dal implementation backed by MongoDB.
@@ -66,15 +68,6 @@ func (d MongoDal) Update(book *Entity) error {
 	return d.collection.Update(bson.M{id: book.ID}, dict)
 }
 
-//.update(Authors:{$elemMatch:{Slug:"slug"}}, {$set: {'Authors.$.Name':"zzz"}});
-func (d MongoDal) UpdateAuthor(author *author.Entity) error {
-	info, err := d.collection.UpdateAll(
-		bson.M{authors: bson.M{"$elemMatch": bson.M{id: author.ID}}},
-		bson.M{"$set": bson.M{"authors.$.firstName": author.FirstName, "authors.$.lastName": author.LastName}})
-	log.Printf("UpdateAll info %v", info)
-	return err
-}
-
 // Delete removes book with given id from MongoDb.
 func (d MongoDal) Delete(bookID bson.ObjectId) error {
 	return d.collection.RemoveId(bookID)
@@ -88,4 +81,22 @@ func (d MongoDal) GetBook(bookID bson.ObjectId) (*Entity, error) {
 		return nil, &model.NotFoundError{Type: "book"}
 	}
 	return entity, err
+}
+
+//.update(Authors:{$elemMatch:{Slug:"slug"}}, {$set: {'Authors.$.Name':"zzz"}});
+func (d MongoDal) UpdateAuthor(author *author.Entity) error {
+	info, err := d.collection.UpdateAll(
+		bson.M{authors: bson.M{"$elemMatch": bson.M{id: author.ID}}},
+		bson.M{"$set": bson.M{"authors.$.firstName": author.FirstName, "authors.$.lastName": author.LastName}})
+	log.Printf("UpdateAll info %v", info)
+	return err
+}
+
+//.update(Authors:{$elemMatch:{Slug:"slug"}}, {$set: {'Authors.$.Name':"zzz"}});
+func (d MongoDal) DeleteAuthor(authorID bson.ObjectId) error {
+	info, err := d.collection.UpdateAll(
+		bson.M{},
+		bson.M{"$pull": bson.M{"authors": bson.M{id: authorID}}})
+	log.Printf("UpdateAll info %v", info)
+	return err
 }
