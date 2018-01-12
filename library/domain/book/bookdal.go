@@ -7,6 +7,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/adrian83/go-mvc-library/library/domain/author"
+	"github.com/adrian83/go-mvc-library/library/domain/common/dal"
 	"github.com/adrian83/go-mvc-library/library/domain/common/model"
 )
 
@@ -22,7 +23,7 @@ const (
 // Dal is an interface for book data access layer.
 type Dal interface {
 	Add(book *Entity) (*Entity, error)
-	GetBooks() ([]*Entity, error)
+	Books(page *dal.PageInfo) ([]*Entity, error)
 	Update(book *Entity) error
 	Delete(bookID bson.ObjectId) error
 	GetBook(bookID bson.ObjectId) (*Entity, error)
@@ -51,10 +52,12 @@ func (d MongoDal) Add(book *Entity) (*Entity, error) {
 	return book, err
 }
 
-// GetBooks returns slice of books.
-func (d MongoDal) GetBooks() ([]*Entity, error) {
+// Books returns slice of books.
+func (d MongoDal) Books(page *dal.PageInfo) ([]*Entity, error) {
+	log.Printf("Getting books from page: %v", page)
 	entities := make([]*Entity, 0)
-	if err := d.collection.Find(nil).All(&entities); err != nil {
+	query := d.collection.Find(nil).Skip(page.From()).Limit(page.Size).Sort(page.Sort)
+	if err := query.All(&entities); err != nil {
 		return nil, err
 	}
 	return entities, nil
@@ -83,20 +86,25 @@ func (d MongoDal) GetBook(bookID bson.ObjectId) (*Entity, error) {
 	return entity, err
 }
 
-//.update(Authors:{$elemMatch:{Slug:"slug"}}, {$set: {'Authors.$.Name':"zzz"}});
+// UpdateAuthor updates data in all books' authors.
 func (d MongoDal) UpdateAuthor(author *author.Entity) error {
 	info, err := d.collection.UpdateAll(
 		bson.M{authors: bson.M{"$elemMatch": bson.M{id: author.ID}}},
 		bson.M{"$set": bson.M{"authors.$.firstName": author.FirstName, "authors.$.lastName": author.LastName}})
-	log.Printf("UpdateAll info %v", info)
+	logChangeInfo(info)
 	return err
 }
 
-//.update(Authors:{$elemMatch:{Slug:"slug"}}, {$set: {'Authors.$.Name':"zzz"}});
+// DeleteAuthor removes authors with given id from all books.
 func (d MongoDal) DeleteAuthor(authorID bson.ObjectId) error {
 	info, err := d.collection.UpdateAll(
 		bson.M{},
 		bson.M{"$pull": bson.M{"authors": bson.M{id: authorID}}})
-	log.Printf("UpdateAll info %v", info)
+	logChangeInfo(info)
 	return err
+}
+
+func logChangeInfo(info *mgo.ChangeInfo) {
+	log.Printf("Result: updated: %v, removed: %v, matched: %v, upsertedId: %v",
+		info.Updated, info.Removed, info.Matched, info.UpsertedId)
 }

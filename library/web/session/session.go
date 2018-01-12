@@ -1,7 +1,6 @@
 package session
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 
@@ -37,7 +36,7 @@ func WithSession(sessionStore session.Store, sessionHandler SessionHandler) func
 			session = sess
 
 		} else {
-			fmt.Printf("store: %v, id: %v", sessionStore, sessionID)
+
 			// get existing session
 			sess, err := sessionStore.FindSession(sessionID)
 			if err != nil {

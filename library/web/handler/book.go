@@ -8,6 +8,7 @@ import (
 
 	// ours
 	libbook "github.com/adrian83/go-mvc-library/library/domain/book"
+	"github.com/adrian83/go-mvc-library/library/domain/common/dal"
 	"github.com/adrian83/go-mvc-library/library/domain/common/model"
 	liberrors "github.com/adrian83/go-mvc-library/library/web/errors"
 	"github.com/adrian83/go-mvc-library/library/web/forms"
@@ -27,7 +28,7 @@ const (
 // BookHandler is a handler for everything book-related.
 type BookHandler struct {
 	SessionStore session.Store
-	BookService  libbook.BookService
+	BookService  libbook.Service
 }
 
 // Routes implements Controller interface.
@@ -74,7 +75,7 @@ func (bh *BookHandler) addBook(w http.ResponseWriter, r *http.Request, s session
 		return liberrors.Error400(validationErrs)
 	}
 
-	book, err := bh.BookService.Add(newBook.ToBook())
+	book, err := bh.BookService.Save(newBook.ToBook())
 	if err != nil {
 		return liberrors.Error500(err)
 	}
@@ -91,7 +92,7 @@ func (bh *BookHandler) addBook(w http.ResponseWriter, r *http.Request, s session
 
 func (bh *BookHandler) getBooks(w http.ResponseWriter, r *http.Request, s session.Session) error {
 
-	books, err := bh.BookService.GetBooks()
+	books, err := bh.BookService.Books(dal.NewPageInfo(0))
 	if err != nil {
 		log.Printf("Error while getting books. Error: %v", err)
 		return liberrors.Error500(err)

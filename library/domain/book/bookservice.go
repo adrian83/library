@@ -2,12 +2,14 @@ package book
 
 import (
 	author "github.com/adrian83/go-mvc-library/library/domain/author"
+	"github.com/adrian83/go-mvc-library/library/domain/common/dal"
 	"gopkg.in/mgo.v2/bson"
 )
 
-type BookService interface {
-	Add(book *Book) (*Book, error)
-	GetBooks() ([]*Book, error)
+// Service describes all operations which can be done on Book.
+type Service interface {
+	Save(book *Book) (*Book, error)
+	Books(page *dal.PageInfo) ([]*Book, error)
 	Update(book *Book) error
 	Delete(bookID string) error
 	GetBook(bookID string) (*Book, error)
@@ -16,19 +18,22 @@ type BookService interface {
 	DeleteAuthor(authorID string) error
 }
 
-type BookServiceImpl struct {
+// ServiceImpl is a default implementation of the Service interface.
+type ServiceImpl struct {
 	bookDal   Dal
 	authorDal author.Dal
 }
 
-func NewBookServiceImpl(bookDal Dal, authorDal author.Dal) BookService {
-	return BookServiceImpl{
+// NewBookServiceImpl returns newly created implementation of a Service.
+func NewBookServiceImpl(bookDal Dal, authorDal author.Dal) Service {
+	return ServiceImpl{
 		bookDal:   bookDal,
 		authorDal: authorDal,
 	}
 }
 
-func (s BookServiceImpl) Add(book *Book) (*Book, error) {
+// Save stores given Book in DB, returns Book (with filled ID) or error.
+func (s ServiceImpl) Save(book *Book) (*Book, error) {
 	entity, err := s.bookDal.Add(book.ToEntity())
 	if err != nil {
 		return nil, err
@@ -36,31 +41,32 @@ func (s BookServiceImpl) Add(book *Book) (*Book, error) {
 	return entity.ToBook(), nil
 }
 
-func (s BookServiceImpl) GetBooks() ([]*Book, error) {
-	entities, err := s.bookDal.GetBooks()
+// Books returns slice of Books.
+func (s ServiceImpl) Books(page *dal.PageInfo) ([]*Book, error) {
+	entities, err := s.bookDal.Books(page)
 	if err != nil {
 		return nil, err
 	}
 	return entitiesToBooks(entities), nil
 }
 
-func (s BookServiceImpl) Update(book *Book) error {
+func (s ServiceImpl) Update(book *Book) error {
 	return s.bookDal.Update(book.ToEntity())
 }
 
-func (s BookServiceImpl) UpdateAuthor(author *author.Author) error {
+func (s ServiceImpl) UpdateAuthor(author *author.Author) error {
 	return s.bookDal.UpdateAuthor(author.ToEntity())
 }
 
-func (s BookServiceImpl) DeleteAuthor(authorID string) error {
+func (s ServiceImpl) DeleteAuthor(authorID string) error {
 	return s.bookDal.DeleteAuthor(bson.ObjectIdHex(authorID))
 }
 
-func (s BookServiceImpl) Delete(bookID string) error {
+func (s ServiceImpl) Delete(bookID string) error {
 	return s.bookDal.Delete(bson.ObjectIdHex(bookID))
 }
 
-func (s BookServiceImpl) GetBook(bookID string) (*Book, error) {
+func (s ServiceImpl) GetBook(bookID string) (*Book, error) {
 	entity, err := s.bookDal.GetBook(bson.ObjectIdHex(bookID))
 	if err != nil {
 		return nil, err

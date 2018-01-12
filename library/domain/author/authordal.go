@@ -70,7 +70,7 @@ func (d MongoDal) GetAuthor(authorID bson.ObjectId) (*Entity, error) {
 	entity := new(Entity)
 	err := d.collection.FindId(authorID).One(entity)
 	if err == mgo.ErrNotFound {
-		return nil, &model.NotFoundError{Type: "book"}
+		return nil, &model.NotFoundError{Type: "author"}
 	}
 	return entity, err
 }

@@ -24,7 +24,7 @@ const (
 type AuthorHandler struct {
 	SessionStore  session.Store
 	AuthorService libauthor.AuthorService
-	BookService   libbook.BookService
+	BookService   libbook.Service
 }
 
 // Routes implements Controller interface.
