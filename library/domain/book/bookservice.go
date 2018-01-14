@@ -6,10 +6,16 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+// BooksPage represents single page of Books in Books' pagination.
+type BooksPage struct {
+	*dal.Page
+	Books []*Book `json:"books"`
+}
+
 // Service describes all operations which can be done on Book.
 type Service interface {
 	Save(book *Book) (*Book, error)
-	Books(page *dal.PageInfo) ([]*Book, error)
+	Books(page *dal.PageInfo) (*BooksPage, error)
 	Update(book *Book) error
 	Delete(bookID string) error
 	GetBook(bookID string) (*Book, error)
@@ -42,12 +48,19 @@ func (s ServiceImpl) Save(book *Book) (*Book, error) {
 }
 
 // Books returns slice of Books.
-func (s ServiceImpl) Books(page *dal.PageInfo) ([]*Book, error) {
-	entities, err := s.bookDal.Books(page)
+func (s ServiceImpl) Books(page *dal.PageInfo) (*BooksPage, error) {
+	entitiesPage, err := s.bookDal.Books(page)
 	if err != nil {
 		return nil, err
 	}
-	return entitiesToBooks(entities), nil
+
+	return &BooksPage{
+		Page: &dal.Page{
+			TotalElements: entitiesPage.TotalElements,
+			Number:        entitiesPage.Number,
+		},
+		Books: entitiesToBooks(entitiesPage.Elements),
+	}, nil
 }
 
 func (s ServiceImpl) Update(book *Book) error {
@@ -67,7 +80,7 @@ func (s ServiceImpl) Delete(bookID string) error {
 }
 
 func (s ServiceImpl) GetBook(bookID string) (*Book, error) {
-	entity, err := s.bookDal.GetBook(bson.ObjectIdHex(bookID))
+	entity, err := s.bookDal.Book(bson.ObjectIdHex(bookID))
 	if err != nil {
 		return nil, err
 	}

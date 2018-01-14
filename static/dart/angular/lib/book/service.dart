@@ -18,13 +18,11 @@ class BookService {
 
   BookService(this._http);
 
-  Future<List<Book>> listBooks() async {
+  Future<BooksPage> listBooks() async {
     try {
       final response = await _http.get(_listBooksUrl);
-      final books = _extractData(response)
-          .map((value) => new Book.fromJson(value))
-          .toList();
-      return books;
+      final page = new BooksPage.fromJson(_extractData(response));
+      return page;
     } catch (e) {
       throw _handleError(e);
     }

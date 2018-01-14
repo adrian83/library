@@ -33,3 +33,15 @@ func NewPageInfo(no int) *PageInfo {
 		Sort:   "_id",
 	}
 }
+
+// Page represents single page in Pagination.
+type Page struct {
+	TotalElements int `json:"totalElements"`
+	Number        int `json:"pageNumber"`
+}
+
+// String returns string representation of this struct.
+func (pi *Page) String() string {
+	return fmt.Sprintf("Page { TotalElements: %v, Number: %v}",
+		pi.TotalElements, pi.Number)
+}

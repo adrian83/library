@@ -20,13 +20,19 @@ const (
 	id = "_id"
 )
 
+// EntitiesPage represents single page of Entities in pagination.
+type EntitiesPage struct {
+	*dal.Page
+	Elements []*Entity
+}
+
 // Dal is an interface for book data access layer.
 type Dal interface {
 	Add(book *Entity) (*Entity, error)
-	Books(page *dal.PageInfo) ([]*Entity, error)
+	Books(page *dal.PageInfo) (*EntitiesPage, error)
 	Update(book *Entity) error
 	Delete(bookID bson.ObjectId) error
-	GetBook(bookID bson.ObjectId) (*Entity, error)
+	Book(bookID bson.ObjectId) (*Entity, error)
 
 	UpdateAuthor(author *author.Entity) error
 	DeleteAuthor(authorID bson.ObjectId) error
@@ -53,14 +59,24 @@ func (d MongoDal) Add(book *Entity) (*Entity, error) {
 }
 
 // Books returns slice of books.
-func (d MongoDal) Books(page *dal.PageInfo) ([]*Entity, error) {
+func (d MongoDal) Books(page *dal.PageInfo) (*EntitiesPage, error) {
 	log.Printf("Getting books from page: %v", page)
 	entities := make([]*Entity, 0)
 	query := d.collection.Find(nil).Skip(page.From()).Limit(page.Size).Sort(page.Sort)
 	if err := query.All(&entities); err != nil {
 		return nil, err
 	}
-	return entities, nil
+	totalCount, err := d.collection.Count()
+	if err != nil {
+		return nil, err
+	}
+
+	return &EntitiesPage{
+		Page: &dal.Page{
+			TotalElements: totalCount,
+			Number:        page.Number,
+		},
+		Elements: entities}, nil
 }
 
 // Update updates book in MongoDB.
@@ -76,8 +92,8 @@ func (d MongoDal) Delete(bookID bson.ObjectId) error {
 	return d.collection.RemoveId(bookID)
 }
 
-// GetBook returns book with given id or error.
-func (d MongoDal) GetBook(bookID bson.ObjectId) (*Entity, error) {
+// Book returns book with given id or error.
+func (d MongoDal) Book(bookID bson.ObjectId) (*Entity, error) {
 	entity := new(Entity)
 	err := d.collection.FindId(bookID).One(entity)
 	if err == mgo.ErrNotFound {
@@ -99,7 +115,7 @@ func (d MongoDal) UpdateAuthor(author *author.Entity) error {
 func (d MongoDal) DeleteAuthor(authorID bson.ObjectId) error {
 	info, err := d.collection.UpdateAll(
 		bson.M{},
-		bson.M{"$pull": bson.M{"authors": bson.M{id: authorID}}})
+		bson.M{"$pull": bson.M{authors: bson.M{id: authorID}}})
 	logChangeInfo(info)
 	return err
 }
