@@ -74,7 +74,8 @@ func (d MongoDal) Books(page *dal.PageInfo) (*EntitiesPage, error) {
 	return &EntitiesPage{
 		Page: &dal.Page{
 			TotalElements: totalCount,
-			Number:        page.Number,
+			Size:          page.Size,
+			Current:       page.Number,
 		},
 		Elements: entities}, nil
 }

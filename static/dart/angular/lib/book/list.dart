@@ -16,7 +16,7 @@ class BooksListComponent implements OnInit {
   final BookService _bookService;
   final Router _router;
 
-  BooksPage page = new BooksPage(0, 0, new List<Book>());
+  BooksPage page = new BooksPage(0, 0, 0, new List<Book>());
   List<Book> books = new List<Book>();
 
   BooksListComponent(this._bookService, this._router);

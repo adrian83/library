@@ -4,7 +4,7 @@ import '../common/page.dart';
 
 class BooksPage extends Page<Book> {
 
-  BooksPage(int total, int size, List<Book> books): super(total, size, books);
+  BooksPage(int current, int total, int size, List<Book> books): super(current, total, size, books);
 
   factory BooksPage.fromJson(Map<String, dynamic> json) {
     var booksJson = json['books'];
@@ -13,7 +13,7 @@ class BooksPage extends Page<Book> {
     if(booksJson != null) {
       booksJson.forEach((j) => books.add(new Book.fromJson(j)));
     }
-    return new BooksPage(json['totalElements'], json['pageNumber'], books);
+    return new BooksPage(json['currentPage'], json['totalElements'], json['pageSize'], books);
   }
 }
 

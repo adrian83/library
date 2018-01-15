@@ -57,12 +57,14 @@ func (s ServiceImpl) Books(page *dal.PageInfo) (*BooksPage, error) {
 	return &BooksPage{
 		Page: &dal.Page{
 			TotalElements: entitiesPage.TotalElements,
-			Number:        entitiesPage.Number,
+			Size:          entitiesPage.Size,
+			Current:       page.Number,
 		},
 		Books: entitiesToBooks(entitiesPage.Elements),
 	}, nil
 }
 
+// Update updates Book data.
 func (s ServiceImpl) Update(book *Book) error {
 	return s.bookDal.Update(book.ToEntity())
 }
