@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 
 	// ours
 	libbook "github.com/adrian83/go-mvc-library/library/domain/book"
@@ -92,7 +93,18 @@ func (bh *BookHandler) addBook(w http.ResponseWriter, r *http.Request, s session
 
 func (bh *BookHandler) getBooks(w http.ResponseWriter, r *http.Request, s session.Session) error {
 
-	books, err := bh.BookService.Books(dal.NewPageInfo(0))
+	pageNo := 0
+	pageStrs, _ := r.URL.Query()["page"]
+	if len(pageStrs) > 0 {
+		p, err := strconv.Atoi(pageStrs[0])
+		if err != nil {
+			log.Printf("Error while getting page number. Error: %v", err)
+			return liberrors.Error500(err)
+		}
+		pageNo = p
+	}
+
+	books, err := bh.BookService.Books(dal.NewPageInfo(pageNo))
 	if err != nil {
 		log.Printf("Error while getting books. Error: %v", err)
 		return liberrors.Error500(err)

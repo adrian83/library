@@ -9,8 +9,9 @@ import '../common/errors.dart';
 
 @Injectable()
 class BookService {
-  static final String _listBooksUrl = "/rest/api/v1.0/books";
-  static final String _createBookUrl = "/rest/api/v1.0/books";
+  static final String _baseBookUrl = "/rest/api/v1.0/books";
+  static final String _listBooksUrl = "/rest/api/v1.0/books?page=";
+
 
   static final _headers = {'Content-Type': 'application/json'};
 
@@ -18,9 +19,9 @@ class BookService {
 
   BookService(this._http);
 
-  Future<BooksPage> listBooks() async {
+  Future<BooksPage> listBooks(int pageNumber) async {
     try {
-      final response = await _http.get(_listBooksUrl);
+      final response = await _http.get(_listBooksUrl + pageNumber.toString());
       final page = new BooksPage.fromJson(_extractData(response));
       return page;
     } catch (e) {
@@ -31,7 +32,7 @@ class BookService {
   Future<Book> updateBook(Book book) async {
     print(book.title);
 
-    final response = await _http.put(_listBooksUrl + "/" + book.id,
+    final response = await _http.put(_baseBookUrl + "/" + book.id,
         headers: _headers, body: JSON.encode(book));
 
     var json = _extractData(response);
@@ -49,7 +50,7 @@ class BookService {
   Future<Book> createBook(Book book) async {
     print(book.title);
 
-    final response = await _http.post(_createBookUrl,
+    final response = await _http.post(_baseBookUrl,
         headers: _headers, body: JSON.encode(book));
 
     var json = _extractData(response);
@@ -66,7 +67,7 @@ class BookService {
 
   Future<Book> getBook(String id) async {
     try {
-      final response = await _http.get(_listBooksUrl + "/" + id);
+      final response = await _http.get(_baseBookUrl + "/" + id);
       return new Book.fromJson(_extractData(response));
     } catch (e) {
       throw _handleError(e);
@@ -75,7 +76,7 @@ class BookService {
 
   Future<Null> deleteBook(String id) async {
     try {
-      await _http.delete(_listBooksUrl + "/" + id);
+      await _http.delete(_baseBookUrl + "/" + id);
     } catch (e) {
       throw _handleError(e);
     }

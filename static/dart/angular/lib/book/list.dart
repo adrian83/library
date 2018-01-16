@@ -8,6 +8,19 @@ import 'model.dart';
 
 import '../common/components/pagination.dart';
 
+
+class BooksPageSwitcher extends PageSwitcher {
+
+  final BooksListComponent _booksListComponent;
+
+  BooksPageSwitcher(this._booksListComponent);
+
+  void change(int pageNumber) {
+    print("change to $pageNumber in list books");
+    _booksListComponent.fetchBooks(pageNumber);
+  }
+}
+
 @Component(
     selector: 'books_list-comp',
     templateUrl: 'list.template.html',
@@ -18,11 +31,18 @@ class BooksListComponent implements OnInit {
 
   BooksPage page = new BooksPage(0, 0, 0, new List<Book>());
   List<Book> books = new List<Book>();
+  PageSwitcher switcher;
 
-  BooksListComponent(this._bookService, this._router);
+  BooksListComponent(this._bookService, this._router){
+    switcher = new BooksPageSwitcher(this);
+  }
 
   Future<Null> ngOnInit() async {
-    this.page = await this._bookService.listBooks();
+    fetchBooks(0);
+  }
+
+  Future<Null> fetchBooks(int pageNo) async {
+    this.page = await this._bookService.listBooks(pageNo);
     this.books = page.getElements;
   }
 
