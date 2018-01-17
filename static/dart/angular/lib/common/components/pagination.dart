@@ -1,79 +1,74 @@
 import 'dart:async';
 
 import 'package:angular/angular.dart';
-import 'package:angular_router/angular_router.dart';
 import 'package:angular_forms/angular_forms.dart';
+
+import 'package:logging/logging.dart';
 
 import '../page.dart';
 
-
 class PageLink {
-	String label;
-	bool disabled;
-	bool current;
-	int page;
+  String _label;
+  bool _disabled;
+  bool _current;
+  int _page;
 
-	PageLink(this.label, this.disabled, this.current, this.page);
+  PageLink(this._label, this._disabled, this._current, this._page);
+
+  String get label => this._label;
+  bool get disabled => this._disabled;
+  bool get current => this._current;
+  int get page => this._page;
 }
 
 abstract class PageSwitcher {
-	void change(int pageNumber);
+  void change(int pageNumber);
 }
 
 @Component(
-		selector: 'pagination',
+    selector: 'pagination',
     templateUrl: 'pagination.template.html',
-		directives: const[formDirectives, CORE_DIRECTIVES]
-    )
+    directives: const [formDirectives, CORE_DIRECTIVES])
 class Pagination implements OnInit {
-  String text = "this is test";
+  static final Logger LOGGER = new Logger('Pagination');
 
-	@Input()
-	Page page;
+  @Input()
+  Page page;
+  @Input()
+  PageSwitcher switcher;
 
-	@Input()
-	PageSwitcher switcher;
+  Future<Null> ngOnInit() async {
+    LOGGER.info("Pagination initialized. Switcher: $switcher, page: $page");
+  }
 
-   Future<Null> ngOnInit() async {
-     print("Pagination initialized $switcher $page");
-   }
+  void changePage(int page) {
+    LOGGER.info("Change to page $page");
+    switcher.change(page);
+  }
 
-	 void changePage(int page) {
-		 print("change to $page");
-		 switcher.change(page);
-	 }
+  int _pagesCount() {
+    var count = this.page == null ? 0 : (page.total / page.size);
+    return count.isNaN ? 0 : count.ceil();
+  }
 
-int get pages {
-	if(this.page == null) {
-		return 0;
-	}
-	var r = (page.getTotal / page.getSize);
-	return r.isNaN ? 0 : r.ceil();
-}
+  List<PageLink> get links {
+    List<PageLink> links = new List<PageLink>();
 
-String get desc => this.page == null ? "" : page.toString();
+    if (this.page == null) {
+      return links;
+    }
 
-List<PageLink> get links {
-	if(this.page == null){
-		return new List<PageLink>();
-	}
+    var current = page.current;
+    var pages = _pagesCount();
 
+    links.add(new PageLink("<<", current == 0, false, current - 1));
 
-	List<PageLink> l = new List<PageLink>();
+    for (var i = 0; i < pages; i++) {
+      PageLink li = new PageLink((i + 1).toString(), false, current == i, i);
+      links.add(li);
+    }
 
-	PageLink prev = new PageLink("<<", page.getCurrent == 0, false, page.getCurrent-1);
-	l.add(prev);
-
-
-	for (var i = 0; i < pages; i++) {
-		PageLink li = new PageLink((i+1).toString(), false, page.getCurrent == i, i);
-		l.add(li);
-	}
-
-	PageLink next = new PageLink(">>", page.getCurrent == (pages-1), false, page.getCurrent + 1);
-	l.add(next);
-	return l;
-}
-
-
+    links.add(new PageLink(">>", current == (pages - 1), false, current + 1));
+    return links;
+  }
 }

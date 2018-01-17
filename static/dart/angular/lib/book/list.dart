@@ -8,6 +8,7 @@ import 'model.dart';
 
 import '../common/components/pagination.dart';
 
+import 'package:logging/logging.dart';
 
 class BooksPageSwitcher extends PageSwitcher {
 
@@ -26,12 +27,17 @@ class BooksPageSwitcher extends PageSwitcher {
     templateUrl: 'list.template.html',
     directives: const [CORE_DIRECTIVES, Pagination])
 class BooksListComponent implements OnInit {
+
+static final Logger LOGGER = new Logger('BooksListComponent');
+
   final BookService _bookService;
   final Router _router;
 
+  String searchedPhrase;
+
   BooksPage page = new BooksPage(0, 0, 0, new List<Book>());
-  List<Book> books = new List<Book>();
   PageSwitcher switcher;
+
 
   BooksListComponent(this._bookService, this._router){
     switcher = new BooksPageSwitcher(this);
@@ -43,10 +49,9 @@ class BooksListComponent implements OnInit {
 
   Future<Null> fetchBooks(int pageNo) async {
     this.page = await this._bookService.listBooks(pageNo);
-    this.books = page.getElements;
   }
 
-  List<Book> get getBooks => this.books;
+  List<Book> get books => this.page == null ? new List<Book>() : this.page.elements;
 
   Future<Null> show(Book book) async {
     _router.navigate([
@@ -57,7 +62,7 @@ class BooksListComponent implements OnInit {
 
   Future<Null> delete(Book book) async {
     await this._bookService.deleteBook(book.id);
-    books.remove(book);
+    fetchBooks(page.current);
   }
 
   Future<Null> edit(Book book) async {

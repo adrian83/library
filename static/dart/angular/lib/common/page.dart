@@ -1,20 +1,20 @@
 
 class Page<T> {
 
-  int total;
-  int size;
-  int current;
-  List<T> elements;
+  int _total;
+  int _size;
+  int _current;
+  List<T> _elements;
 
-  Page(this.current, this.total, this.size, this.elements);
+  Page(this._current, this._total, this._size, this._elements);
 
-  List<T> get getElements => this.elements;
-  int get getSize => this.size;
-  int get getTotal => this.total;
-  int get getCurrent => this.current;
+  List<T> get elements => this._elements;
+  int get size => this._size;
+  int get total => this._total;
+  int get current => this._current;
 
   String toString() {
-    return "Page { current: $current, total: $total, size: $size, elements: $elements }";
+    return "Page { current: $_current, total: $_total, size: $_size, elements: $_elements }";
   }
 
 }

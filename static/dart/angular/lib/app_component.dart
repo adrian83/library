@@ -59,7 +59,7 @@ class AppComponent {
   AppComponent(){
     Logger.root.level = Level.ALL;
     Logger.root.onRecord.listen((LogRecord rec) {
-      print('${rec.level.name}: ${rec.time}: ${rec.message}');
+      print('${rec.loggerName}: ${rec.level.name}: ${rec.time}: ${rec.message}');
     });
   }
 
