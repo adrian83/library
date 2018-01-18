@@ -6,11 +6,12 @@ import 'package:http/http.dart';
 
 import 'model.dart';
 import '../common/errors.dart';
+import '../common/page.dart';
 
 @Injectable()
 class BookService {
   static final String _baseBookUrl = "/rest/api/v1.0/books";
-  static final String _listBooksUrl = "/rest/api/v1.0/books?page=";
+  static final String _listBooksUrl = "/rest/api/v1.0/books?";
 
 
   static final _headers = {'Content-Type': 'application/json'};
@@ -19,9 +20,14 @@ class BookService {
 
   BookService(this._http);
 
-  Future<BooksPage> listBooks(int pageNumber) async {
+
+  String requestToUri(PageRequest request) {
+    return "page=${request.page}&phrase=${Uri.encodeFull(request.phrase)}";
+  }
+
+  Future<BooksPage> listBooks(PageRequest request) async {
     try {
-      final response = await _http.get(_listBooksUrl + pageNumber.toString());
+      final response = await _http.get(_listBooksUrl + requestToUri(request));
       final page = new BooksPage.fromJson(_extractData(response));
       return page;
     } catch (e) {

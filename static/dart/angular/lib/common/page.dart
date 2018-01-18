@@ -1,6 +1,4 @@
-
 class Page<T> {
-
   int _total;
   int _size;
   int _current;
@@ -16,5 +14,18 @@ class Page<T> {
   String toString() {
     return "Page { current: $_current, total: $_total, size: $_size, elements: $_elements }";
   }
+}
 
+class PageRequest {
+  int _page;
+  String _phrase;
+
+  PageRequest(this._page, this._phrase);
+
+  int get page => this._page;
+  String get phrase => this._phrase;
+
+  String toString() {
+    return "PageRequest { page: $_page, phrase: $_phrase }";
+  }
 }

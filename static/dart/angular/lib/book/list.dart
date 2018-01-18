@@ -2,11 +2,13 @@ import 'dart:async';
 
 import 'package:angular/angular.dart';
 import 'package:angular_router/angular_router.dart';
+import 'package:angular_forms/angular_forms.dart';
 
 import 'service.dart';
 import 'model.dart';
 
 import '../common/components/pagination.dart';
+import '../common/page.dart';
 
 import 'package:logging/logging.dart';
 
@@ -25,7 +27,7 @@ class BooksPageSwitcher extends PageSwitcher {
 @Component(
     selector: 'books_list-comp',
     templateUrl: 'list.template.html',
-    directives: const [CORE_DIRECTIVES, Pagination])
+    directives: const [CORE_DIRECTIVES, Pagination, formDirectives])
 class BooksListComponent implements OnInit {
 
 static final Logger LOGGER = new Logger('BooksListComponent');
@@ -33,7 +35,7 @@ static final Logger LOGGER = new Logger('BooksListComponent');
   final BookService _bookService;
   final Router _router;
 
-  String searchedPhrase;
+  String searchedPhrase = "test";
 
   BooksPage page = new BooksPage(0, 0, 0, new List<Book>());
   PageSwitcher switcher;
@@ -48,10 +50,15 @@ static final Logger LOGGER = new Logger('BooksListComponent');
   }
 
   Future<Null> fetchBooks(int pageNo) async {
-    this.page = await this._bookService.listBooks(pageNo);
+    PageRequest req = new PageRequest(0, searchedPhrase);
+    this.page = await this._bookService.listBooks(req);
   }
 
   List<Book> get books => this.page == null ? new List<Book>() : this.page.elements;
+
+  Future<Null> findBooks() async {
+    fetchBooks(0);
+  }
 
   Future<Null> show(Book book) async {
     _router.navigate([

@@ -1,15 +1,19 @@
 <h1>Book' list</h1>
 
+<div>{{ searchedPhrase }}</div>
+
 <div class="input-group mb-3">
   <input type="text"
          class="form-control"
          placeholder="Book's title"
          aria-label="Book's title"
-         value="{{ searchedPhrase }}"
+         [(ngModel)]="searchedPhrase"
          aria-describedby="basic-addon2">
 
   <div class="input-group-append">
-    <button class="btn btn-outline-secondary" type="button">Search</button>
+    <button class="btn btn-outline-secondary"
+            type="button"
+            (click)="findBooks()">Search</button>
   </div>
 </div>
 
