@@ -21,13 +21,11 @@ class BookService {
   BookService(this._http);
 
 
-  String requestToUri(PageRequest request) {
-    return "page=${request.page}&phrase=${Uri.encodeFull(request.phrase)}";
-  }
+
 
   Future<BooksPage> listBooks(PageRequest request) async {
     try {
-      final response = await _http.get(_listBooksUrl + requestToUri(request));
+      final response = await _http.get(_listBooksUrl + request.params());
       final page = new BooksPage.fromJson(_extractData(response));
       return page;
     } catch (e) {

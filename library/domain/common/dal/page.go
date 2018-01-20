@@ -2,11 +2,16 @@ package dal
 
 import "fmt"
 
+const (
+	defPageSize = 5
+)
+
 // PageInfo is a struct used in DALs in queries that returs collections of structs.
 type PageInfo struct {
 	Number int
 	Size   int
 	Sort   string
+	Phrase string
 }
 
 // From returns lower index for listing query.
@@ -21,16 +26,37 @@ func (pi *PageInfo) To() int {
 
 // String returns string representation of this struct.
 func (pi *PageInfo) String() string {
-	return fmt.Sprintf("PageInfo { Number: %v, Size: %v, Sort: %v }",
-		pi.Number, pi.Size, pi.Sort)
+	return fmt.Sprintf("PageInfo { Number: %v, Size: %v, Sort: %v, Phrase: %v }",
+		pi.Number, pi.Size, pi.Sort, pi.Phrase)
 }
 
-// NewPageInfo returns page info with given page number and few default values.
-func NewPageInfo(no int) *PageInfo {
+// NewPageInfo returns page info with given values or default ones..
+func NewPageInfo(no, size int, phrase, sort string) *PageInfo {
+	pageNumber := 0
+	if no > 0 {
+		pageNumber = no
+	}
+
+	pageSize := defPageSize
+	if size > 0 {
+		pageSize = size
+	}
+
+	searchPhrase := ""
+	if phrase != "" {
+		searchPhrase = phrase
+	}
+
+	pageSort := "_id"
+	if sort != "" {
+		pageSort = sort
+	}
+
 	return &PageInfo{
-		Number: no,
-		Size:   2,
-		Sort:   "_id",
+		Number: pageNumber,
+		Size:   pageSize,
+		Sort:   pageSort,
+		Phrase: searchPhrase,
 	}
 }
 

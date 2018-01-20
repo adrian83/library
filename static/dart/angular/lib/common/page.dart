@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class Page<T> {
   int _total;
   int _size;
@@ -17,15 +19,23 @@ class Page<T> {
 }
 
 class PageRequest {
-  int _page;
-  String _phrase;
+  int _page = 0;
+  int _size = 5;
+  String _phrase = "";
+  String _sort = "";
 
-  PageRequest(this._page, this._phrase);
+  PageRequest(this._page, this._phrase, [this._size, this._sort]);
 
-  int get page => this._page;
-  String get phrase => this._phrase;
+  int get page => this._page == null ? 0 : this._page;
+  int get size => this._size == null ? 0 : this._size;
+  String get phrase => this._phrase == null ? "" : this._phrase;
+  String get sort => this._sort == null ? "" : this._sort;
+
+  String params(){
+    return "page=${page}&phrase=${Uri.encodeFull(phrase)}&size=$size&sort=$sort";
+  }
 
   String toString() {
-    return "PageRequest { page: $_page, phrase: $_phrase }";
+    return "PageRequest { page: $_page, phrase: $_phrase, size: $_size, sort: $_sort }";
   }
 }

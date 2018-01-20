@@ -1,6 +1,7 @@
 package book
 
 import (
+	"fmt"
 	"log"
 
 	"gopkg.in/mgo.v2"
@@ -62,11 +63,17 @@ func (d MongoDal) Add(book *Entity) (*Entity, error) {
 func (d MongoDal) Books(page *dal.PageInfo) (*EntitiesPage, error) {
 	log.Printf("Getting books from page: %v", page)
 	entities := make([]*Entity, 0)
-	query := d.collection.Find(nil).Skip(page.From()).Limit(page.Size).Sort(page.Sort)
+	// {$regex : ".*son.*"}
+	var findExp interface{}
+	if page.Phrase != "" {
+		findExp = bson.M{title: bson.M{"$regex": fmt.Sprintf(".*%v.*", page.Phrase)}}
+	}
+
+	query := d.collection.Find(findExp).Skip(page.From()).Limit(page.Size).Sort(page.Sort)
 	if err := query.All(&entities); err != nil {
 		return nil, err
 	}
-	totalCount, err := d.collection.Count()
+	totalCount, err := d.collection.Find(findExp).Count()
 	if err != nil {
 		return nil, err
 	}

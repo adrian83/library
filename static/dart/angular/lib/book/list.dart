@@ -50,7 +50,7 @@ static final Logger LOGGER = new Logger('BooksListComponent');
   }
 
   Future<Null> fetchBooks(int pageNo) async {
-    PageRequest req = new PageRequest(0, searchedPhrase);
+    PageRequest req = new PageRequest(pageNo, searchedPhrase);
     this.page = await this._bookService.listBooks(req);
   }
 
