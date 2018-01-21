@@ -1,6 +1,10 @@
 package author
 
 import (
+	"fmt"
+	"log"
+
+	"github.com/adrian83/go-mvc-library/library/domain/common/dal"
 	"github.com/adrian83/go-mvc-library/library/domain/common/model"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -15,10 +19,16 @@ const (
 	id = "_id"
 )
 
+// EntitiesPage represents single page of Entities in pagination.
+type EntitiesPage struct {
+	*dal.Page
+	Elements []*Entity
+}
+
 // Dal is a data access layer for authors.
 type Dal interface {
 	Add(author *Entity) (*Entity, error)
-	GetAuthors() (Entities, error)
+	Authors(page *dal.PageInfo) (*EntitiesPage, error)
 	Update(author *Entity) error
 	Delete(authorID bson.ObjectId) error
 	GetAuthor(authorID bson.ObjectId) (*Entity, error)
@@ -44,11 +54,33 @@ func (d MongoDal) Add(author *Entity) (*Entity, error) {
 	return author, d.collection.Insert(author)
 }
 
-// GetAuthors returns slice of authors fetched from MongoDB.
-func (d MongoDal) GetAuthors() (Entities, error) {
-	authorsEntities := make([]*Entity, 0)
-	err := d.collection.Find(nil).All(&authorsEntities)
-	return authorsEntities, err
+// Authors returns slice of authors fetched from MongoDB.
+func (d MongoDal) Authors(page *dal.PageInfo) (*EntitiesPage, error) {
+
+	log.Printf("Getting authors from page: %v", page)
+	entities := make([]*Entity, 0)
+	// {$regex : ".*son.*"}
+	var findExp interface{}
+	if page.Phrase != "" {
+		findExp = bson.M{firstName: bson.M{"$regex": fmt.Sprintf(".*%v.*", page.Phrase)}}
+	}
+
+	query := d.collection.Find(findExp).Skip(page.From()).Limit(page.Size).Sort(page.Sort)
+	if err := query.All(&entities); err != nil {
+		return nil, err
+	}
+	totalCount, err := d.collection.Find(findExp).Count()
+	if err != nil {
+		return nil, err
+	}
+
+	return &EntitiesPage{
+		Page: &dal.Page{
+			TotalElements: totalCount,
+			Size:          page.Size,
+			Current:       page.Number,
+		},
+		Elements: entities}, nil
 }
 
 // Update updates author's data into MongoDB.

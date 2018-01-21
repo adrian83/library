@@ -62,9 +62,9 @@ func NewPageInfo(no, size int, phrase, sort string) *PageInfo {
 
 // Page represents single page in Pagination.
 type Page struct {
-	TotalElements int `json:"totalElements"`
-	Size          int `json:"pageSize"`
-	Current       int `json:"currentPage"`
+	TotalElements int `json:"total"`
+	Size          int `json:"size"`
+	Current       int `json:"page"`
 }
 
 // String returns string representation of this struct.

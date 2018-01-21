@@ -15,15 +15,15 @@ class AuthorsListComponent implements OnInit {
   final AuthorService _authorService;
   final Router _router;
 
-  List<Author> authors = new List<Author>();
+  AuthorsPage page;
 
   AuthorsListComponent(this._authorService, this._router);
 
   Future<Null> ngOnInit() async {
-    this.authors = await this._authorService.listAuthors();
+    this.page = await this._authorService.authors();
   }
 
-  List<Author> get getAuthors => this.authors;
+  List<Author> get authors => this.page == null ? new List() : this.page.elements;
 
   Future<Null> show(Author author) async {
     _router.navigate([
@@ -41,6 +41,6 @@ class AuthorsListComponent implements OnInit {
 
   Future<Null> delete(Author author) async {
     await this._authorService.deleteAuthor(author.id);
-    this.authors = await this._authorService.listAuthors();
+    this.page = await this._authorService.authors();
   }
 }

@@ -33,7 +33,8 @@ class BookCreateComponent implements OnInit {
 
   Future<Null> ngOnInit() async {
     LOGGER.info("Init BookCreateComponent");
-    this.authors = await this._authorService.listAuthors();
+    var page = await this._authorService.authors();
+    this.authors = page == null ? new List() : page.elements;
   }
 
   List<Author> get getAuthors => this.authors;

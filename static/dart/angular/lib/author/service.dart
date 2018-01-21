@@ -22,14 +22,12 @@ class AuthorService {
 
   AuthorService(this._http);
 
-  Future<List<Author>> listAuthors() async {
+  Future<AuthorsPage> authors() async {
     LOGGER.info("Get authors");
     try {
       final response = await _http.get(_listAuthorsUrl);
-      final authors = _extractData(response)
-          .map((value) => new Author.fromJson(value))
-          .toList();
-      return authors;
+      final page = new AuthorsPage.fromJson(_extractData(response));
+      return page;
     } catch (e) {
       throw _handleError(e);
     }

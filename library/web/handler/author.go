@@ -92,7 +92,9 @@ func (ah *AuthorHandler) addAuthor(w http.ResponseWriter, r *http.Request, s ses
 
 func (ah *AuthorHandler) getAuthors(w http.ResponseWriter, r *http.Request, s session.Session) error {
 
-	authors, err := ah.AuthorService.GetAuthors()
+	pageInfo := PageInfoFrom(r)
+
+	authors, err := ah.AuthorService.Authors(pageInfo)
 	if err != nil {
 		return liberrors.Error500(err)
 	}

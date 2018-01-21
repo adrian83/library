@@ -38,7 +38,8 @@ class BookUpdateComponent implements OnInit {
     var _id = _routeParams.get('id');
     this.book = await this._bookService.getBook(_id);
     LOGGER.info("Edited book: $book");
-    this.authors = await this._authorService.listAuthors();
+    var page = await this._authorService.authors();
+    this.authors = page == null ? new List() : page.elements;
   }
 
   List<Author> get getAuthors => this.authors;

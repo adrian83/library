@@ -25,7 +25,7 @@ class BookService {
 
   Future<BooksPage> listBooks(PageRequest request) async {
     try {
-      final response = await _http.get(_listBooksUrl + request.params());
+      final response = await _http.get(_listBooksUrl + request.asGetParams());
       final page = new BooksPage.fromJson(_extractData(response));
       return page;
     } catch (e) {

@@ -1,4 +1,4 @@
-
+import '../common/page.dart';
 import '../common/serializable.dart';
 
 class Author extends Serializable {
@@ -21,4 +21,19 @@ class Author extends Serializable {
 		return "Author { id=$id, firstName=$firstName, lastName=$lastName }";
 	}
 
+}
+
+class AuthorsPage extends Page<Author> {
+
+  AuthorsPage(int page, int total, int size, List<Author> authors): super(page, total, size, authors);
+
+  factory AuthorsPage.fromJson(Map<String, dynamic> json) {
+    var authorsJson = json['authors'];
+    List<Author> authors = new List<Author>();
+
+    if(authorsJson != null) {
+      authorsJson.forEach((j) => authors.add(new Author.fromJson(j)));
+    }
+    return new AuthorsPage(json[PAGE], json[TOTAL], json[SIZE], authors);
+  }
 }

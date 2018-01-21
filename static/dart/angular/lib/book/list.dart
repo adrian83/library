@@ -35,7 +35,7 @@ static final Logger LOGGER = new Logger('BooksListComponent');
   final BookService _bookService;
   final Router _router;
 
-  String searchedPhrase = "test";
+  String searchedPhrase = "";
 
   BooksPage page = new BooksPage(0, 0, 0, new List<Book>());
   PageSwitcher switcher;

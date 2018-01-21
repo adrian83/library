@@ -2,20 +2,7 @@ import '../author/model.dart';
 import '../common/serializable.dart';
 import '../common/page.dart';
 
-class BooksPage extends Page<Book> {
 
-  BooksPage(int current, int total, int size, List<Book> books): super(current, total, size, books);
-
-  factory BooksPage.fromJson(Map<String, dynamic> json) {
-    var booksJson = json['books'];
-    List<Book> books = new List<Book>();
-
-    if(booksJson != null) {
-      booksJson.forEach((j) => books.add(new Book.fromJson(j)));
-    }
-    return new BooksPage(json['currentPage'], json['totalElements'], json['pageSize'], books);
-  }
-}
 
 class Book extends Serializable {
   String id;
@@ -47,5 +34,20 @@ class Book extends Serializable {
 
   String toString() {
     return "Book { title: $title, authors: ${authors.map((a) => a.toString()).join()}}";
+  }
+}
+
+class BooksPage extends Page<Book> {
+
+  BooksPage(int current, int total, int size, List<Book> books): super(current, total, size, books);
+
+  factory BooksPage.fromJson(Map<String, dynamic> json) {
+    var booksJson = json['books'];
+    List<Book> books = new List<Book>();
+
+    if(booksJson != null) {
+      booksJson.forEach((j) => books.add(new Book.fromJson(j)));
+    }
+    return new BooksPage(json[PAGE], json[TOTAL], json[SIZE], books);
   }
 }

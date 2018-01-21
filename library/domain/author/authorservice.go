@@ -1,10 +1,19 @@
 package author
 
-import "gopkg.in/mgo.v2/bson"
+import (
+	"github.com/adrian83/go-mvc-library/library/domain/common/dal"
+	"gopkg.in/mgo.v2/bson"
+)
+
+// AuthorsPage represents single page of Authors in Authors' pagination.
+type AuthorsPage struct {
+	*dal.Page
+	Authors []*Author `json:"authors"`
+}
 
 type AuthorService interface {
 	Add(author *Author) (*Author, error)
-	GetAuthors() ([]*Author, error)
+	Authors(page *dal.PageInfo) (*AuthorsPage, error)
 	Update(author *Author) error
 	Delete(authorID string) error
 	GetAuthor(authorID string) (*Author, error)
@@ -26,12 +35,21 @@ func (s AuthorServiceImpl) Add(author *Author) (*Author, error) {
 	return entity.ToAuthor(), nil
 }
 
-func (s AuthorServiceImpl) GetAuthors() ([]*Author, error) {
-	entities, err := s.authorDal.GetAuthors()
+// Authors returns page of Authors.
+func (s AuthorServiceImpl) Authors(page *dal.PageInfo) (*AuthorsPage, error) {
+	entitiesPage, err := s.authorDal.Authors(page)
 	if err != nil {
 		return nil, err
 	}
-	return entitiesToAuthors(entities), nil
+
+	return &AuthorsPage{
+		Page: &dal.Page{
+			TotalElements: entitiesPage.TotalElements,
+			Size:          entitiesPage.Size,
+			Current:       page.Number,
+		},
+		Authors: entitiesToAuthors(entitiesPage.Elements),
+	}, nil
 }
 
 func (s AuthorServiceImpl) Update(author *Author) error {
