@@ -7,14 +7,17 @@ import 'package:logging/logging.dart';
 
 import 'model.dart';
 
+import '../common/page.dart';
+
 @Injectable()
 class AuthorService {
 
   static final Logger LOGGER = new Logger('AuthorService');
 
-  static final String _listAuthorsUrl = "/rest/api/v1.0/authors";
+  static final String _listAuthorsUrl = "/rest/api/v1.0/authors?";
   static final String _createAuthorUrl = "/rest/api/v1.0/authors";
   static final String _updateAuthorUrl = "/rest/api/v1.0/authors";
+  static final String _getAuthorUrl = "/rest/api/v1.0/authors/";
 
   static final _headers = {'Content-Type': 'application/json'};
 
@@ -22,10 +25,10 @@ class AuthorService {
 
   AuthorService(this._http);
 
-  Future<AuthorsPage> authors() async {
+  Future<AuthorsPage> authors(PageRequest request) async {
     LOGGER.info("Get authors");
     try {
-      final response = await _http.get(_listAuthorsUrl);
+      final response = await _http.get(_listAuthorsUrl + request.asGetParams());
       final page = new AuthorsPage.fromJson(_extractData(response));
       return page;
     } catch (e) {
@@ -55,7 +58,7 @@ class AuthorService {
 
   Future<Author> getAuthor(String id) async {
     try {
-      final response = await _http.get(_listAuthorsUrl + "/" + id);
+      final response = await _http.get(_getAuthorUrl + id);
       return new Author.fromJson(_extractData(response));
     } catch (e) {
       throw _handleError(e);
@@ -64,7 +67,7 @@ class AuthorService {
 
   Future<Null> deleteAuthor(String id) async {
     try {
-      await _http.delete(_listAuthorsUrl + "/" + id);
+      await _http.delete(_getAuthorUrl + id);
     } catch (e) {
       throw _handleError(e);
     }

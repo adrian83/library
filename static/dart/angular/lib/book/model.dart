@@ -2,8 +2,6 @@ import '../author/model.dart';
 import '../common/serializable.dart';
 import '../common/page.dart';
 
-
-
 class Book extends Serializable {
   String id;
   String title;
@@ -13,11 +11,9 @@ class Book extends Serializable {
 
   factory Book.fromJson(Map<String, dynamic> json) {
     var authorsJson = json['authors'];
-    List<Author> atrs = new List<Author>();
-
-    if(authorsJson != null) {
-    authorsJson.forEach((j) => atrs.add(new Author.fromJson(j)));
-  }
+    List<Author> atrs = authorsJson == null
+        ? new List<Author>()
+        : authorsJson.map((j) => new Author.fromJson(j));
 
     return new Book(json['id'], json['title'], atrs);
   }
@@ -26,28 +22,21 @@ class Book extends Serializable {
 
   bool get hasAuthors => authors != null && authors.length > 0;
 
-  String get authorsNames {
-    return authors == null
-        ? ""
-        : authors.map((a) => a.fullName).join(", ").trim();
-  }
-
   String toString() {
     return "Book { title: $title, authors: ${authors.map((a) => a.toString()).join()}}";
   }
 }
 
 class BooksPage extends Page<Book> {
-
-  BooksPage(int current, int total, int size, List<Book> books): super(current, total, size, books);
+  BooksPage(int current, int total, int size, List<Book> books)
+      : super(current, total, size, books);
 
   factory BooksPage.fromJson(Map<String, dynamic> json) {
     var booksJson = json['books'];
-    List<Book> books = new List<Book>();
+    List<Book> books = booksJson == null
+        ? new List<Book>()
+        : booksJson.map((j) => new Book.fromJson(j));
 
-    if(booksJson != null) {
-      booksJson.forEach((j) => books.add(new Book.fromJson(j)));
-    }
     return new BooksPage(json[PAGE], json[TOTAL], json[SIZE], books);
   }
 }
