@@ -41,6 +41,11 @@
     </div>
 
     <div class="row">
+      <pagination [page]="page" [switcher]="switcher"></pagination>
+    </div>
+
+
+    <div class="row">
 
       <dt class="col-sm-3"></dt>
       <dd class="col-sm-9"><input type="submit" (click)="createBook()" /></dd>

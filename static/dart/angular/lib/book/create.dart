@@ -13,12 +13,14 @@ import '../author/service.dart';
 import '../author/model.dart';
 
 import '../common/errors.dart';
+import '../common/components/pagination.dart';
+import '../common/page.dart';
 
 @Component(
     selector: 'b-comp',
     templateUrl: 'create.template.html',
-    directives: const [formDirectives, CORE_DIRECTIVES])
-class BookCreateComponent implements OnInit {
+    directives: const [formDirectives, CORE_DIRECTIVES, Pagination])
+class BookCreateComponent extends PageSwitcher implements OnInit {
   static final Logger LOGGER = new Logger('BookCreateComponent');
 
   final BookService _bookService;
@@ -26,22 +28,36 @@ class BookCreateComponent implements OnInit {
   final Router _router;
 
   Book book = new Book(null, "", new List<Author>());
-  List<Author> authors = new List<Author>();
   List<ValidationError> validationErrors;
+
+  String searchedPhrase = "";
+
+  AuthorsPage page = new AuthorsPage(0, 0, 0, new List<Author>());
+
 
   BookCreateComponent(this._bookService, this._authorService, this._router);
 
   Future<Null> ngOnInit() async {
     LOGGER.info("Init BookCreateComponent");
-    var page = await this._authorService.authors();
-    this.authors = page == null ? new List() : page.elements;
+    fetchAuthors(0);
   }
 
-  List<Author> get getAuthors => this.authors;
+  void change(int pageNumber){
+    print("Change authors page to $pageNumber");
+    fetchAuthors(pageNumber);
+  }
+
+  Future<Null> fetchAuthors(int pageNo) async {
+    PageRequest req = new PageRequest(pageNo, searchedPhrase);
+    this.page = await this._authorService.authors(req);
+  }
+
+  List<Author> get authors => this.page == null ? new List<Author>() : this.page.elements;
+  PageSwitcher get switcher => this;
 
   void addAuthor(Author author) {
     LOGGER.info("Adding author: $author");
-    if (!book.authors.contains(author)) {
+    if (!book.authors.any((a) => a.id == author.id)) {
       book.authors.add(author);
     }
   }

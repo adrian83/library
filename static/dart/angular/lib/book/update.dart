@@ -13,6 +13,8 @@ import '../author/service.dart';
 import '../author/model.dart';
 
 import '../common/errors.dart';
+import '../common/components/pagination.dart';
+import '../common/page.dart';
 
 @Component(
     selector: 'b-comp',
@@ -30,6 +32,9 @@ class BookUpdateComponent implements OnInit {
   List<Author> authors = new List<Author>();
   List<ValidationError> validationErrors;
 
+  String searchedPhrase = "";
+  int pageNumber = 0;
+
   BookUpdateComponent(this._bookService, this._authorService, this._router, this._routeParams);
 
   Future<Null> ngOnInit() async {
@@ -38,7 +43,8 @@ class BookUpdateComponent implements OnInit {
     var _id = _routeParams.get('id');
     this.book = await this._bookService.getBook(_id);
     LOGGER.info("Edited book: $book");
-    var page = await this._authorService.authors();
+    PageRequest req = new PageRequest(pageNumber, searchedPhrase);
+    var page = await this._authorService.authors(req);
     this.authors = page == null ? new List() : page.elements;
   }
 

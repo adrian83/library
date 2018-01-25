@@ -13,31 +13,36 @@ import '../common/page.dart';
 @Component(
     selector: 'authors_list-comp',
     templateUrl: 'list.template.html',
-		directives: const[CORE_DIRECTIVES, Pagination, formDirectives]
-  )
-class AuthorsListComponent implements OnInit {
+    directives: const [CORE_DIRECTIVES, Pagination, formDirectives])
+class AuthorsListComponent extends PageSwitcher implements OnInit {
   final AuthorService _authorService;
   final Router _router;
 
   String searchedPhrase = "";
+  int pageNumber = 0;
 
   AuthorsPage page = new AuthorsPage(0, 0, 0, new List<Author>());
-  PageSwitcher switcher;
 
-  AuthorsListComponent(this._authorService, this._router){
-    switcher = new AuthorsPageSwitcher(this);
-  }
+  AuthorsListComponent(this._authorService, this._router);
 
   Future<Null> ngOnInit() async {
-    fetchAuthors(0);
+    fetchAuthors(pageNumber);
+  }
+
+  void change(int pageNumber) {
+    print("change to $pageNumber in list authors");
+    fetchAuthors(pageNumber);
   }
 
   Future<Null> fetchAuthors(int pageNo) async {
-    PageRequest req = new PageRequest(pageNo, searchedPhrase);
+    this.pageNumber = pageNo;
+    PageRequest req = new PageRequest(pageNumber, searchedPhrase);
     this.page = await this._authorService.authors(req);
   }
 
-  List<Author> get authors => this.page == null ? new List() : this.page.elements;
+  List<Author> get authors =>
+      this.page == null ? new List() : this.page.elements;
+  PageSwitcher get switcher => this;
 
   Future<Null> show(Author author) async {
     _router.navigate([
@@ -55,18 +60,7 @@ class AuthorsListComponent implements OnInit {
 
   Future<Null> delete(Author author) async {
     await this._authorService.deleteAuthor(author.id);
-    this.page = await this._authorService.authors();
-  }
-}
-
-class AuthorsPageSwitcher extends PageSwitcher {
-
-  final AuthorsListComponent _authorsListComponent;
-
-  AuthorsPageSwitcher(this._authorsListComponent);
-
-  void change(int pageNumber) {
-    print("change to $pageNumber in list authors");
-    _authorsListComponent.fetchAuthors(pageNumber);
+    PageRequest req = new PageRequest(this.pageNumber, this.searchedPhrase);
+    this.page = await this._authorService.authors(req);
   }
 }
