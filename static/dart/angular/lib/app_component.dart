@@ -41,7 +41,7 @@ import 'package:logging/logging.dart';
   const Route(path: '/authors/list', name: 'AuthorsListC', component: AuthorsListComponent),
   const Route(path: '/authors/new', name: 'CreateAuthorComponent', component: CreateAuthorComponent),
   const Route(path: '/authors/show/:id', name: 'AuthorShowC', component: AuthorShowComponent),
-  const Route(path: '/authors/update/:id', name: 'AuthorUpdateC', component: AuthorUpdateComponent),
+  const Route(path: '/authors/update/:id', name: 'UpdateAuthorComponent', component: UpdateAuthorComponent),
 
   const Route(path: '/books/list', name: 'BooksListC', component: BooksListComponent),
   const Route(path: '/books/new', name: 'BookCreateC', component: BookCreateComponent),

@@ -36,14 +36,11 @@ class CreateAuthorComponent {
       : this._validationErrors;
 
   Author get author => _author;
-  void set author(Author author) {
-    this._author = author;
-  }
 
-  Future<Null> onSubmit() async {
-    LOGGER.info("Creating $author");
+  Future<Null> save() async {
+    LOGGER.info("Saving $author");
 
-    this._authorService.createAuthor(this._author).then((a) => this._author = a,
+    this._authorService.create(this._author).then((a) => this._author = a,
         onError: (e) {
       if (e is ValidationErrors) {
         LOGGER.info("Invalid author: ${e.validationErrors}");

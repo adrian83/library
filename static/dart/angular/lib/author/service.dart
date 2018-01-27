@@ -1,91 +1,49 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:angular/angular.dart';
 import 'package:http/http.dart';
 import 'package:logging/logging.dart';
 
 import 'model.dart';
-import '../common/errors.dart';
 import '../common/page.dart';
+import '../common/service.dart';
 
 @Injectable()
-class AuthorService {
-
+class AuthorService extends Service {
   static final Logger LOGGER = new Logger('AuthorService');
 
-  static final String _listAuthorsUrl = "/rest/api/v1.0/authors?";
-  static final String _createAuthorUrl = "/rest/api/v1.0/authors";
-  static final String _updateAuthorUrl = "/rest/api/v1.0/authors";
-  static final String _getAuthorUrl = "/rest/api/v1.0/authors/";
+  static final String apiV1 = "/rest/api/v1.0";
+  static final String _authors = "authors";
 
-  static final _headers = {'Content-Type': 'application/json'};
-
-  final Client _http;
-
-  AuthorService(this._http);
+  AuthorService(Client client) : super(client);
 
   Future<AuthorsPage> authors(PageRequest request) async {
-    LOGGER.info("Get authors");
-    try {
-      final response = await _http.get(_listAuthorsUrl + request.asGetParams());
-      final page = new AuthorsPage.fromJson(_extractData(response));
-      return page;
-    } catch (e) {
-      throw _handleError(e);
-    }
+    LOGGER.info("Get authors. Request params: $request");
+    var jsonPage = await getEntity(listUrl(apiV1, _authors, request.asGetParams()));
+    return new AuthorsPage.fromJson(jsonPage);
   }
 
-  Future<Author> createAuthor(Author author) async {
-
-
-    final response = await _http.post(_createAuthorUrl,
-        headers: _headers, body: JSON.encode(author));
-
-    var json = _extractData(response);
-    print(json);
-
-    if (response.statusCode == 400) {
-      var valErrors = new ValidationErrors.fromJson(json);
-      print(valErrors);
-      throw valErrors;
-    } else {
-      return new Author.fromJson(json);
-    }
-
+  Future<Author> create(Author author) async {
+    LOGGER.info("Create author: $author");
+    var json = await createEntity(createUrl(apiV1, _authors), author);
+    return new Author.fromJson(json);
   }
 
   Future<Author> updateAuthor(Author author) async {
-    try {
-      final response = await _http.put(_updateAuthorUrl + "/" + author.id,
-          headers: _headers, body: JSON.encode(author));
-      return new Author.fromJson(_extractData(response));
-    } catch (e) {
-      throw _handleError(e);
-    }
+    LOGGER.info("Update author: $author");
+    var json = await updateEntity(updateUrl(apiV1, _authors, author.id), author);
+    return new Author.fromJson(json);
   }
 
   Future<Author> getAuthor(String id) async {
-    try {
-      final response = await _http.get(_getAuthorUrl + id);
-      return new Author.fromJson(_extractData(response));
-    } catch (e) {
-      throw _handleError(e);
-    }
+    LOGGER.info("Get author with id: $id");
+    var json = await getEntity(getUrl(apiV1, _authors, id));
+    return new Author.fromJson(json);
   }
 
   Future<Null> deleteAuthor(String id) async {
-    try {
-      await _http.delete(_getAuthorUrl + id);
-    } catch (e) {
-      throw _handleError(e);
-    }
+    LOGGER.info("Delete author with id: $id");
+    await deleteEntity(deleteUrl(apiV1, _authors, id));
   }
 
-  dynamic _extractData(Response resp) => JSON.decode(resp.body);
-
-  Exception _handleError(dynamic e) {
-    print(e);
-    return new Exception('Server error; cause: $e');
-  }
 }

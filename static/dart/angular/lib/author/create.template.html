@@ -2,11 +2,11 @@
 
 <validation-errors [errors]="validationErrors"></validation-errors>
 
-<div>{{author.id}} {{author.firstName}} {{author.lastName}}</div>
+
 <div>
   <input [(ngModel)]="author.firstName"/>
   <br/>
   <input [(ngModel)]="author.lastName"/>
   <br/>
-  <input type="submit" (click)="onSubmit()" />
+  <input type="submit" (click)="save()" />
 </div>

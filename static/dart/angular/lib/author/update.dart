@@ -8,28 +8,32 @@ import 'service.dart';
 import 'model.dart';
 
 @Component(
-		selector: 'b-comp',
+		selector: 'update-author-component',
     templateUrl: 'update.template.html',
 		directives: const[formDirectives]
     )
-class AuthorUpdateComponent implements OnInit {
+class UpdateAuthorComponent implements OnInit {
 
-	Author author = new Author();
+
 
 	final AuthorService _authorService;
 	final RouteParams _routeParams;
 
-	AuthorUpdateComponent(this._authorService, this._routeParams);
+	Author _author = new Author();
+
+	UpdateAuthorComponent(this._authorService, this._routeParams);
 
 	Future<Null> ngOnInit() async {
 		var _id = _routeParams.get('id');
-    this.author = await this._authorService.getAuthor(_id);
+    this._author = await this._authorService.getAuthor(_id);
   }
+
+	Author get author => this._author;
 
 	Future<Null> onSubmit() async {
 		print("onSubmit");
 
-		this.author = await this._authorService.updateAuthor(this.author);
+		this._author = await this._authorService.updateAuthor(this.author);
 	}
 
 }
