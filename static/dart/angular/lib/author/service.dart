@@ -6,7 +6,7 @@ import 'package:http/http.dart';
 import 'package:logging/logging.dart';
 
 import 'model.dart';
-
+import '../common/errors.dart';
 import '../common/page.dart';
 
 @Injectable()
@@ -37,13 +37,22 @@ class AuthorService {
   }
 
   Future<Author> createAuthor(Author author) async {
-    try {
-      final response = await _http.post(_createAuthorUrl,
-          headers: _headers, body: JSON.encode(author));
-      return new Author.fromJson(_extractData(response));
-    } catch (e) {
-      throw _handleError(e);
+
+
+    final response = await _http.post(_createAuthorUrl,
+        headers: _headers, body: JSON.encode(author));
+
+    var json = _extractData(response);
+    print(json);
+
+    if (response.statusCode == 400) {
+      var valErrors = new ValidationErrors.fromJson(json);
+      print(valErrors);
+      throw valErrors;
+    } else {
+      return new Author.fromJson(json);
     }
+
   }
 
   Future<Author> updateAuthor(Author author) async {

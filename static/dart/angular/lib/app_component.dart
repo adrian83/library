@@ -25,7 +25,7 @@ import 'package:logging/logging.dart';
       <h1>{{title}}</h1>
       <a [routerLink]="['AuthorsListC']">Authors list</a>
       <br/>
-      <a [routerLink]="['AuthorCreateC']">Create author</a>
+      <a [routerLink]="['CreateAuthorComponent']">Create author</a>
       <br/>
       <a [routerLink]="['BooksListC']">Books list</a>
       <br/>
@@ -39,7 +39,7 @@ import 'package:logging/logging.dart';
 
 @RouteConfig(const [
   const Route(path: '/authors/list', name: 'AuthorsListC', component: AuthorsListComponent),
-  const Route(path: '/authors/new', name: 'AuthorCreateC', component: AuthorCreateComponent),
+  const Route(path: '/authors/new', name: 'CreateAuthorComponent', component: CreateAuthorComponent),
   const Route(path: '/authors/show/:id', name: 'AuthorShowC', component: AuthorShowComponent),
   const Route(path: '/authors/update/:id', name: 'AuthorUpdateC', component: AuthorUpdateComponent),
 
