@@ -41,7 +41,7 @@ static final Logger LOGGER = new Logger('BooksListComponent');
 
   Future<Null> fetchBooks(int pageNo) async {
     PageRequest req = new PageRequest(pageNo, searchedPhrase);
-    this.page = await this._bookService.listBooks(req);
+    this.page = await this._bookService.list(req);
   }
 
   List<Book> get books => this.page == null ? new List<Book>() : this.page.elements;
@@ -59,7 +59,7 @@ static final Logger LOGGER = new Logger('BooksListComponent');
   }
 
   Future<Null> delete(Book book) async {
-    await this._bookService.deleteBook(book.id);
+    await this._bookService.delete(book.id);
     fetchBooks(page.current);
   }
 

@@ -4,8 +4,8 @@ import 'package:angular/angular.dart';
 import 'package:angular_router/angular_router.dart';
 import 'package:angular_forms/angular_forms.dart';
 
-import 'service.dart';
-import 'model.dart';
+import '../service.dart';
+import '../model.dart';
 
 @Component(
 		selector: 'update-author-component',
@@ -13,8 +13,6 @@ import 'model.dart';
 		directives: const[formDirectives]
     )
 class UpdateAuthorComponent implements OnInit {
-
-
 
 	final AuthorService _authorService;
 	final RouteParams _routeParams;
@@ -25,7 +23,7 @@ class UpdateAuthorComponent implements OnInit {
 
 	Future<Null> ngOnInit() async {
 		var _id = _routeParams.get('id');
-    this._author = await this._authorService.getAuthor(_id);
+    this._author = await this._authorService.get(_id);
   }
 
 	Author get author => this._author;
@@ -33,7 +31,7 @@ class UpdateAuthorComponent implements OnInit {
 	Future<Null> onSubmit() async {
 		print("onSubmit");
 
-		this._author = await this._authorService.updateAuthor(this.author);
+		this._author = await this._authorService.update(this.author);
 	}
 
 }

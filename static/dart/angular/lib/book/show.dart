@@ -20,6 +20,6 @@ class BookShowComponent implements OnInit {
 
 	Future<Null> ngOnInit() async {
 		var _id = _routeParams.get('id');
-    this.book = await this._bookService.getBook(_id);
+    this.book = await this._bookService.get(_id);
   }
 }

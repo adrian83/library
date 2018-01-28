@@ -4,10 +4,10 @@ import 'package:angular_router/angular_router.dart';
 import 'author/service.dart';
 import 'book/service.dart';
 
-import 'author/list.dart';
-import 'author/create.dart';
-import 'author/update.dart';
-import 'author/show.dart';
+import 'author/components/list.dart';
+import 'author/components/create.dart';
+import 'author/components/update.dart';
+import 'author/components/show.dart';
 
 import 'info/info_comp.dart';
 
@@ -23,7 +23,7 @@ import 'package:logging/logging.dart';
     selector: 'app',
     template: '''
       <h1>{{title}}</h1>
-      <a [routerLink]="['AuthorsListC']">Authors list</a>
+      <a [routerLink]="['ListAuthorsComponent']">Authors list</a>
       <br/>
       <a [routerLink]="['CreateAuthorComponent']">Create author</a>
       <br/>
@@ -38,9 +38,9 @@ import 'package:logging/logging.dart';
 
 
 @RouteConfig(const [
-  const Route(path: '/authors/list', name: 'AuthorsListC', component: AuthorsListComponent),
+  const Route(path: '/authors/list', name: 'ListAuthorsComponent', component: ListAuthorsComponent),
   const Route(path: '/authors/new', name: 'CreateAuthorComponent', component: CreateAuthorComponent),
-  const Route(path: '/authors/show/:id', name: 'AuthorShowC', component: AuthorShowComponent),
+  const Route(path: '/authors/show/:id', name: 'ShowAuthorComponent', component: ShowAuthorComponent),
   const Route(path: '/authors/update/:id', name: 'UpdateAuthorComponent', component: UpdateAuthorComponent),
 
   const Route(path: '/books/list', name: 'BooksListC', component: BooksListComponent),

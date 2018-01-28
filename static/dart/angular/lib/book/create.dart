@@ -49,7 +49,7 @@ class BookCreateComponent extends PageSwitcher implements OnInit {
 
   Future<Null> fetchAuthors(int pageNo) async {
     PageRequest req = new PageRequest(pageNo, searchedPhrase);
-    this.page = await this._authorService.authors(req);
+    this.page = await this._authorService.list(req);
   }
 
   List<Author> get authors => this.page == null ? new List<Author>() : this.page.elements;
@@ -68,7 +68,7 @@ class BookCreateComponent extends PageSwitcher implements OnInit {
   }
 
   Future<Null> createBook() async {
-    this._bookService.createBook(this.book).then((book) => this.book = book,
+    this._bookService.create(this.book).then((book) => this.book = book,
         onError: (e) {
       if (e is ValidationErrors) {
         LOGGER.info("Invalid book: ${e.validationErrors}");

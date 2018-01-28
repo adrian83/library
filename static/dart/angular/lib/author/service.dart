@@ -12,38 +12,42 @@ import '../common/service.dart';
 class AuthorService extends Service {
   static final Logger LOGGER = new Logger('AuthorService');
 
-  static final String apiV1 = "/rest/api/v1.0";
+  static final String _apiV1 = "/rest/api/v1.0";
   static final String _authors = "authors";
 
   AuthorService(Client client) : super(client);
 
-  Future<AuthorsPage> authors(PageRequest request) async {
+  Future<AuthorsPage> list(PageRequest request) async {
     LOGGER.info("Get authors. Request params: $request");
-    var jsonPage = await getEntity(listUrl(apiV1, _authors, request.asGetParams()));
+    var url = listUrl(_apiV1, _authors, request.asGetParams());
+    var jsonPage = await getEntity(url);
     return new AuthorsPage.fromJson(jsonPage);
   }
 
   Future<Author> create(Author author) async {
     LOGGER.info("Create author: $author");
-    var json = await createEntity(createUrl(apiV1, _authors), author);
+    var url = createUrl(_apiV1, _authors);
+    var json = await createEntity(url, author);
     return new Author.fromJson(json);
   }
 
-  Future<Author> updateAuthor(Author author) async {
+  Future<Author> update(Author author) async {
     LOGGER.info("Update author: $author");
-    var json = await updateEntity(updateUrl(apiV1, _authors, author.id), author);
+    var url = updateUrl(_apiV1, _authors, author.id);
+    var json = await updateEntity(url, author);
     return new Author.fromJson(json);
   }
 
-  Future<Author> getAuthor(String id) async {
+  Future<Author> get(String id) async {
     LOGGER.info("Get author with id: $id");
-    var json = await getEntity(getUrl(apiV1, _authors, id));
+    var url = getUrl(_apiV1, _authors, id);
+    var json = await getEntity(url);
     return new Author.fromJson(json);
   }
 
-  Future<Null> deleteAuthor(String id) async {
+  Future<Null> delete(String id) async {
     LOGGER.info("Delete author with id: $id");
-    await deleteEntity(deleteUrl(apiV1, _authors, id));
+    var url = deleteUrl(_apiV1, _authors, id);
+    await deleteEntity(url);
   }
-
 }

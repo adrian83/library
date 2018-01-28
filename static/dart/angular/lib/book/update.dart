@@ -41,10 +41,10 @@ class BookUpdateComponent implements OnInit {
     LOGGER.info("Init BookCreateComponent");
 
     var _id = _routeParams.get('id');
-    this.book = await this._bookService.getBook(_id);
+    this.book = await this._bookService.get(_id);
     LOGGER.info("Edited book: $book");
     PageRequest req = new PageRequest(pageNumber, searchedPhrase);
-    var page = await this._authorService.authors(req);
+    var page = await this._authorService.list(req);
     this.authors = page == null ? new List() : page.elements;
   }
 
@@ -63,7 +63,7 @@ class BookUpdateComponent implements OnInit {
   }
 
   Future<Null> updateBook() async {
-    this._bookService.updateBook(this.book).then((book) => this.book = book,
+    this._bookService.update(this.book).then((book) => this.book = book,
         onError: (e) {
       if (e is ValidationErrors) {
         LOGGER.info("Invalid book: ${e.validationErrors}");

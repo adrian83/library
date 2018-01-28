@@ -1,95 +1,53 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:angular/angular.dart';
 import 'package:http/http.dart';
+import 'package:logging/logging.dart';
 
 import 'model.dart';
-import '../common/errors.dart';
 import '../common/page.dart';
+import '../common/service.dart';
 
 @Injectable()
-class BookService {
-  static final String _baseBookUrl = "/rest/api/v1.0/books";
-  static final String _listBooksUrl = "/rest/api/v1.0/books?";
+class BookService extends Service {
+  static final Logger LOGGER = new Logger('BookService');
 
+  static final String _apiV1 = "/rest/api/v1.0/";
+  static final String _books = "books";
 
-  static final _headers = {'Content-Type': 'application/json'};
+  BookService(Client client) : super(client);
 
-  final Client _http;
-
-  BookService(this._http);
-
-
-
-
-  Future<BooksPage> listBooks(PageRequest request) async {
-    try {
-      final response = await _http.get(_listBooksUrl + request.asGetParams());
-      final page = new BooksPage.fromJson(_extractData(response));
-      return page;
-    } catch (e) {
-      throw _handleError(e);
-    }
+  Future<BooksPage> list(PageRequest request) async {
+    LOGGER.info("Get books. Request params: $request");
+    var url = listUrl(_apiV1, _books, request.asGetParams());
+    var jsonPage = await getEntity(url);
+    return new BooksPage.fromJson(jsonPage);
   }
 
-  Future<Book> updateBook(Book book) async {
-    print(book.title);
-
-    final response = await _http.put(_baseBookUrl + "/" + book.id,
-        headers: _headers, body: JSON.encode(book));
-
-    var json = _extractData(response);
-    print(json);
-
-    if (response.statusCode == 400) {
-      var valErrors = new ValidationErrors.fromJson(json);
-      print(valErrors);
-      throw valErrors;
-    } else {
-      return new Book.fromJson(json);
-    }
+  Future<Book> create(Book book) async {
+    LOGGER.info("Create book: $book");
+    var url = createUrl(_apiV1, _books);
+    var json = await createEntity(url, book);
+    return new Book.fromJson(json);
   }
 
-  Future<Book> createBook(Book book) async {
-    print(book.title);
-
-    final response = await _http.post(_baseBookUrl,
-        headers: _headers, body: JSON.encode(book));
-
-    var json = _extractData(response);
-    print(json);
-
-    if (response.statusCode == 400) {
-      var valErrors = new ValidationErrors.fromJson(json);
-      print(valErrors);
-      throw valErrors;
-    } else {
-      return new Book.fromJson(json);
-    }
+  Future<Book> update(Book book) async {
+    LOGGER.info("Update book: $book");
+    var url = updateUrl(_apiV1, _books, book.id);
+    var json = await updateEntity(url, book);
+    return new Book.fromJson(json);
   }
 
-  Future<Book> getBook(String id) async {
-    try {
-      final response = await _http.get(_baseBookUrl + "/" + id);
-      return new Book.fromJson(_extractData(response));
-    } catch (e) {
-      throw _handleError(e);
-    }
+  Future<Book> get(String id) async {
+    LOGGER.info("Get book with id: $id");
+    var url = getUrl(_apiV1, _books, id);
+    var json = await getEntity(url);
+    return new Book.fromJson(json);
   }
 
-  Future<Null> deleteBook(String id) async {
-    try {
-      await _http.delete(_baseBookUrl + "/" + id);
-    } catch (e) {
-      throw _handleError(e);
-    }
-  }
-
-  dynamic _extractData(Response resp) => JSON.decode(resp.body);
-
-  Exception _handleError(dynamic e) {
-    print(e);
-    return new Exception('Server error; cause: $e');
+  Future<Null> delete(String id) async {
+    LOGGER.info("Delete book with id: $id");
+    var url = deleteUrl(_apiV1, _books, id);
+    await deleteEntity(url);
   }
 }
