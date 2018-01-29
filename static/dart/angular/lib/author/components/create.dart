@@ -44,7 +44,7 @@ class CreateAuthorComponent extends ErrorHandler {
   void showEditPage() {
     if (this._author.id != null) {
       _router.navigate([
-        'AuthorUpdateC',
+        'UpdateAuthorComponent',
         {'id': this._author.id}
       ]);
     }

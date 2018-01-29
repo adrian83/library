@@ -6,13 +6,13 @@ import 'package:angular_forms/angular_forms.dart';
 
 import 'package:logging/logging.dart';
 
-import '../service.dart';
-import '../model.dart';
-
 import '../../common/components/validation.dart';
 import '../../common/components/pagination.dart';
 import '../../common/errorhandler.dart';
 import '../../common/page.dart';
+
+import '../service.dart';
+import '../model.dart';
 
 @Component(
     selector: 'authors_list-comp',
@@ -26,34 +26,37 @@ import '../../common/page.dart';
 class ListAuthorsComponent extends PageSwitcher
     with ErrorHandler
     implements OnInit {
+
   static final Logger LOGGER = new Logger('ListAuthorsComponent');
 
   final AuthorService _authorService;
   final Router _router;
 
-  AuthorsPage page = new AuthorsPage(0, 0, 0, new List<Author>());
-  String searchedPhrase = "";
-  int pageNumber = 0;
+  AuthorsPage _page = new AuthorsPage(0, 0, 0, new List<Author>());
+  String _filter = "";
+  int _currentPage = 0;
 
   ListAuthorsComponent(this._authorService, this._router);
 
   Future<Null> ngOnInit() async {
-    fetchAuthors(pageNumber);
+    fetchAuthors(_currentPage);
   }
 
+  PageSwitcher get switcher => this;
+  AuthorsPage get page => this._page;
+  String get filter => this._filter;
+
   void change(int pageNumber) {
-    print("change to $pageNumber in list authors");
+    print("Fetch $pageNumber authors page");
     fetchAuthors(pageNumber);
   }
 
   Future<Null> fetchAuthors(int pageNo) async {
-    this.pageNumber = pageNo;
-    PageRequest req = new PageRequest(pageNumber, searchedPhrase);
-    _authorService.list(req).then((p) => this.page = p, onError: handleError);
+    this._currentPage = pageNo;
+    _authorService
+        .list(new PageRequest(_currentPage, _filter))
+        .then((p) => this._page = p, onError: handleError);
   }
-
-  List<Author> get authors => page == null ? new List() : page.elements;
-  PageSwitcher get switcher => this;
 
   Future<Null> show(Author author) async {
     _router.navigate([
@@ -70,8 +73,10 @@ class ListAuthorsComponent extends PageSwitcher
   }
 
   Future<Null> delete(Author author) async {
-    await this._authorService.delete(author.id);
-    PageRequest req = new PageRequest(this.pageNumber, this.searchedPhrase);
-    this.page = await this._authorService.list(req);
+    _authorService.delete(author.id).then((n) {
+      _authorService
+          .list(new PageRequest(this._currentPage, this._filter))
+          .then((p) => this._page = p, onError: handleError);
+    }, onError: handleError);
   }
 }

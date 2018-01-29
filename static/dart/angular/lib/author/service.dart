@@ -4,9 +4,10 @@ import 'package:angular/angular.dart';
 import 'package:http/http.dart';
 import 'package:logging/logging.dart';
 
-import 'model.dart';
 import '../common/page.dart';
 import '../common/service.dart';
+
+import 'model.dart';
 
 @Injectable()
 class AuthorService extends Service {

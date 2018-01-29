@@ -4,7 +4,7 @@
 
 <div>
   <ul>
-    <li style="cursor: pointer;" *ngFor="let author of authors"  >
+    <li style="cursor: pointer;" *ngFor="let author of page.elements"  >
     <span (click)="show(author);">{{author.id}} {{author.firstName}} {{author.lastName}}</span>
     <i class="fa fa-pencil-square-o fa-2" aria-hidden="true" (click)="edit(author);"></i>
     <i class="fa fa-times fa-2" aria-hidden="true" (click)="delete(author);"></i>
