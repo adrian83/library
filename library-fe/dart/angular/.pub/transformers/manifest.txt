@@ -1,0 +1,2 @@
+1.24.3
+angular,dart_to_js_script_rewriter,sass_builder,test/pub_serve

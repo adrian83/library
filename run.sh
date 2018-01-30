@@ -82,7 +82,7 @@ run-app() {
 
 dart() {
 	set -e
-		cd static/dart/angular && pub get && pub build
+		cd library-fe/dart/angular && pub get && pub build
 	set +e
 }
 

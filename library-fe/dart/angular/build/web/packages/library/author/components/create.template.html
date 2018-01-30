@@ -1,0 +1,11 @@
+<h1>Create author</h1>
+
+<validation-errors [errors]="validationErrors"></validation-errors>
+
+<div>
+  <input [(ngModel)]="author.firstName"/>
+  <br/>
+  <input [(ngModel)]="author.lastName"/>
+  <br/>
+  <input type="submit" (click)="save()" />
+</div>

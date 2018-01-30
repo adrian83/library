@@ -1,0 +1,80 @@
+import 'dart:async';
+
+import 'package:angular/angular.dart';
+import 'package:angular_router/angular_router.dart';
+import 'package:angular_forms/angular_forms.dart';
+
+import 'package:logging/logging.dart';
+
+import '../../common/components/validation.dart';
+import '../../common/components/pagination.dart';
+import '../../common/errorhandler.dart';
+import '../../common/page.dart';
+
+import '../service.dart';
+import '../model.dart';
+
+@Component(
+    selector: 'list-books-component',
+    templateUrl: 'list.template.html',
+    directives: const [CORE_DIRECTIVES, formDirectives, Pagination, ValidationErrorsComponent])
+class ListBooksComponent extends PageSwitcher
+    with ErrorHandler
+    implements OnInit {
+  static final Logger LOGGER = new Logger('BooksListComponent');
+
+  final BookService _bookService;
+  final Router _router;
+
+  String _filter = "";
+  BooksPage _page = new BooksPage(0, 0, 0, new List<Book>());
+
+  ListBooksComponent(this._bookService, this._router);
+
+  Future<Null> ngOnInit() async {
+    LOGGER.info("ListBooksComponent initialized");
+    fetchBooks(0);
+  }
+
+  Future<Null> findBooks() async {
+    fetchBooks(0);
+  }
+
+  void change(int pageNumber) {
+    print("change to $pageNumber in list books");
+    fetchBooks(pageNumber);
+  }
+
+  PageSwitcher get switcher => this;
+  BooksPage get page => _page;
+  String get filter => _filter;
+  void set filter(String f){
+    _filter = f;
+  }
+
+  Future<Null> delete(Book book) async {
+    _bookService
+        .delete(book.id)
+        .then((n) => fetchBooks(_page.current), onError: handleError);
+  }
+
+  Future<Null> fetchBooks(int pageNo) async {
+    _bookService
+        .list(new PageRequest(pageNo, _filter))
+        .then((p) => _page = p, onError: handleError);
+  }
+
+  Future<Null> show(Book book) async {
+    _router.navigate([
+      'BookShowC',
+      {'id': book.id}
+    ]);
+  }
+
+  Future<Null> edit(Book book) async {
+    _router.navigate([
+      'BookUpdateC',
+      {'id': book.id}
+    ]);
+  }
+}

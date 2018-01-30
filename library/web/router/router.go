@@ -10,7 +10,7 @@ import (
 // CreateRouter creates new Router.
 func CreateRouter(notFound http.Handler, controllers ...handler.Controller) *mux.Router {
 	mux := mux.NewRouter()
-	mux.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("../static/"))))
+	mux.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("../library-fe/"))))
 
 	for _, controller := range controllers {
 		for _, route := range controller.Routes() {
