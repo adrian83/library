@@ -12,7 +12,8 @@
       <dd class="col-sm-9">
         <ul class="list-inline" *ngIf="book.hasAuthors">
           <li class="list-inline-item" *ngFor="let author of book.authors">
-            <i class="fa fa-user fa-2 lib-icon" aria-hidden="true">{{ author.fullName }}<i class="fa fa-times fa-2" aria-hidden="true" (click)="deleteAuthor(author);"></i></i>
+            <i class="fa fa-user fa-2 lib-icon" aria-hidden="true">{{ author.fullName }}
+              <i class="fa fa-times fa-2" aria-hidden="true" (click)="deleteAuthor(author);"></i></i>
           </li>
         </ul>
       </dd>

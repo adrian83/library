@@ -1,14 +1,14 @@
-static/build/web/**
-static/.packages
-static/packages/**
-static/.pub/**
-static/pubspec.lock
-static/web/packages
+library-fe/build/web/**
+library-fe/.packages
+library-fe/packages/**
+library-fe/.pub/**
+library-fe/pubspec.lock
+library-fe/web/packages
 
 infrastructure/
 
 
-static/dart/angular/.packages
-static/dart/angular/build
-static/dart/angular/.pub
-static/dart/angular/pubspec.lock
+library-fe/dart/angular/.packages
+library-fe/dart/angular/build
+library-fe/dart/angular/.pub
+library-fe/dart/angular/pubspec.lock

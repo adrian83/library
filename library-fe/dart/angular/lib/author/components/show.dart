@@ -27,7 +27,9 @@ class ShowAuthorComponent extends ErrorHandler
 
   ShowAuthorComponent(this._authorService, this._routeParams);
 
+  @override
   Future<Null> ngOnInit() async {
+    LOGGER.info("ShowAuthorComponent initialized");
     var id = _routeParams.get('id');
     _authorService.get(id).then((a) => this._author = a, onError: handleError);
   }

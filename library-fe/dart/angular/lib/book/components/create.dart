@@ -37,6 +37,7 @@ class CreateBookComponent extends PageSwitcher
 
   CreateBookComponent(this._bookService, this._authorService, this._router);
 
+@override
   Future<Null> ngOnInit() async {
     LOGGER.info("CreateBookComponent initialized");
     fetchAuthors(0);
@@ -55,8 +56,6 @@ class CreateBookComponent extends PageSwitcher
 
   Book get book => _book;
   AuthorsPage get authorsPage => _authorsPage;
-  List<Author> get authors =>
-      _authorsPage == null ? new List<Author>() : _authorsPage.elements;
   PageSwitcher get switcher => this;
 
   void addAuthor(Author author) {
@@ -81,7 +80,7 @@ class CreateBookComponent extends PageSwitcher
   void showEditPage() {
     if (_book.id != null) {
       _router.navigate([
-        'BookUpdateC',
+        'UpdateBookComponent',
         {'id': _book.id}
       ]);
     }

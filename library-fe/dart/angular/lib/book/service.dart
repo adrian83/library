@@ -12,7 +12,7 @@ import '../common/service.dart';
 class BookService extends Service {
   static final Logger LOGGER = new Logger('BookService');
 
-  static final String _apiV1 = "/rest/api/v1.0/";
+  static final String _apiV1 = "/rest/api/v1.0";
   static final String _books = "books";
 
   BookService(Client client) : super(client);
@@ -27,7 +27,9 @@ class BookService extends Service {
   Future<Book> create(Book book) async {
     LOGGER.info("Create book: $book");
     var url = createUrl(_apiV1, _books);
+    LOGGER.info("URL: $url");
     var json = await createEntity(url, book);
+    LOGGER.info("Json: $json");
     return new Book.fromJson(json);
   }
 

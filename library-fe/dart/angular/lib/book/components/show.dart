@@ -3,23 +3,34 @@ import 'dart:async';
 import 'package:angular/angular.dart';
 import 'package:angular_router/angular_router.dart';
 
+import 'package:logging/logging.dart';
+
+import '../../common/components/validation.dart';
+import '../../common/errorhandler.dart';
+
 import '../service.dart';
 import '../model.dart';
 
 @Component(
-		selector: 'b-comp',
+    selector: 'show-book-component',
     templateUrl: 'show.template.html',
-    directives: const [CORE_DIRECTIVES])
-class BookShowComponent implements OnInit {
-	Book book = new Book();
+    directives: const [CORE_DIRECTIVES, ValidationErrorsComponent])
+class ShowBookComponent extends ErrorHandler implements OnInit {
+  static final Logger LOGGER = new Logger('ShowBookComponent');
 
-	final BookService _bookService;
-	final RouteParams _routeParams;
+  Book _book = new Book();
 
-	BookShowComponent(this._bookService, this._routeParams);
+  final BookService _bookService;
+  final RouteParams _routeParams;
 
-	Future<Null> ngOnInit() async {
-		var _id = _routeParams.get('id');
-    this.book = await this._bookService.get(_id);
+  ShowBookComponent(this._bookService, this._routeParams);
+
+  Book get book => _book;
+
+  @override
+  Future<Null> ngOnInit() async {
+    LOGGER.info("ShowBookComponent initialized");
+    var _id = _routeParams.get('id');
+    _bookService.get(_id).then((b) => _book = b, onError: handleError);
   }
 }

@@ -1,13 +1,6 @@
 <h1>Update book</h1>
 
-<div class="row">
-  <ul>
-    <li *ngFor="let err of validationErrors">
-    {{ err.message }}
-    </li>
-  </ul>
-</div>
-
+<validation-errors [errors]="validationErrors"></validation-errors>
 
 
 <h3>Fill data</h3>
@@ -19,8 +12,9 @@
       <dt class="col-sm-3">Authors:</dt>
       <dd class="col-sm-9">
         <ul class="list-inline" *ngIf="book.hasAuthors">
-          <li class="list-inline-item" *ngFor="let author of book.authors">
-            <i class="fa fa-user fa-2 lib-icon" aria-hidden="true">{{ author.fullName }}<i class="fa fa-times fa-2" aria-hidden="true" (click)="deleteAuthor(author);"></i></i>
+          <li class="list-inline-item" *ngFor="let author of authors">
+            <i class="fa fa-user fa-2 lib-icon" aria-hidden="true">{{ author.fullName }}
+              <i class="fa fa-times fa-2" aria-hidden="true" (click)="deleteAuthor(author);"></i></i>
           </li>
         </ul>
       </dd>
@@ -33,12 +27,16 @@
       <dt class="col-sm-3">Pick one or more:</dt>
       <dd class="col-sm-9">
         <ul>
-          <li *ngFor="let author of authors" (click)="addAuthor(author);">
-          {{ author.fullName }}
+          <li *ngFor="let author2 of authorsPage.elements" (click)="addAuthor(author2);">
+          {{ author2.fullName }}
           </li>
         </ul>
       </dd>
     </div>
+
+<div class="row">
+      <pagination [page]="authorsPage" [switcher]="switcher"></pagination>
+  </div>
 
     <div class="row">
 

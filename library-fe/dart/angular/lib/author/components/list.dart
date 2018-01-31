@@ -38,7 +38,9 @@ class ListAuthorsComponent extends PageSwitcher
 
   ListAuthorsComponent(this._authorService, this._router);
 
+  @override
   Future<Null> ngOnInit() async {
+    LOGGER.info("ListAuthorsComponent initialized");
     fetchAuthors(_currentPage);
   }
 
@@ -47,7 +49,7 @@ class ListAuthorsComponent extends PageSwitcher
   String get filter => this._filter;
 
   void change(int pageNumber) {
-    print("Fetch $pageNumber authors page");
+    LOGGER.info("Fetch $pageNumber authors page");
     fetchAuthors(pageNumber);
   }
 

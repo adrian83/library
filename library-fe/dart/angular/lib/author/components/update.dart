@@ -30,7 +30,9 @@ class UpdateAuthorComponent extends ErrorHandler implements OnInit {
 
   UpdateAuthorComponent(this._authorService, this._routeParams);
 
+@override
   Future<Null> ngOnInit() async {
+    LOGGER.info("UpdateAuthorComponent initialized");
     var _id = _routeParams.get('id');
     _authorService.get(_id).then((a) => _author = a, onError: handleError);
   }

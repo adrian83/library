@@ -20,7 +20,7 @@ import '../model.dart';
       formDirectives,
       ValidationErrorsComponent
     ])
-class CreateAuthorComponent extends ErrorHandler {
+class CreateAuthorComponent extends ErrorHandler implements OnInit {
   static final Logger LOGGER = new Logger('CreateAuthorComponent');
 
   final AuthorService _authorService;
@@ -31,6 +31,11 @@ class CreateAuthorComponent extends ErrorHandler {
   CreateAuthorComponent(this._authorService, this._router);
 
   Author get author => _author;
+
+  @override
+  void ngOnInit() {
+    LOGGER.info("CreateAuthorComponent initialized");
+  }
 
   Future<Null> save() async {
     LOGGER.info("Saving $author");

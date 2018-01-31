@@ -17,7 +17,12 @@ import '../model.dart';
 @Component(
     selector: 'list-books-component',
     templateUrl: 'list.template.html',
-    directives: const [CORE_DIRECTIVES, formDirectives, Pagination, ValidationErrorsComponent])
+    directives: const [
+      CORE_DIRECTIVES,
+      formDirectives,
+      Pagination,
+      ValidationErrorsComponent
+    ])
 class ListBooksComponent extends PageSwitcher
     with ErrorHandler
     implements OnInit {
@@ -31,25 +36,27 @@ class ListBooksComponent extends PageSwitcher
 
   ListBooksComponent(this._bookService, this._router);
 
+  PageSwitcher get switcher => this;
+  BooksPage get page => _page;
+  String get filter => _filter;
+  void set filter(String f) {
+    _filter = f;
+  }
+
+  @override
   Future<Null> ngOnInit() async {
     LOGGER.info("ListBooksComponent initialized");
     fetchBooks(0);
   }
 
-  Future<Null> findBooks() async {
-    fetchBooks(0);
-  }
-
+  @override
   void change(int pageNumber) {
-    print("change to $pageNumber in list books");
+    LOGGER.info("Fetch $pageNumber books page");
     fetchBooks(pageNumber);
   }
 
-  PageSwitcher get switcher => this;
-  BooksPage get page => _page;
-  String get filter => _filter;
-  void set filter(String f){
-    _filter = f;
+  Future<Null> findBooks() async {
+    fetchBooks(0);
   }
 
   Future<Null> delete(Book book) async {
@@ -66,14 +73,14 @@ class ListBooksComponent extends PageSwitcher
 
   Future<Null> show(Book book) async {
     _router.navigate([
-      'BookShowC',
+      'ShowBookComponent',
       {'id': book.id}
     ]);
   }
 
   Future<Null> edit(Book book) async {
     _router.navigate([
-      'BookUpdateC',
+      'UpdateBookComponent',
       {'id': book.id}
     ]);
   }

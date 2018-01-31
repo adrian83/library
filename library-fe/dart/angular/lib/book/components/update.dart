@@ -6,73 +6,95 @@ import 'package:angular_forms/angular_forms.dart';
 
 import 'package:logging/logging.dart';
 
-import '../service.dart';
-import '../model.dart';
+import '../../common/errors.dart';
+import '../../common/components/pagination.dart';
+import '../../common/page.dart';
+import '../../common/components/validation.dart';
+import '../../common/errorhandler.dart';
 
 import '../../author/service.dart';
 import '../../author/model.dart';
 
-import '../../common/errors.dart';
-import '../../common/components/pagination.dart';
-import '../../common/page.dart';
+import '../service.dart';
+import '../model.dart';
 
 @Component(
-    selector: 'b-comp',
+    selector: 'update-book-component',
     templateUrl: 'update.template.html',
-    directives: const [formDirectives, CORE_DIRECTIVES])
-class BookUpdateComponent implements OnInit {
+    directives: const [
+      CORE_DIRECTIVES,
+      formDirectives,
+      Pagination,
+      ValidationErrorsComponent
+    ])
+class UpdateBookComponent extends PageSwitcher
+    with ErrorHandler
+    implements OnInit {
   static final Logger LOGGER = new Logger('BookUpdateComponent');
 
   final BookService _bookService;
   final AuthorService _authorService;
-  final Router _router;
   final RouteParams _routeParams;
 
-  Book book = new Book(null, "", new List<Author>());
-  List<Author> authors = new List<Author>();
+  Book _book = new Book(null, "", new List<Author>());
+  AuthorsPage _authorsPage = new AuthorsPage(0, 0, 0, new List<Author>());
   List<ValidationError> validationErrors;
 
   String searchedPhrase = "";
   int pageNumber = 0;
 
-  BookUpdateComponent(this._bookService, this._authorService, this._router, this._routeParams);
+  UpdateBookComponent(this._bookService, this._authorService, this._routeParams);
 
+
+
+  AuthorsPage get authorsPage => _authorsPage;
+  PageSwitcher get switcher => this;
+  Book get book => _book;
+  void set book(b){
+    _book = b;
+  }
+  List<Author> get authors => _book == null ? new List<Author>() :_book.authors;
+
+
+  @override
   Future<Null> ngOnInit() async {
-    LOGGER.info("Init BookCreateComponent");
+    LOGGER.info("BookUpdateComponent initialized");
 
     var _id = _routeParams.get('id');
-    this.book = await this._bookService.get(_id);
-    LOGGER.info("Edited book: $book");
-    PageRequest req = new PageRequest(pageNumber, searchedPhrase);
-    var page = await this._authorService.list(req);
-    this.authors = page == null ? new List() : page.elements;
+    _bookService
+        .get(_id)
+        .then((b) => _book = b, onError: handleError)
+        .then((n) {
+      fetchAuthors(0);
+    });
+  }
+@override
+  void change(int pageNumber) {
+    LOGGER.info("Fetch $pageNumber authors page");
+    fetchAuthors(pageNumber);
   }
 
-  List<Author> get getAuthors => this.authors;
+  void fetchAuthors(int pageNumber) {
+    _authorService
+        .list(new PageRequest(pageNumber, searchedPhrase))
+        .then((p) => _authorsPage = p, onError: handleError);
+  }
 
   void addAuthor(Author author) {
     LOGGER.info("Adding author: $author");
-    if (!book.authors.contains(author)) {
-      book.authors.add(author);
+    if(!_book.authors.any((a) => a.id == author.id)){
+      _book.authors.add(author);
+      LOGGER.info("Adding author2: $_book ${_book.authors} ");
     }
+    LOGGER.info("Adding author3: $author");
   }
 
   void deleteAuthor(Author author) {
     LOGGER.info("Removing author: $author");
-    book.authors.remove(author);
+    _book.authors.removeWhere((a) => a.id == author.id);
   }
 
   Future<Null> updateBook() async {
-    this._bookService.update(this.book).then((book) => this.book = book,
-        onError: (e) {
-      if (e is ValidationErrors) {
-        LOGGER.info("Invalid book: ${e.validationErrors}");
-        this.validationErrors = e.validationErrors;
-      } else {
-        LOGGER.info("Error while book creation: $e");
-      }
-    });
+    _bookService.update(_book).then((b) => _book = b, onError: handleError);
   }
-
-
 }
