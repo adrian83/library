@@ -40,20 +40,21 @@ class UpdateBookComponent extends PageSwitcher
   AuthorsPage _authorsPage = new AuthorsPage(0, 0, 0, new List<Author>());
   List<ValidationError> validationErrors;
 
-  String searchedPhrase = "";
-  int pageNumber = 0;
+  String _authorsFilter = "";
 
-  UpdateBookComponent(this._bookService, this._authorService, this._routeParams);
-
-
+  UpdateBookComponent(
+      this._bookService, this._authorService, this._routeParams);
 
   AuthorsPage get authorsPage => _authorsPage;
   PageSwitcher get switcher => this;
   Book get book => _book;
-  void set book(b){
+  void set book(b) {
     _book = b;
   }
-  List<Author> get authors => _book == null ? new List<Author>() :_book.authors;
+  String get authorsFilter => _authorsFilter;
+  void set authorsFilter(String f){
+    _authorsFilter = f;
+  }
 
 
   @override
@@ -64,29 +65,30 @@ class UpdateBookComponent extends PageSwitcher
     _bookService
         .get(_id)
         .then((b) => _book = b, onError: handleError)
-        .then((n) {
-      fetchAuthors(0);
-    });
+        .then((n) { fetchAuthors(0); });
   }
-@override
+
+  @override
   void change(int pageNumber) {
     LOGGER.info("Fetch $pageNumber authors page");
     fetchAuthors(pageNumber);
   }
 
+  void findAuthors(){
+    fetchAuthors(0);
+  }
+
   void fetchAuthors(int pageNumber) {
     _authorService
-        .list(new PageRequest(pageNumber, searchedPhrase))
+        .list(new PageRequest(pageNumber, _authorsFilter))
         .then((p) => _authorsPage = p, onError: handleError);
   }
 
   void addAuthor(Author author) {
     LOGGER.info("Adding author: $author");
-    if(!_book.authors.any((a) => a.id == author.id)){
+    if (!_book.authors.any((a) => a.id == author.id)) {
       _book.authors.add(author);
-      LOGGER.info("Adding author2: $_book ${_book.authors} ");
     }
-    LOGGER.info("Adding author3: $author");
   }
 
   void deleteAuthor(Author author) {

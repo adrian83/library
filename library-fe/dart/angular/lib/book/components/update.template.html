@@ -12,7 +12,7 @@
       <dt class="col-sm-3">Authors:</dt>
       <dd class="col-sm-9">
         <ul class="list-inline" *ngIf="book.hasAuthors">
-          <li class="list-inline-item" *ngFor="let author of authors">
+          <li class="list-inline-item" *ngFor="let author of book.authors ">
             <i class="fa fa-user fa-2 lib-icon" aria-hidden="true">{{ author.fullName }}
               <i class="fa fa-times fa-2" aria-hidden="true" (click)="deleteAuthor(author);"></i></i>
           </li>
@@ -22,6 +22,24 @@
     </div>
 
 <h4>Choose authors</h4>
+
+  <div class="input-group mb-3">
+    <input type="text"
+           class="form-control"
+           placeholder="Author's name"
+           aria-label="Author's name"
+           [(ngModel)]="authorsFilter"
+           aria-describedby="basic-addon2">
+
+    <div class="input-group-append">
+      <button class="btn btn-outline-secondary"
+              type="button"
+              (click)="findAuthors()">Search</button>
+    </div>
+  </div>
+
+
+
     <div class="row">
 
       <dt class="col-sm-3">Pick one or more:</dt>

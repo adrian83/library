@@ -61,14 +61,16 @@ class Pagination implements OnInit {
     var current = page.current;
     var pages = _pagesCount();
 
-    links.add(new PageLink("<<", current == 0, false, current - 1));
+    LOGGER.info("Page: $page");
+
+    links.add(new PageLink("<<", current == 0 || pages == 0, false, current - 1));
 
     for (var i = 0; i < pages; i++) {
       PageLink li = new PageLink((i + 1).toString(), false, current == i, i);
       links.add(li);
     }
 
-    links.add(new PageLink(">>", current == (pages - 1), false, current + 1));
+    links.add(new PageLink(">>", (current == (pages - 1)) || pages == 0, false, current + 1));
     return links;
   }
 }
