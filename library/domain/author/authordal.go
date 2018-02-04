@@ -62,7 +62,7 @@ func (d MongoDal) Authors(page *dal.PageInfo) (*EntitiesPage, error) {
 	// {$regex : ".*son.*"}
 	var findExp interface{}
 	if page.Phrase != "" {
-		findExp = bson.M{firstName: bson.M{"$regex": fmt.Sprintf(".*%v.*", page.Phrase)}}
+		findExp = bson.M{firstName: bson.M{"$regex": fmt.Sprintf(".*%v.*", page.Phrase), "$options": "i"}}
 	}
 
 	query := d.collection.Find(findExp).Skip(page.From()).Limit(page.Size).Sort(page.Sort)

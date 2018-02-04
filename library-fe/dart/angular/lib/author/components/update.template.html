@@ -1,4 +1,7 @@
 <h1>Update author</h1>
+
+<validation-errors [errors]="validationErrors"></validation-errors>
+
 <div>{{author.id}} {{author.firstName}} {{author.lastName}}</div>
 <div>
   <input [(ngModel)]="author.firstName"/>

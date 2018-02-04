@@ -66,7 +66,7 @@ func (d MongoDal) Books(page *dal.PageInfo) (*EntitiesPage, error) {
 	// {$regex : ".*son.*"}
 	var findExp interface{}
 	if page.Phrase != "" {
-		findExp = bson.M{title: bson.M{"$regex": fmt.Sprintf(".*%v.*", page.Phrase)}}
+		findExp = bson.M{title: bson.M{"$regex": fmt.Sprintf(".*%v.*", page.Phrase), "$options": "i"}}
 	}
 
 	query := d.collection.Find(findExp).Skip(page.From()).Limit(page.Size).Sort(page.Sort)
@@ -116,6 +116,9 @@ func (d MongoDal) UpdateAuthor(author *author.Entity) error {
 		bson.M{authors: bson.M{"$elemMatch": bson.M{id: author.ID}}},
 		bson.M{"$set": bson.M{"authors.$.firstName": author.FirstName, "authors.$.lastName": author.LastName}})
 	logChangeInfo(info)
+	if err == mgo.ErrNotFound {
+		return nil
+	}
 	return err
 }
 
@@ -125,6 +128,9 @@ func (d MongoDal) DeleteAuthor(authorID bson.ObjectId) error {
 		bson.M{},
 		bson.M{"$pull": bson.M{authors: bson.M{id: authorID}}})
 	logChangeInfo(info)
+	if err == mgo.ErrNotFound {
+		return nil
+	}
 	return err
 }
 

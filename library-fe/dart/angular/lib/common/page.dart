@@ -18,6 +18,10 @@ class Page<T> {
   int get total => this._total;
   int get current => this._current;
 
+  bool get hasPrev => this._current > 0;
+  bool get isEmpty => this._elements == null || this._elements.length == 0; 
+
+
   String toString() {
     return "Page { current: $_current, total: $_total, size: $_size, elements: $_elements }";
   }

@@ -43,6 +43,9 @@ class UpdateAuthorComponent extends ErrorHandler implements OnInit {
     print("Update $_author");
     _authorService
         .update(this._author)
-        .then((a) => _author = a, onError: handleError);
+        .then((a){
+          _author = a;
+          cleanValidationErrors();
+        }, onError: handleError);
   }
 }

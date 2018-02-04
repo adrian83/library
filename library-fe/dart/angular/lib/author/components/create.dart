@@ -42,7 +42,10 @@ class CreateAuthorComponent extends ErrorHandler implements OnInit {
 
     _authorService
         .create(this._author)
-        .then((a) => this._author = a, onError: handleError)
+        .then((a) {
+          _author = a;
+          cleanValidationErrors();
+        }, onError: handleError)
         .whenComplete(showEditPage);
   }
 

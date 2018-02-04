@@ -2,81 +2,65 @@
 
 <validation-errors [errors]="validationErrors"></validation-errors>
 
+<form>
+  <div class="form-group row">
+    <label for="inputTitle"
+           class="col-sm-2 col-form-label">Title</label>
 
-<h3>Fill data</h3>
-  <div class="row">
-
-      <dt class="col-sm-3">Title:</dt>
-      <dd class="col-sm-9"><input [(ngModel)]="book.title"/></dd>
-
-      <dt class="col-sm-3">Authors:</dt>
-      <dd class="col-sm-9">
-        <ul class="list-inline" *ngIf="book.hasAuthors">
-          <li class="list-inline-item" *ngFor="let author of book.authors ">
-            <i class="fa fa-user fa-2 lib-icon" aria-hidden="true">{{ author.fullName }}
-              <i class="fa fa-times fa-2" aria-hidden="true" (click)="deleteAuthor(author);"></i></i>
-          </li>
-        </ul>
-      </dd>
-
-    </div>
-
-<h4>Choose authors</h4>
-
-  <div class="input-group mb-3">
-    <input type="text"
-           class="form-control"
-           placeholder="Author's name"
-           aria-label="Author's name"
-           [(ngModel)]="authorsFilter"
-           aria-describedby="basic-addon2">
-
-    <div class="input-group-append">
-      <button class="btn btn-outline-secondary"
-              type="button"
-              (click)="findAuthors()">Search</button>
+    <div class="col-sm-10">
+      <input type="text"
+             [(ngModel)]="book.title"
+             class="form-control"
+             id="inputTitle"
+             placeholder="Title">
     </div>
   </div>
 
-
-
-    <div class="row">
-
-      <dt class="col-sm-3">Pick one or more:</dt>
-      <dd class="col-sm-9">
-        <ul>
-          <li *ngFor="let author2 of authorsPage.elements" (click)="addAuthor(author2);">
-          {{ author2.fullName }}
-          </li>
-        </ul>
-      </dd>
+  <div class="form-group row">
+    <label for="inputTitle" class="col-sm-2 col-form-label">Authors</label>
+    <div class="col-sm-10">
+      <ul class="list-inline" *ngIf="book.hasAuthors">
+        <li class="list-inline-item" *ngFor="let author of book.authors">
+          <i class="fa fa-user fa-2 lib-icon" aria-hidden="true">{{ author.fullName }}
+            <i class="fa fa-times fa-2"
+               aria-hidden="true"
+               (click)="deleteAuthor(author);"></i></i>
+        </li>
+      </ul>
     </div>
-
-<div class="row">
-      <pagination [page]="authorsPage" [switcher]="switcher"></pagination>
   </div>
 
-    <div class="row">
+  <div class="form-group row">
+    <label for="inputTitle" class="col-sm-2 col-form-label">Available authors</label>
+    <div class="col-sm-10">
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <button class="btn btn-outline-secondary"
+                  (click)="filterAuthors()"
+                  type="button">Filter</button>
+        </div>
+        <input type="text"
+               class="form-control"
+               [(ngModel)]="authorsFilter"
+               placeholder="Filter authors"
+               aria-label=""
+               aria-describedby="basic-addon1">
+      </div>
 
-      <dt class="col-sm-3"></dt>
-      <dd class="col-sm-9"><input type="submit" (click)="updateBook()" /></dd>
+      <ul>
+        <li *ngFor="let author of authorsPage.elements" (click)="addAuthor(author);">
+        {{ author.fullName }}
+        </li>
+      </ul>
+
+      <div>
+        <pagination [page]="authorsPage" [switcher]="switcher"></pagination>
+      </div>
     </div>
+  </div>
 
+  <input type="submit"
+         class="btn btn-primary"
+         (click)="updateBook()"/>
 
-
-<h3>Summary</h3>
-<dl class="row">
-
-  <dt class="col-sm-3">Title:</dt>
-  <dd class="col-sm-9"><i *ngIf="book.hasTitle" class="fa fa-book fa-2 lib-icon" aria-hidden="true">{{ book.title }}</i></dd>
-
-  <dt class="col-sm-3">Authors:</dt>
-  <dd class="col-sm-9">
-    <ul class="list-inline" *ngIf="book.hasAuthors">
-      <li class="list-inline-item" *ngFor="let author of book.authors">
-        <i class="fa fa-user fa-2 lib-icon" aria-hidden="true">{{ author.fullName }}</i>
-      </li>
-    </ul>
-  </dd>
-
-</dl>
+</form>

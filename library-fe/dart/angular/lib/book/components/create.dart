@@ -57,6 +57,14 @@ class CreateBookComponent extends PageSwitcher
   Book get book => _book;
   AuthorsPage get authorsPage => _authorsPage;
   PageSwitcher get switcher => this;
+  String get authorsFilter => _authorsFilter;
+  void set authorsFilter(String f){
+    _authorsFilter = f;
+  }
+
+  void filterAuthors(){
+    fetchAuthors(0);
+  }
 
   void addAuthor(Author author) {
     LOGGER.info("Adding author: $author");

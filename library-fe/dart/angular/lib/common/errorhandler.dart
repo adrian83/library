@@ -23,4 +23,9 @@ class ErrorHandler {
   List<ValidationError> get validationErrors => this._validationErrors == null
       ? new List<ValidationError>()
       : this._validationErrors;
+
+  void cleanValidationErrors(){
+    this._validationErrors = new List<ValidationError>();
+  }
+
 }

@@ -55,7 +55,7 @@ class ListBooksComponent extends PageSwitcher
     fetchBooks(pageNumber);
   }
 
-  Future<Null> findBooks() async {
+  Future<Null> filterBooks() async {
     fetchBooks(0);
   }
 
@@ -68,7 +68,8 @@ class ListBooksComponent extends PageSwitcher
   Future<Null> fetchBooks(int pageNo) async {
     _bookService
         .list(new PageRequest(pageNo, _filter))
-        .then((p) => _page = p, onError: handleError);
+        .then((p) => _page = p, onError: handleError)
+        .whenComplete(ifEmptyShowPrev);
   }
 
   Future<Null> show(Book book) async {
@@ -83,5 +84,11 @@ class ListBooksComponent extends PageSwitcher
       'UpdateBookComponent',
       {'id': book.id}
     ]);
+  }
+
+  void ifEmptyShowPrev() {
+    if (_page.hasPrev && _page.isEmpty) {
+      fetchBooks(_page.current - 1);
+    }
   }
 }

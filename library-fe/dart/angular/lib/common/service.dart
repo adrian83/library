@@ -32,8 +32,8 @@ class Service {
   }
 
   Future<Map<String, dynamic>> deleteEntity(String url) async {
-    var response = http.delete(url);
-    return _handleErrors(response);
+    var response = await http.delete(url);
+    return response.statusCode == 200 ? new Map<String, dynamic>() : _handleErrors(response);
   }
 
   Map<String, dynamic> _handleErrors(response) {

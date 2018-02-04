@@ -49,6 +49,7 @@ class AuthorService extends Service {
   Future<Null> delete(String id) async {
     LOGGER.info("Delete author with id: $id");
     var url = deleteUrl(_apiV1, _authors, id);
+    LOGGER.info("Url : $url");
     await deleteEntity(url);
   }
 }

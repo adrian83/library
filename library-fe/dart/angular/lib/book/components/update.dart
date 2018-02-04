@@ -37,13 +37,11 @@ class UpdateBookComponent extends PageSwitcher
   final RouteParams _routeParams;
 
   Book _book = new Book(null, "", new List<Author>());
-  AuthorsPage _authorsPage = new AuthorsPage(0, 0, 0, new List<Author>());
-  List<ValidationError> validationErrors;
 
+  AuthorsPage _authorsPage = new AuthorsPage(0, 0, 0, new List<Author>());
   String _authorsFilter = "";
 
-  UpdateBookComponent(
-      this._bookService, this._authorService, this._routeParams);
+  UpdateBookComponent(this._bookService, this._authorService, this._routeParams);
 
   AuthorsPage get authorsPage => _authorsPage;
   PageSwitcher get switcher => this;
@@ -74,7 +72,7 @@ class UpdateBookComponent extends PageSwitcher
     fetchAuthors(pageNumber);
   }
 
-  void findAuthors(){
+  void filterAuthors(){
     fetchAuthors(0);
   }
 

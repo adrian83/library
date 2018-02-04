@@ -26,7 +26,6 @@ import '../model.dart';
 class ListAuthorsComponent extends PageSwitcher
     with ErrorHandler
     implements OnInit {
-
   static final Logger LOGGER = new Logger('ListAuthorsComponent');
 
   final AuthorService _authorService;
@@ -57,7 +56,8 @@ class ListAuthorsComponent extends PageSwitcher
     this._currentPage = pageNo;
     _authorService
         .list(new PageRequest(_currentPage, _filter))
-        .then((p) => this._page = p, onError: handleError);
+        .then((p) => this._page = p, onError: handleError)
+        .whenComplete(ifEmptyShowPrev);
   }
 
   Future<Null> show(Author author) async {
@@ -76,9 +76,13 @@ class ListAuthorsComponent extends PageSwitcher
 
   Future<Null> delete(Author author) async {
     _authorService.delete(author.id).then((n) {
-      _authorService
-          .list(new PageRequest(this._currentPage, this._filter))
-          .then((p) => this._page = p, onError: handleError);
+      fetchAuthors(_page.current);
     }, onError: handleError);
+  }
+
+  void ifEmptyShowPrev(){
+    if (_page.hasPrev && _page.isEmpty) {
+      fetchAuthors(_page.current - 1);
+    }
   }
 }

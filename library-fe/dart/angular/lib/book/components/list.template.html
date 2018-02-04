@@ -3,19 +3,20 @@
 <validation-errors [errors]="validationErrors"></validation-errors>
 
 <div class="input-group mb-3">
+  <div class="input-group-prepend">
+    <button class="btn btn-outline-secondary"
+            (click)="filterBooks()"
+            type="button">Filter</button>
+  </div>
   <input type="text"
          class="form-control"
-         placeholder="Book's title"
-         aria-label="Book's title"
          [(ngModel)]="filter"
-         aria-describedby="basic-addon2">
-
-  <div class="input-group-append">
-    <button class="btn btn-outline-secondary"
-            type="button"
-            (click)="findBooks()">Search</button>
-  </div>
+         placeholder="Filter books"
+         aria-label=""
+         aria-describedby="basic-addon1">
 </div>
+
+
 
 <div>
   <ul>

@@ -1,8 +1,7 @@
 
-<div class="row">
-  <ul>
-    <li *ngFor="let err of errors">
+<div class="row" *ngFor="let err of errors">
+  <div class="alert alert-danger"
+       role="alert">
     {{ err.message }}
-    </li>
-  </ul>
+  </div>
 </div>
