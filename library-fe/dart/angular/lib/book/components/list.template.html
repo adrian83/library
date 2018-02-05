@@ -21,7 +21,7 @@
 <div>
   <ul>
     <li style="cursor: pointer;" *ngFor="let book of page.elements">
-      <span (click)="show(book);">{{book.id}} {{book.title}}</span>
+      <span (click)="show(book);">{{book.title}}</span>
 
     <i class="fa fa-pencil-square-o fa-2" aria-hidden="true" (click)="edit(book);"></i>
     <i class="fa fa-times fa-2" aria-hidden="true" (click)="delete(book);"></i>

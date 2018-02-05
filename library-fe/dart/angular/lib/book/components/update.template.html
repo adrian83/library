@@ -21,10 +21,12 @@
     <div class="col-sm-10">
       <ul class="list-inline" *ngIf="book.hasAuthors">
         <li class="list-inline-item" *ngFor="let author of book.authors">
-          <i class="fa fa-user fa-2 lib-icon" aria-hidden="true">{{ author.fullName }}
-            <i class="fa fa-times fa-2"
-               aria-hidden="true"
-               (click)="deleteAuthor(author);"></i></i>
+          <i class="fa fa-user fa-2 lib-icon" aria-hidden="true"></i>
+          <span>{{ author.fullName }}</span>
+          <i class="fa fa-times fa-2 lib-icon"
+             aria-hidden="true"
+             (click)="deleteAuthor(author);"></i>
+          <span class="lib-icon-desc"></span>
         </li>
       </ul>
     </div>

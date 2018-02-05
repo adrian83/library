@@ -80,8 +80,11 @@ body {
 .lh-150 { line-height: 1.5; }
 
 .lib-icon {
-  margin-left: 2rem;
-  margin-right: 1rem;
+  padding-right: 4px;
+}
+
+.lib-icon-desc {
+  padding-right: 10px;
 }
 
 app {
