@@ -21,18 +21,7 @@ import 'package:logging/logging.dart';
 
 @Component(
     selector: 'app',
-    template: '''
-      <h1>{{title}}</h1>
-      <a [routerLink]="['ListAuthorsComponent']">Authors list</a>
-      <br/>
-      <a [routerLink]="['CreateAuthorComponent']">Create author</a>
-      <br/>
-      <a [routerLink]="['ListBooksComponent']">Books list</a>
-      <br/>
-      <a [routerLink]="['CreateBookComponent']">Create books</a>
-      <br/>
-      <a [routerLink]="['InfoC']">Info</a>
-      <router-outlet></router-outlet>''',
+    templateUrl: 'app_component.template.html',
     directives: const [CORE_DIRECTIVES, ROUTER_DIRECTIVES],
     providers: const [AuthorService, BookService, ROUTER_PROVIDERS])
 

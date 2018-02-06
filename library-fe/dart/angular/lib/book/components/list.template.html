@@ -17,17 +17,45 @@
 </div>
 
 
+<div class="list-group">
+  <div class="list-group-item list-group-item-action flex-column align-items-start"
+       style="cursor: pointer;"
+       *ngFor="let book of page.elements"
+       (click)="show(book);">
 
-<div>
-  <ul>
-    <li style="cursor: pointer;" *ngFor="let book of page.elements">
-      <span (click)="show(book);">{{book.title}}</span>
+    <div class="d-flex w-100 justify-content-between">
+      <h5 class="mb-1">{{book.title}}</h5>
+      <small>
+        <i class="fa fa-pencil-square-o fa-2"
+           aria-hidden="true"
+           (click)="edit(book);"></i>
 
-    <i class="fa fa-pencil-square-o fa-2" aria-hidden="true" (click)="edit(book);"></i>
-    <i class="fa fa-times fa-2" aria-hidden="true" (click)="delete(book);"></i>
-    </li>
-  </ul>
+        <i class="fa fa-times fa-2"
+           aria-hidden="true"
+           (click)="delete(book);"></i>
+      </small>
+    </div>
+
+    <div class="mb-1">
+      <ul class="list-inline"
+          *ngIf="book.hasAuthors">
+
+        <li class="list-inline-item"
+            *ngFor="let author of book.authors">
+
+            <i class="fa fa-user fa-2 lib-icon"
+               aria-hidden="true"></i>
+
+            <span class="lib-icon-desc">{{ author.fullName }}</span>
+
+        </li>
+      </ul>
+    </div>
+    <small>Place for short description</small>
+  </div>
 </div>
+
+<br/>
 
 <div>
   <pagination [page]="page" [switcher]="switcher"></pagination>
