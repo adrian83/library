@@ -1,14 +1,26 @@
 <nav class="navbar navbar-expand-md fixed-top navbar-dark bg-dark">
-  <a class="navbar-brand" href="#">Offcanvas navbar</a>
+  <a class="navbar-brand" href="#">Library</a>
   <button class="navbar-toggler p-0 border-0" type="button" data-toggle="offcanvas">
     <span class="navbar-toggler-icon"></span>
   </button>
 
   <div class="navbar-collapse offcanvas-collapse" id="navbarsExampleDefault">
     <ul class="navbar-nav mr-auto">
-      <li class="nav-item active">
-        <a class="nav-link" href="#">Dashboard <span class="sr-only">(current)</span></a>
+      <!--
+      <li class="nav-item active"
+          *ngFor="let menuElement of menuElements"
+          (click)="makeActive(menuElement);" >
+        <span class="nav-link">{{ menuElement.label }}</span>
+      -->
+
+      <li class="nav-item"
+          *ngFor="let menuElement of menuElements"
+          (click)="makeActive(menuElement);" >
+        <span class="nav-link">{{ menuElement.label }}</span>
+    <!--    <a class="nav-link" [routerLink]="menuElement.component">{{ menuElement.label }}</a>-->
+      <!--  <a class="nav-link" href="#">{{ menuElement.label }} <span class="sr-only">(current)</span></a> -->
       </li>
+      <!--
       <li class="nav-item">
         <a class="nav-link" href="#">Notifications</a>
       </li>
@@ -18,13 +30,22 @@
       <li class="nav-item">
         <a class="nav-link" href="#">Switch account</a>
       </li>
+    -->
     </ul>
+
   </div>
 </nav>
 
 <div class="nav-scroller bg-white box-shadow">
   <nav class="nav nav-underline">
+    <!--
     <a class="nav-link active" href="#">Dashboard</a>
+  -->
+
+    <a *ngFor="let subElement of menuSubElements"
+       class="nav-link"
+       [routerLink]="subElement.component">{{ subElement.label }}</a>
+<!--
     <a class="nav-link" href="#">
       Friends
       <span class="badge badge-pill bg-light align-text-bottom">27</span>
@@ -36,10 +57,12 @@
     <a class="nav-link" href="#">Link</a>
     <a class="nav-link" href="#">Link</a>
     <a class="nav-link" href="#">Link</a>
+  -->
   </nav>
 </div>
 
 <main role="main" class="container">
+  <!--
   <div class="d-flex align-items-center p-3 my-3 text-white-50 bg-purple rounded box-shadow">
     <img class="mr-3" src="https://getbootstrap.com/assets/brand/bootstrap-outline.svg" alt="" width="48" height="48">
     <div class="lh-100">
@@ -47,7 +70,8 @@
       <small>Since 2011</small>
     </div>
   </div>
-
+-->
+<!--
   <h1>{{title}}</h1>
   <a [routerLink]="['ListAuthorsComponent']">Authors list</a>
   <br/>
@@ -59,6 +83,11 @@
   <br/>
   <a [routerLink]="['InfoC']">Info</a>
   <router-outlet></router-outlet>
+
+
+-->
+
+<router-outlet></router-outlet>
 
   <!--
   <div class="my-3 p-3 bg-white rounded box-shadow">
