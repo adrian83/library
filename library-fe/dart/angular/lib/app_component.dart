@@ -16,6 +16,8 @@ import 'book/components/create.dart';
 import 'book/components/update.dart';
 import 'book/components/show.dart';
 
+import './start_component.dart';
+
 import 'package:logging/logging.dart';
 
 @Component(
@@ -24,6 +26,11 @@ import 'package:logging/logging.dart';
     directives: const [CORE_DIRECTIVES, ROUTER_DIRECTIVES],
     providers: const [AuthorService, BookService, ROUTER_PROVIDERS])
 @RouteConfig(const [
+
+  const Route(
+      path: '/',
+      name: 'StartComponent',
+      component: StartComponent),
   const Route(
       path: '/authors/list',
       name: 'ListAuthorsComponent',
@@ -63,6 +70,7 @@ class AppComponent {
 
   List<MenuElement> _menuElements;
   MenuElement _active;
+  MenuSubElements _activeSubElement;
 
   AppComponent() {
     Logger.root.level = Level.ALL;
@@ -101,15 +109,28 @@ class AppComponent {
     _menuElements.add(books);
     _menuElements.add(info);
 
-    _active = authors;
+    _active = _menuElements[0];
+    _activeSubElement = _active.subElements[0];
   }
 
   List<MenuElement> get menuElements => _menuElements;
   List<MenuSubElements> get menuSubElements => _active.subElements;
+  String get activeMenuElem => _active == null ? "" : _active.label;
+  String get activeMenuSubElem => _activeSubElement == null ? "" : _activeSubElement.label;
+
+  void cleanMenu() {
+    _active = null;
+    _activeSubElement = null;
+  }
 
   void makeActive(MenuElement menuElem) {
     print("Change to $menuElem.label");
     _active = menuElem;
+  }
+
+  void makeActiveSubElem(MenuSubElements menuSubElem) {
+    print("Change to $menuSubElem.label");
+    _activeSubElement = menuSubElem;
   }
 }
 
