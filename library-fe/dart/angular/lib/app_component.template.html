@@ -1,6 +1,9 @@
 <nav class="navbar navbar-expand-md fixed-top navbar-dark bg-dark">
   <a class="navbar-brand"
-     [routerLink]="['StartComponent']">Library</a>
+     [routerLink]="['StartComponent']"
+     (click)="cleanMenu();">Library</a>
+
+
   <button class="navbar-toggler p-0 border-0" type="button" data-toggle="offcanvas">
     <span class="navbar-toggler-icon"></span>
   </button>
@@ -10,7 +13,7 @@
       <li class="nav-item"
           [class.active]="menuElement.label == activeMenuElem"
           *ngFor="let menuElement of menuElements"
-          (click)="makeActive(menuElement);" >
+          (click)="makeActiveMenuElem(menuElement);" >
         <span class="nav-link">{{ menuElement.label }}</span>
       </li>
     </ul>
@@ -22,7 +25,7 @@
     <a *ngFor="let subElement of menuSubElements"
        class="nav-link"
        [class.active]="subElement.label == activeMenuSubElem"
-       (click)="makeActiveSubElem(subElement);"
+       (click)="makeActiveMenuSubElem(subElement);"
        [routerLink]="subElement.component">{{ subElement.label }}</a>
   </nav>
 </div>

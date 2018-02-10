@@ -110,7 +110,6 @@ class AppComponent {
     _menuElements.add(info);
 
     _active = _menuElements[0];
-    _activeSubElement = _active.subElements[0];
   }
 
   List<MenuElement> get menuElements => _menuElements;
@@ -119,17 +118,14 @@ class AppComponent {
   String get activeMenuSubElem => _activeSubElement == null ? "" : _activeSubElement.label;
 
   void cleanMenu() {
-    _active = null;
     _activeSubElement = null;
   }
 
-  void makeActive(MenuElement menuElem) {
-    print("Change to $menuElem.label");
+  void makeActiveMenuElem(MenuElement menuElem) {
     _active = menuElem;
   }
 
-  void makeActiveSubElem(MenuSubElements menuSubElem) {
-    print("Change to $menuSubElem.label");
+  void makeActiveMenuSubElem(MenuSubElements menuSubElem) {
     _activeSubElement = menuSubElem;
   }
 }
