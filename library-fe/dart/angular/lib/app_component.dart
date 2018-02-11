@@ -26,11 +26,7 @@ import 'package:logging/logging.dart';
     directives: const [CORE_DIRECTIVES, ROUTER_DIRECTIVES],
     providers: const [AuthorService, BookService, ROUTER_PROVIDERS])
 @RouteConfig(const [
-
-  const Route(
-      path: '/',
-      name: 'StartComponent',
-      component: StartComponent),
+  const Route(path: '/', name: 'StartComponent', component: StartComponent),
   const Route(
       path: '/authors/list',
       name: 'ListAuthorsComponent',
@@ -115,7 +111,8 @@ class AppComponent {
   List<MenuElement> get menuElements => _menuElements;
   List<MenuSubElements> get menuSubElements => _active.subElements;
   String get activeMenuElem => _active == null ? "" : _active.label;
-  String get activeMenuSubElem => _activeSubElement == null ? "" : _activeSubElement.label;
+  String get activeMenuSubElem =>
+      _activeSubElement == null ? "" : _activeSubElement.label;
 
   void cleanMenu() {
     _activeSubElement = null;

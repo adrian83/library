@@ -46,10 +46,17 @@ class ListAuthorsComponent extends PageSwitcher
   PageSwitcher get switcher => this;
   AuthorsPage get page => this._page;
   String get filter => this._filter;
-
+  void set filter(String f) {
+    _filter = f;
+  }
+  
   void change(int pageNumber) {
     LOGGER.info("Fetch $pageNumber authors page");
     fetchAuthors(pageNumber);
+  }
+
+  void filterAuthors() {
+    fetchAuthors(0);
   }
 
   Future<Null> fetchAuthors(int pageNo) async {
