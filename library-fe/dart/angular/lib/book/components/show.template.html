@@ -6,9 +6,11 @@
   <div class="form-group row">
     <label for="staticTitle" class="col-sm-2 col-form-label">Title</label>
     <div class="col-sm-10">
-      <i id="staticTitle"
-         readonly
-         class="form-control-plaintext">{{ book.title }}</i>
+      <input type="text"
+             readonly
+             class="form-control-plaintext"
+             id="staticTitle"
+             value="{{ book.title }}">
     </div>
   </div>
 

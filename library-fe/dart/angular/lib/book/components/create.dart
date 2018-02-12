@@ -48,6 +48,10 @@ class CreateBookComponent extends PageSwitcher
     fetchAuthors(pageNumber);
   }
 
+  bool authorUsed(Author author) {
+    return _book.authors.any((a) => a.id == author.id);
+  }
+
   Future<Null> fetchAuthors(int pageNumber) async {
     _authorService
         .list(new PageRequest(pageNumber, _authorsFilter))
