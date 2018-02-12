@@ -6,7 +6,6 @@ import 'package:logging/logging.dart';
 
 import '../errors.dart';
 
-
 @Component(
     selector: 'validation-errors',
     templateUrl: 'validation.template.html',
@@ -17,10 +16,7 @@ class ValidationErrorsComponent implements OnInit {
   @Input()
   List<ValidationError> errors;
 
-
   Future<Null> ngOnInit() async {
     LOGGER.info("ValidationErrors initialized. Errors: $errors");
   }
-
-
 }

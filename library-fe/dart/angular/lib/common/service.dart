@@ -40,6 +40,8 @@ class Service {
     var json = JSON.decode(response.body);
     if (response.statusCode == 400) {
       throw new ValidationErrors.fromJson(json);
+    } else if (response.statusCode == 500) {
+      throw new ServerError.fromJson(json);
     }
     return json;
   }

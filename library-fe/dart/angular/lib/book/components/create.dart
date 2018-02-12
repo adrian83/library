@@ -8,6 +8,7 @@ import 'package:logging/logging.dart';
 
 import '../../common/components/validation.dart';
 import '../../common/components/pagination.dart';
+import '../../common/components/errors.dart';
 import '../../common/errorhandler.dart';
 import '../../common/page.dart';
 
@@ -20,7 +21,7 @@ import '../model.dart';
 @Component(
     selector: 'create-book-component',
     templateUrl: 'create.template.html',
-    directives: const [CORE_DIRECTIVES, formDirectives, Pagination, ValidationErrorsComponent])
+    directives: const [CORE_DIRECTIVES, formDirectives, Pagination, ValidationErrorsComponent, ServerErrorsComponent])
 class CreateBookComponent extends PageSwitcher
     with ErrorHandler
     implements OnInit {

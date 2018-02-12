@@ -8,6 +8,7 @@ import 'package:logging/logging.dart';
 
 import '../../common/components/validation.dart';
 import '../../common/components/pagination.dart';
+import '../../common/components/errors.dart';
 import '../../common/errorhandler.dart';
 import '../../common/page.dart';
 
@@ -21,7 +22,7 @@ import '../model.dart';
       CORE_DIRECTIVES,
       formDirectives,
       Pagination,
-      ValidationErrorsComponent
+      ValidationErrorsComponent, ServerErrorsComponent
     ])
 class ListBooksComponent extends PageSwitcher
     with ErrorHandler

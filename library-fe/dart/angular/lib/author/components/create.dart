@@ -7,6 +7,7 @@ import 'package:angular_forms/angular_forms.dart';
 import 'package:logging/logging.dart';
 
 import '../../common/components/validation.dart';
+import '../../common/components/errors.dart';
 import '../../common/errorhandler.dart';
 
 import '../service.dart';
@@ -18,7 +19,7 @@ import '../model.dart';
     directives: const [
       CORE_DIRECTIVES,
       formDirectives,
-      ValidationErrorsComponent
+      ValidationErrorsComponent, ServerErrorsComponent
     ])
 class CreateAuthorComponent extends ErrorHandler implements OnInit {
   static final Logger LOGGER = new Logger('CreateAuthorComponent');

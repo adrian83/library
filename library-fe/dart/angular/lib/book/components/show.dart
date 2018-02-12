@@ -6,6 +6,7 @@ import 'package:angular_router/angular_router.dart';
 import 'package:logging/logging.dart';
 
 import '../../common/components/validation.dart';
+import '../../common/components/errors.dart';
 import '../../common/errorhandler.dart';
 
 import '../service.dart';
@@ -14,7 +15,7 @@ import '../model.dart';
 @Component(
     selector: 'show-book-component',
     templateUrl: 'show.template.html',
-    directives: const [CORE_DIRECTIVES, ValidationErrorsComponent])
+    directives: const [CORE_DIRECTIVES, ValidationErrorsComponent, ServerErrorsComponent])
 class ShowBookComponent extends ErrorHandler implements OnInit {
   static final Logger LOGGER = new Logger('ShowBookComponent');
 

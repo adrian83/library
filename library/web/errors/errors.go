@@ -21,9 +21,9 @@ func (e *AppError) Error() string {
 func (e *AppError) Dict() map[string]interface{} {
 
 	info := make(map[string]interface{})
-	info["HttpStatus"] = e.HttpStatus
-	info["Code"] = e.Code
-	info["Message"] = e.Message
+	info["httpStatus"] = e.HttpStatus
+	info["code"] = e.Code
+	info["message"] = e.Message
 
 	model := make(map[string]interface{})
 	model["generalInformation"] = info

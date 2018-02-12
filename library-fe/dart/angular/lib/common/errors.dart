@@ -1,5 +1,20 @@
 import './serializable.dart';
 
+class ServerError extends Serializable {
+  String message;
+
+  ServerError([this.message]);
+
+  factory ServerError.fromJson(Map<String, dynamic> json) {
+    var info = json['generalInformation'];
+    return new ServerError(info['message']);
+  }
+
+  String toString() {
+    return "ServerError { message=$message }";
+  }
+}
+
 class ValidationError extends Serializable {
   String field, code, message;
 

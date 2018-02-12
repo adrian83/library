@@ -6,13 +6,19 @@ class ErrorHandler {
   static final Logger LOGGER = new Logger('ErrorHandler');
 
   List<ValidationError> _validationErrors;
+  ServerError _serverError;
 
   void handleError(e) {
     if (e is ValidationErrors) {
       this.validationErrors = e.validationErrors;
       LOGGER.info("Validation errors: $validationErrors");
       return;
+    } else if (e is ServerError) {
+      this._serverError = e;
+      LOGGER.info("Server error: $_serverError");
+      return;
     }
+
     LOGGER.info("Errors: $e");
   }
 
@@ -23,6 +29,8 @@ class ErrorHandler {
   List<ValidationError> get validationErrors => this._validationErrors == null
       ? new List<ValidationError>()
       : this._validationErrors;
+
+  ServerError get serverError => _serverError;
 
   void cleanValidationErrors(){
     this._validationErrors = new List<ValidationError>();

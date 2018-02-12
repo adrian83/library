@@ -8,6 +8,7 @@ import 'package:logging/logging.dart';
 
 import '../../common/components/validation.dart';
 import '../../common/components/pagination.dart';
+import '../../common/components/errors.dart';
 import '../../common/errorhandler.dart';
 import '../../common/page.dart';
 
@@ -21,7 +22,7 @@ import '../model.dart';
       CORE_DIRECTIVES,
       Pagination,
       formDirectives,
-      ValidationErrorsComponent
+      ValidationErrorsComponent, ServerErrorsComponent
     ])
 class ListAuthorsComponent extends PageSwitcher
     with ErrorHandler
@@ -49,7 +50,7 @@ class ListAuthorsComponent extends PageSwitcher
   void set filter(String f) {
     _filter = f;
   }
-  
+
   void change(int pageNumber) {
     LOGGER.info("Fetch $pageNumber authors page");
     fetchAuthors(pageNumber);
