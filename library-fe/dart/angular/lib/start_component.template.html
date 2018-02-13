@@ -1,1 +1,15 @@
-<h1>START</h1>
+
+<validation-errors [errors]="validationErrors"></validation-errors>
+<server-errors [error]="serverError"></server-errors>
+
+<div class="jumbotron">
+  <h1 class="display-4">Welcome</h1>
+  <hr class="my-4">
+  <div class="lead">
+    <p>Currently in our database:</p>
+    <ul>
+      <li>around {{ booksCount }} books</li>
+      <li>around {{ authorsCount }} authors</li>
+    </ul>
+  </div>
+</div>
