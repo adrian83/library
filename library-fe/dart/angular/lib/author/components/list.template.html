@@ -20,19 +20,21 @@
 
 <div class="list-group">
   <div class="list-group-item list-group-item-action flex-column align-items-start"
-       style="cursor: pointer;"
-       *ngFor="let author of page.elements"
-       (click)="show(author);">
+       *ngFor="let author of page.elements">
 
     <div class="d-flex w-100 justify-content-between">
-      <h5 class="mb-1">{{author.firstName}} {{author.lastName}}</h5>
+      <h5 class="mb-1"
+          style="cursor: pointer;"
+          (click)="show(author);">{{author.firstName}} {{author.lastName}}</h5>
       <small>
         <i class="fa fa-pencil-square-o fa-2"
            aria-hidden="true"
+           style="cursor: pointer;"
            (click)="edit(author);"></i>
 
         <i class="fa fa-times fa-2"
            aria-hidden="true"
+           style="cursor: pointer;"
            (click)="delete(author);"></i>
       </small>
     </div>

@@ -16,7 +16,8 @@ import 'book/components/create.dart';
 import 'book/components/update.dart';
 import 'book/components/show.dart';
 
-import './start_component.dart';
+import 'start_component.dart';
+import 'notfound_component.dart';
 
 import 'package:logging/logging.dart';
 
@@ -65,7 +66,8 @@ const INFO_PATH = '/info';
       path: '/books/update/:id',
       name: 'UpdateBookComponent',
       component: UpdateBookComponent),
-  const Route(path: INFO_PATH, name: 'InfoC', component: InfoComponent)
+  const Route(path: INFO_PATH, name: 'InfoComponent', component: InfoComponent),
+  const Route(path: '/**', name: 'NotFoundComponent', component: NotFoundComponent)
 ])
 class AppComponent {
 
@@ -99,7 +101,7 @@ class AppComponent {
         new MenuSubElements("Books list", const ['ListBooksComponent'], LIST_BOOKS_PATH);
     var cleateBook =
         new MenuSubElements("Create books", const ['CreateBookComponent'], CREATE_BOOK_PATH);
-    var showInfo = new MenuSubElements("Info", const ['InfoC'], INFO_PATH);
+    var showInfo = new MenuSubElements("Info", const ['InfoComponent'], INFO_PATH);
 
     var authorsLinks = new List<MenuSubElements>();
     authorsLinks.add(listAuthors);

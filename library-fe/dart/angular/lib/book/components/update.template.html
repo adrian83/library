@@ -50,11 +50,16 @@
                aria-describedby="basic-addon1">
       </div>
 
-      <ul>
-        <li *ngFor="let author of authorsPage.elements" (click)="addAuthor(author);">
-        {{ author.fullName }}
+      <ul class="list-group">
+        <li class="list-group-item"
+            (click)="addAuthor(author);"
+            *ngFor="let author of authorsPage.elements">
+          <i class="fa fa-user fa-2 lib-icon" aria-hidden="true"></i>
+          <span>{{ author.fullName }}</span>
         </li>
       </ul>
+
+      <br/>
 
       <div>
         <pagination [page]="authorsPage" [switcher]="switcher"></pagination>
