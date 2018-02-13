@@ -21,7 +21,7 @@ import 'book/service.dart';
       ServerErrorsComponent
     ])
 class StartComponent extends ErrorHandler implements OnInit {
-  static final Logger LOGGER = new Logger('CreateBookComponent');
+  static final Logger LOGGER = new Logger('StartComponent');
 
   final BookService _bookService;
   final AuthorService _authorService;

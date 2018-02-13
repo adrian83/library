@@ -20,6 +20,12 @@ import './start_component.dart';
 
 import 'package:logging/logging.dart';
 
+const LIST_AUTHORS_PATH = '/authors/list';
+const CREATE_AUTHOR_PATH = '/authors/new';
+const LIST_BOOKS_PATH = '/books/list';
+const CREATE_BOOK_PATH = '/books/new';
+const INFO_PATH = '/info';
+
 @Component(
     selector: 'app',
     templateUrl: 'app_component.template.html',
@@ -28,11 +34,11 @@ import 'package:logging/logging.dart';
 @RouteConfig(const [
   const Route(path: '/', name: 'StartComponent', component: StartComponent),
   const Route(
-      path: '/authors/list',
+      path: LIST_AUTHORS_PATH,
       name: 'ListAuthorsComponent',
       component: ListAuthorsComponent),
   const Route(
-      path: '/authors/new',
+      path: CREATE_AUTHOR_PATH,
       name: 'CreateAuthorComponent',
       component: CreateAuthorComponent),
   const Route(
@@ -44,11 +50,11 @@ import 'package:logging/logging.dart';
       name: 'UpdateAuthorComponent',
       component: UpdateAuthorComponent),
   const Route(
-      path: '/books/list',
+      path: LIST_BOOKS_PATH,
       name: 'ListBooksComponent',
       component: ListBooksComponent),
   const Route(
-      path: '/books/new',
+      path: CREATE_BOOK_PATH,
       name: 'CreateBookComponent',
       component: CreateBookComponent),
   const Route(
@@ -59,31 +65,41 @@ import 'package:logging/logging.dart';
       path: '/books/update/:id',
       name: 'UpdateBookComponent',
       component: UpdateBookComponent),
-  const Route(path: '/info', name: 'InfoC', component: InfoComponent)
+  const Route(path: INFO_PATH, name: 'InfoC', component: InfoComponent)
 ])
 class AppComponent {
+
+  static final Logger LOGGER = new Logger('AppComponent');
+
   String title = 'Library';
 
   List<MenuElement> _menuElements;
   MenuElement _active;
   MenuSubElements _activeSubElement;
 
-  AppComponent() {
+  final Location location;
+
+  AppComponent(this.location) {
+
+
+
     Logger.root.level = Level.ALL;
     Logger.root.onRecord.listen((LogRecord rec) {
       print(
           '${rec.loggerName}: ${rec.level.name}: ${rec.time}: ${rec.message}');
     });
 
-    var listAuthors =
-        new MenuSubElements("Authors list", const ['ListAuthorsComponent']);
+    var p = location.path();
+    LOGGER.info("Location $p");
+
+    var listAuthors = new MenuSubElements("Authors list", const ['ListAuthorsComponent'], LIST_AUTHORS_PATH);
     var createAuthor =
-        new MenuSubElements("Create author", const ['CreateAuthorComponent']);
+        new MenuSubElements("Create author", const ['CreateAuthorComponent'], CREATE_AUTHOR_PATH);
     var listBooks =
-        new MenuSubElements("Books list", const ['ListBooksComponent']);
+        new MenuSubElements("Books list", const ['ListBooksComponent'], LIST_BOOKS_PATH);
     var cleateBook =
-        new MenuSubElements("Create books", const ['CreateBookComponent']);
-    var showInfo = new MenuSubElements("Info", const ['InfoC']);
+        new MenuSubElements("Create books", const ['CreateBookComponent'], CREATE_BOOK_PATH);
+    var showInfo = new MenuSubElements("Info", const ['InfoC'], INFO_PATH);
 
     var authorsLinks = new List<MenuSubElements>();
     authorsLinks.add(listAuthors);
@@ -106,6 +122,8 @@ class AppComponent {
     _menuElements.add(info);
 
     _active = _menuElements[0];
+
+    _selectMenuElements();
   }
 
   List<MenuElement> get menuElements => _menuElements;
@@ -125,7 +143,22 @@ class AppComponent {
   void makeActiveMenuSubElem(MenuSubElements menuSubElem) {
     _activeSubElement = menuSubElem;
   }
+
+  void _selectMenuElements(){
+    var path = location.path();
+    for (var menuElem in _menuElements) {
+      for (var menuSubElem in menuElem.subElements) {
+        if(menuSubElem.path == path) {
+          _activeSubElement = menuSubElem;
+          _active = menuElem;
+          return;
+        }
+      }
+    }
+  }
 }
+
+
 
 class MenuElement {
   String _label;
@@ -140,9 +173,11 @@ class MenuElement {
 class MenuSubElements {
   String _label;
   List<String> _component;
+  String _path;
 
-  MenuSubElements(this._label, this._component);
+  MenuSubElements(this._label, this._component, this._path);
 
   String get label => _label;
   List<String> get component => _component;
+  String get path => _path;
 }
