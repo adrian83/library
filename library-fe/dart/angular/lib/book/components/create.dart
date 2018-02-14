@@ -8,6 +8,7 @@ import 'package:logging/logging.dart';
 
 import '../../common/components/validation.dart';
 import '../../common/components/pagination.dart';
+import '../../common/components/info.dart';
 import '../../common/components/errors.dart';
 import '../../common/errorhandler.dart';
 import '../../common/page.dart';
@@ -21,7 +22,14 @@ import '../model.dart';
 @Component(
     selector: 'create-book-component',
     templateUrl: 'create.template.html',
-    directives: const [CORE_DIRECTIVES, formDirectives, Pagination, ValidationErrorsComponent, ServerErrorsComponent])
+    directives: const [
+      CORE_DIRECTIVES,
+      formDirectives,
+      Pagination,
+      ValidationErrorsComponent,
+      ServerErrorsComponent,
+      InfoComponent
+    ])
 class CreateBookComponent extends PageSwitcher
     with ErrorHandler
     implements OnInit {
@@ -38,7 +46,7 @@ class CreateBookComponent extends PageSwitcher
 
   CreateBookComponent(this._bookService, this._authorService, this._router);
 
-@override
+  @override
   Future<Null> ngOnInit() async {
     LOGGER.info("CreateBookComponent initialized");
     fetchAuthors(0);
@@ -63,11 +71,11 @@ class CreateBookComponent extends PageSwitcher
   AuthorsPage get authorsPage => _authorsPage;
   PageSwitcher get switcher => this;
   String get authorsFilter => _authorsFilter;
-  void set authorsFilter(String f){
+  void set authorsFilter(String f) {
     _authorsFilter = f;
   }
 
-  void filterAuthors(){
+  void filterAuthors() {
     fetchAuthors(0);
   }
 

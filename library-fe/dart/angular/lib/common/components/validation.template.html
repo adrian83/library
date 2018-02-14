@@ -1,7 +1,9 @@
 
-<div class="row" *ngFor="let err of errors">
-  <div class="alert alert-danger"
-       role="alert">
-    {{ err.message }}
-  </div>
+<div class="alert alert-danger alert-dismissible fade show"
+     role="alert"
+     *ngFor="let err of errors">
+  {{ err.message }}
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
 </div>

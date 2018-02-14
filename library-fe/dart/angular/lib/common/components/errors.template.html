@@ -1,6 +1,9 @@
 
-<div class="row" *ngIf="serverError != null">
-  <div class="alert alert-danger" role="alert">
-    {{ serverError.message }}
-  </div>
+<div class="alert alert-danger alert-dismissible fade show"
+     role="alert"
+     *ngIf="serverError != null">
+  {{ serverError.message }}
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
 </div>

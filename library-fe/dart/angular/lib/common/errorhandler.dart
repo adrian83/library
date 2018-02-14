@@ -7,6 +7,7 @@ class ErrorHandler {
 
   List<ValidationError> _validationErrors;
   ServerError _serverError;
+  List<String> _info = new List<String>();
 
   void handleError(e) {
     if (e is ValidationErrors) {
@@ -34,6 +35,17 @@ class ErrorHandler {
 
   void cleanValidationErrors(){
     this._validationErrors = new List<ValidationError>();
+  }
+
+  List<String> get info => _info;
+
+  void showInfo(String msg) {
+    _info.add(msg);
+  }
+
+  void removeInfo(String msg) {
+    _info.removeWhere((i) => i == msg);
+    LOGGER.info("Rem info: $msg");
   }
 
 }

@@ -9,6 +9,7 @@ import 'package:logging/logging.dart';
 import '../../common/components/validation.dart';
 import '../../common/components/pagination.dart';
 import '../../common/components/errors.dart';
+import '../../common/components/info.dart';
 import '../../common/errorhandler.dart';
 import '../../common/page.dart';
 
@@ -22,7 +23,8 @@ import '../model.dart';
       CORE_DIRECTIVES,
       formDirectives,
       Pagination,
-      ValidationErrorsComponent, ServerErrorsComponent
+      ValidationErrorsComponent, ServerErrorsComponent,
+      InfoComponent
     ])
 class ListBooksComponent extends PageSwitcher
     with ErrorHandler
@@ -63,7 +65,7 @@ class ListBooksComponent extends PageSwitcher
   Future<Null> delete(Book book) async {
     _bookService
         .delete(book.id)
-        .then((n) => fetchBooks(_page.current), onError: handleError);
+        .then((n) => fetchBooks(_page.current), onError: handleError).whenComplete(() => showInfo("Book removed"));
   }
 
   Future<Null> fetchBooks(int pageNo) async {
