@@ -9,6 +9,7 @@ import 'package:logging/logging.dart';
 import '../../common/components/validation.dart';
 import '../../common/components/pagination.dart';
 import '../../common/components/errors.dart';
+import '../../common/components/info.dart';
 import '../../common/errorhandler.dart';
 import '../../common/page.dart';
 
@@ -22,7 +23,9 @@ import '../model.dart';
       CORE_DIRECTIVES,
       Pagination,
       formDirectives,
-      ValidationErrorsComponent, ServerErrorsComponent
+      ValidationErrorsComponent,
+      ServerErrorsComponent,
+      InfoComponent
     ])
 class ListAuthorsComponent extends PageSwitcher
     with ErrorHandler
@@ -85,10 +88,10 @@ class ListAuthorsComponent extends PageSwitcher
   Future<Null> delete(Author author) async {
     _authorService.delete(author.id).then((n) {
       fetchAuthors(_page.current);
-    }, onError: handleError);
+    }, onError: handleError).whenComplete(() => showInfo("Author removed"));
   }
 
-  void ifEmptyShowPrev(){
+  void ifEmptyShowPrev() {
     if (_page.hasPrev && _page.isEmpty) {
       fetchAuthors(_page.current - 1);
     }

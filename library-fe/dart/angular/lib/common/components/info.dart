@@ -4,7 +4,6 @@ import 'package:angular/angular.dart';
 
 import 'package:logging/logging.dart';
 
-
 @Component(
     selector: 'info-messages',
     templateUrl: 'info.template.html',
@@ -19,11 +18,9 @@ class InfoComponent implements OnInit {
     LOGGER.info("InfoComponent initialized. Info: $info");
   }
 
-  void removeInfo(String msg) {
-    new Future.delayed(new Duration(seconds: 1), (){
+  void hideInfo(String msg) {
+    new Future.delayed(new Duration(seconds: 1), () {
       info.removeWhere((i) => i == msg);
-      LOGGER.info("Rem info: $msg");
     });
-
   }
 }

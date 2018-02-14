@@ -7,6 +7,7 @@ import 'package:logging/logging.dart';
 
 import '../../common/components/validation.dart';
 import '../../common/components/errors.dart';
+import '../../common/components/info.dart';
 import '../../common/errorhandler.dart';
 
 import '../service.dart';
@@ -15,7 +16,12 @@ import '../model.dart';
 @Component(
     selector: 'show-author-component',
     templateUrl: 'show.template.html',
-    directives: const [CORE_DIRECTIVES, ValidationErrorsComponent, ServerErrorsComponent])
+    directives: const [
+      CORE_DIRECTIVES,
+      ValidationErrorsComponent,
+      ServerErrorsComponent,
+      InfoComponent
+    ])
 class ShowAuthorComponent extends ErrorHandler
     with ErrorHandler
     implements OnInit {

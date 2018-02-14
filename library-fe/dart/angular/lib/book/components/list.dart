@@ -23,7 +23,8 @@ import '../model.dart';
       CORE_DIRECTIVES,
       formDirectives,
       Pagination,
-      ValidationErrorsComponent, ServerErrorsComponent,
+      ValidationErrorsComponent,
+      ServerErrorsComponent,
       InfoComponent
     ])
 class ListBooksComponent extends PageSwitcher
@@ -65,7 +66,8 @@ class ListBooksComponent extends PageSwitcher
   Future<Null> delete(Book book) async {
     _bookService
         .delete(book.id)
-        .then((n) => fetchBooks(_page.current), onError: handleError).whenComplete(() => showInfo("Book removed"));
+        .then((n) => fetchBooks(_page.current), onError: handleError)
+        .whenComplete(() => showInfo("Book removed"));
   }
 
   Future<Null> fetchBooks(int pageNo) async {

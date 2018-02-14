@@ -43,9 +43,4 @@ class ErrorHandler {
     _info.add(msg);
   }
 
-  void removeInfo(String msg) {
-    _info.removeWhere((i) => i == msg);
-    LOGGER.info("Rem info: $msg");
-  }
-
 }

@@ -10,6 +10,7 @@ import '../../common/components/pagination.dart';
 import '../../common/page.dart';
 import '../../common/components/validation.dart';
 import '../../common/components/errors.dart';
+import '../../common/components/info.dart';
 import '../../common/errorhandler.dart';
 
 import '../../author/service.dart';
@@ -25,7 +26,9 @@ import '../model.dart';
       CORE_DIRECTIVES,
       formDirectives,
       Pagination,
-      ValidationErrorsComponent, ServerErrorsComponent
+      ValidationErrorsComponent,
+      ServerErrorsComponent,
+      InfoComponent
     ])
 class UpdateBookComponent extends PageSwitcher
     with ErrorHandler
@@ -41,7 +44,8 @@ class UpdateBookComponent extends PageSwitcher
   AuthorsPage _authorsPage = new AuthorsPage(0, 0, 0, new List<Author>());
   String _authorsFilter = "";
 
-  UpdateBookComponent(this._bookService, this._authorService, this._routeParams);
+  UpdateBookComponent(
+      this._bookService, this._authorService, this._routeParams);
 
   AuthorsPage get authorsPage => _authorsPage;
   PageSwitcher get switcher => this;
@@ -49,11 +53,11 @@ class UpdateBookComponent extends PageSwitcher
   void set book(b) {
     _book = b;
   }
+
   String get authorsFilter => _authorsFilter;
-  void set authorsFilter(String f){
+  void set authorsFilter(String f) {
     _authorsFilter = f;
   }
-
 
   @override
   Future<Null> ngOnInit() async {
@@ -63,7 +67,9 @@ class UpdateBookComponent extends PageSwitcher
     _bookService
         .get(_id)
         .then((b) => _book = b, onError: handleError)
-        .then((n) { fetchAuthors(0); });
+        .then((n) {
+      fetchAuthors(0);
+    });
   }
 
   @override
@@ -72,7 +78,7 @@ class UpdateBookComponent extends PageSwitcher
     fetchAuthors(pageNumber);
   }
 
-  void filterAuthors(){
+  void filterAuthors() {
     fetchAuthors(0);
   }
 
@@ -83,18 +89,19 @@ class UpdateBookComponent extends PageSwitcher
   }
 
   void addAuthor(Author author) {
-    LOGGER.info("Adding author: $author");
     if (!_book.authors.any((a) => a.id == author.id)) {
       _book.authors.add(author);
     }
   }
 
   void deleteAuthor(Author author) {
-    LOGGER.info("Removing author: $author");
     _book.authors.removeWhere((a) => a.id == author.id);
   }
 
   Future<Null> updateBook() async {
-    _bookService.update(_book).then((b) => _book = b, onError: handleError);
+    _bookService
+        .update(_book)
+        .then((b) => _book = b, onError: handleError)
+        .whenComplete(() => showInfo("Book updated"));
   }
 }

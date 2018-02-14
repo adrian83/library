@@ -8,6 +8,7 @@ import 'package:logging/logging.dart';
 
 import '../../common/components/validation.dart';
 import '../../common/components/errors.dart';
+import '../../common/components/info.dart';
 import '../../common/errorhandler.dart';
 
 import '../service.dart';
@@ -19,7 +20,9 @@ import '../model.dart';
     directives: const [
       CORE_DIRECTIVES,
       formDirectives,
-      ValidationErrorsComponent, ServerErrorsComponent
+      ValidationErrorsComponent,
+      ServerErrorsComponent,
+      InfoComponent
     ])
 class CreateAuthorComponent extends ErrorHandler implements OnInit {
   static final Logger LOGGER = new Logger('CreateAuthorComponent');
@@ -41,13 +44,10 @@ class CreateAuthorComponent extends ErrorHandler implements OnInit {
   Future<Null> save() async {
     LOGGER.info("Saving $author");
 
-    _authorService
-        .create(this._author)
-        .then((a) {
-          _author = a;
-          cleanValidationErrors();
-        }, onError: handleError)
-        .whenComplete(showEditPage);
+    _authorService.create(this._author).then((a) {
+      _author = a;
+      cleanValidationErrors();
+    }, onError: handleError).whenComplete(showEditPage);
   }
 
   void showEditPage() {

@@ -3,7 +3,11 @@
      role="alert"
      *ngFor="let err of errors">
   {{ err.message }}
-  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+  <button type="button"
+          class="close"
+          data-dismiss="alert"
+          aria-label="Close"
+          (click)="hideError(err)">
     <span aria-hidden="true">&times;</span>
   </button>
 </div>

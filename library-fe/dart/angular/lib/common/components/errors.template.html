@@ -3,7 +3,11 @@
      role="alert"
      *ngIf="serverError != null">
   {{ serverError.message }}
-  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+  <button type="button"
+          class="close"
+          data-dismiss="alert"
+          aria-label="Close"
+          (click)="hideError()">
     <span aria-hidden="true">&times;</span>
   </button>
 </div>

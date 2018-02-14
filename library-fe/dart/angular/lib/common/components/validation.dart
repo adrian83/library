@@ -19,4 +19,11 @@ class ValidationErrorsComponent implements OnInit {
   Future<Null> ngOnInit() async {
     LOGGER.info("ValidationErrors initialized. Errors: $errors");
   }
+
+  void hideError(ValidationError err) {
+    new Future.delayed(new Duration(seconds: 1), () {
+      errors.removeWhere((e) => e.message == err.message);
+    });
+  }
+
 }

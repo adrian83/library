@@ -8,6 +8,7 @@ import 'package:logging/logging.dart';
 
 import '../../common/components/validation.dart';
 import '../../common/components/errors.dart';
+import '../../common/components/info.dart';
 import '../../common/errorhandler.dart';
 
 import '../service.dart';
@@ -19,7 +20,9 @@ import '../model.dart';
     directives: const [
       CORE_DIRECTIVES,
       formDirectives,
-      ValidationErrorsComponent, ServerErrorsComponent
+      ValidationErrorsComponent,
+      ServerErrorsComponent,
+      InfoComponent
     ])
 class UpdateAuthorComponent extends ErrorHandler implements OnInit {
   static final Logger LOGGER = new Logger('UpdateAuthorComponent');
@@ -31,7 +34,7 @@ class UpdateAuthorComponent extends ErrorHandler implements OnInit {
 
   UpdateAuthorComponent(this._authorService, this._routeParams);
 
-@override
+  @override
   Future<Null> ngOnInit() async {
     LOGGER.info("UpdateAuthorComponent initialized");
     var _id = _routeParams.get('id');
@@ -42,11 +45,9 @@ class UpdateAuthorComponent extends ErrorHandler implements OnInit {
 
   Future<Null> update() async {
     print("Update $_author");
-    _authorService
-        .update(this._author)
-        .then((a){
-          _author = a;
-          cleanValidationErrors();
-        }, onError: handleError);
+    _authorService.update(this._author).then((a) {
+      _author = a;
+      cleanValidationErrors();
+    }, onError: handleError).whenComplete(() => showInfo("Author updated"));
   }
 }
