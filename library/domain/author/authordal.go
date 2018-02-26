@@ -1,8 +1,8 @@
 package author
 
 import (
-	"fmt"
 	"log"
+	"strings"
 
 	"github.com/adrian83/go-mvc-library/library/domain/common/dal"
 	"github.com/adrian83/go-mvc-library/library/domain/common/model"
@@ -59,10 +59,12 @@ func (d MongoDal) Authors(page *dal.PageInfo) (*EntitiesPage, error) {
 
 	log.Printf("Getting authors from page: %v", page)
 	entities := make([]*Entity, 0)
-	// {$regex : ".*son.*"}
+
 	var findExp interface{}
 	if page.Phrase != "" {
-		findExp = bson.M{firstName: bson.M{"$regex": fmt.Sprintf(".*%v.*", page.Phrase), "$options": "i"}}
+		fields := []string{firstName, lastName}
+		words := strings.Split(page.Phrase, " ")
+		findExp = dal.Or(words, fields)
 	}
 
 	query := d.collection.Find(findExp).Skip(page.From()).Limit(page.Size).Sort(page.Sort)
