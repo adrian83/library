@@ -11,23 +11,27 @@ type AuthorsPage struct {
 	Authors []*Author `json:"authors"`
 }
 
-type AuthorService interface {
+// Service is an inferface for service which manipulates Author structs.
+type Service interface {
 	Add(author *Author) (*Author, error)
 	Authors(page *dal.PageInfo) (*AuthorsPage, error)
 	Update(author *Author) error
 	Delete(authorID string) error
-	GetAuthor(authorID string) (*Author, error)
+	GetByID(authorID string) (*Author, error)
 }
 
-type AuthorServiceImpl struct {
+// ServiceImpl is a default implementation of AuthorService.
+type ServiceImpl struct {
 	authorDal Dal
 }
 
-func NewAuthorService(authorDal Dal) AuthorService {
-	return AuthorServiceImpl{authorDal: authorDal}
+// NewAuthorService returns new instance of AuthorService.
+func NewAuthorService(authorDal Dal) Service {
+	return ServiceImpl{authorDal: authorDal}
 }
 
-func (s AuthorServiceImpl) Add(author *Author) (*Author, error) {
+// Add persists (through dal struct) given Author.
+func (s ServiceImpl) Add(author *Author) (*Author, error) {
 	entity, err := s.authorDal.Add(author.ToEntity())
 	if err != nil {
 		return nil, err
@@ -36,7 +40,7 @@ func (s AuthorServiceImpl) Add(author *Author) (*Author, error) {
 }
 
 // Authors returns page of Authors.
-func (s AuthorServiceImpl) Authors(page *dal.PageInfo) (*AuthorsPage, error) {
+func (s ServiceImpl) Authors(page *dal.PageInfo) (*AuthorsPage, error) {
 	entitiesPage, err := s.authorDal.Authors(page)
 	if err != nil {
 		return nil, err
@@ -52,28 +56,24 @@ func (s AuthorServiceImpl) Authors(page *dal.PageInfo) (*AuthorsPage, error) {
 	}, nil
 }
 
-func (s AuthorServiceImpl) Update(author *Author) error {
+// Update updates (through dal struct) given Author.
+func (s ServiceImpl) Update(author *Author) error {
 	return s.authorDal.Update(author.ToEntity())
 }
 
-func (s AuthorServiceImpl) Delete(authorID string) error {
+// Delete removes (through dal struct) Author with given id.
+func (s ServiceImpl) Delete(authorID string) error {
 	return s.authorDal.Delete(bson.ObjectIdHex(authorID))
 }
 
-func (s AuthorServiceImpl) GetAuthor(authorID string) (*Author, error) {
+// GetByID returns (through dal struct) Author with given id.
+func (s ServiceImpl) GetByID(authorID string) (*Author, error) {
 	entity, err := s.authorDal.GetAuthor(bson.ObjectIdHex(authorID))
 	if err != nil {
 		return nil, err
 	}
 	return entity.ToAuthor(), nil
 }
-
-/*
-ids := make([]bson.ObjectId, 0)
-for _, authorID := range authorIDs {
-	ids = append(ids, bson.ObjectIdHex(authorID))
-}
-*/
 
 func entitiesToAuthors(entities []*Entity) []*Author {
 	authors := make([]*Author, len(entities))

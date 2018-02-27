@@ -23,7 +23,7 @@ const (
 // AuthorHandler is a handler for everything author-related.
 type AuthorHandler struct {
 	SessionStore  session.Store
-	AuthorService libauthor.AuthorService
+	AuthorService libauthor.Service
 	BookService   libbook.Service
 }
 
@@ -160,13 +160,13 @@ func (ah *AuthorHandler) getAuthor(w http.ResponseWriter, r *http.Request, s ses
 
 	authorID := GetPathParam(r, authorIDLabel)
 
-	a, err := ah.AuthorService.GetAuthor(authorID)
+	author, err := ah.AuthorService.GetByID(authorID)
 	if err != nil {
 		return liberrors.Error500(err)
 	}
 
 	// return author
-	js, err := json.Marshal(a)
+	js, err := json.Marshal(author)
 	if err != nil {
 		return liberrors.Error500(err)
 	}
