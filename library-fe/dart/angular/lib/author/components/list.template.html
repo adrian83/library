@@ -15,6 +15,7 @@
          [(ngModel)]="filter"
          placeholder="Filter authors"
          aria-label=""
+         (keyup.enter)="filterAuthors()"
          aria-describedby="basic-addon1">
 </div>
 

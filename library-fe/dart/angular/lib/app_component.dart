@@ -100,7 +100,7 @@ class AppComponent {
     var listBooks =
         new MenuSubElements("Books list", const ['ListBooksComponent'], LIST_BOOKS_PATH);
     var cleateBook =
-        new MenuSubElements("Create books", const ['CreateBookComponent'], CREATE_BOOK_PATH);
+        new MenuSubElements("Create book", const ['CreateBookComponent'], CREATE_BOOK_PATH);
     var showInfo = new MenuSubElements("Info", const ['InfoComponent'], INFO_PATH);
 
     var authorsLinks = new List<MenuSubElements>();

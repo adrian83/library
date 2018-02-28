@@ -4,7 +4,7 @@
 <validation-errors [errors]="validationErrors"></validation-errors>
 <server-errors [error]="serverError"></server-errors>
 
-<form>
+<div>
   <div class="form-group row">
     <label for="inputTitle"
            class="col-sm-2 col-form-label">Title</label>
@@ -48,6 +48,7 @@
                [(ngModel)]="authorsFilter"
                placeholder="Filter authors"
                aria-label=""
+               (keyup.enter)="filterAuthors()"
                aria-describedby="basic-addon1">
       </div>
 
@@ -72,4 +73,4 @@
          class="btn btn-primary"
          (click)="updateBook()"/>
 
-</form>
+</div>

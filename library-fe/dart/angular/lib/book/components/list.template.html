@@ -15,6 +15,7 @@
          [(ngModel)]="filter"
          placeholder="Filter books"
          aria-label=""
+         (keyup.enter)="filterBooks()"
          aria-describedby="basic-addon1">
 </div>
 
