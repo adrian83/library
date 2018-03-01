@@ -41,13 +41,13 @@ class UpdateBookComponent extends PageSwitcher
 
   Book _book = new Book(null, "", new List<Author>());
 
-  AuthorsPage _authorsPage = new AuthorsPage(0, 0, 0, new List<Author>());
+  SelectableAuthorsPage _authorsPage = new SelectableAuthorsPage(0, 0, 0, new List<SelectableAuthor>());
   String _authorsFilter = "";
 
   UpdateBookComponent(
       this._bookService, this._authorService, this._routeParams);
 
-  AuthorsPage get authorsPage => _authorsPage;
+  SelectableAuthorsPage get authorsPage => _authorsPage;
   PageSwitcher get switcher => this;
   Book get book => _book;
   void set book(b) {
@@ -82,10 +82,19 @@ class UpdateBookComponent extends PageSwitcher
     fetchAuthors(0);
   }
 
+  bool authorUsed(Author author) {
+    return _book.authors.any((a) => a.id == author.id);
+  }
+
+  SelectableAuthorsPage toSelectableAuthorsPage(AuthorsPage authorsPage){
+    var authors = authorsPage.elements.map((a) => new SelectableAuthor(a, authorUsed(a)));
+    return new SelectableAuthorsPage(authorsPage.current, authorsPage.total, authorsPage.size, authors);
+  }
+
   void fetchAuthors(int pageNumber) {
     _authorService
         .list(new PageRequest(pageNumber, _authorsFilter))
-        .then((p) => _authorsPage = p, onError: handleError);
+        .then((p) => _authorsPage = toSelectableAuthorsPage(p), onError: handleError);
   }
 
   void addAuthor(Author author) {

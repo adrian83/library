@@ -35,3 +35,16 @@ class AuthorsPage extends Page<Author> {
     return new AuthorsPage(json[PAGE], json[TOTAL], json[SIZE], authors);
   }
 }
+
+class SelectableAuthor extends Author {
+  bool selected;
+
+  SelectableAuthor(Author author, this.selected)
+      : super(author.id, author.firstName, author.lastName);
+}
+
+class SelectableAuthorsPage extends Page<SelectableAuthor> {
+  SelectableAuthorsPage(int page, int total, int size, List<SelectableAuthor> authors)
+      : super(page, total, size, authors);
+
+}

@@ -54,6 +54,7 @@
 
       <ul class="list-group">
         <li class="list-group-item"
+            [class.disabled]="author.selected"
             (click)="addAuthor(author);"
             *ngFor="let author of authorsPage.elements">
           <i class="fa fa-user fa-2 lib-icon" aria-hidden="true"></i>
