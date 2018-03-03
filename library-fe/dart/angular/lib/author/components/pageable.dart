@@ -52,6 +52,10 @@ class AuthorsPageable extends PageSwitcher with ErrorHandler {
         onError: handleError);
   }
 
+  Future<Null> fetchFirstAuthors() async {
+    fetchAuthors(0);
+  }
+
   @override
   void change(int pageNumber) {
     print("Fetch $pageNumber authors page");

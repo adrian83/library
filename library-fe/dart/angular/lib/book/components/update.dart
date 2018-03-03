@@ -37,8 +37,8 @@ class UpdateBookComponent extends AuthorsPageable implements OnInit {
 
   Book _book = new Book(null, "", new List<Author>());
 
-  UpdateBookComponent(
-      this._bookService, AuthorService authorService, this._routeParams)
+  UpdateBookComponent(AuthorService authorService,
+      this._bookService, this._routeParams)
       : super(authorService);
 
   Book get book => _book;
@@ -60,23 +60,20 @@ class UpdateBookComponent extends AuthorsPageable implements OnInit {
     });
   }
 
-  void filterAuthors() {
-    fetchAuthors(0);
-  }
-
   void addAuthor(Author author) {
-    LOGGER.info("Add author $author len ${_book.authors.length}" );
+    LOGGER.info("Adding author: $author");
     if (author.id != null && !_book.authors.any((a) => a.id == author.id)) {
       _book.authors.add(author);
     }
   }
 
   void deleteAuthor(Author author) {
+    LOGGER.info("Removing author: $author");
     _book.authors.removeWhere((a) => a.id == author.id);
   }
 
   Future<Null> updateBook() async {
-  LOGGER.info("update book $_book" );
+  LOGGER.info("Update book $_book" );
     _bookService
         .update(_book)
         .then((b) => _book = b, onError: handleError)

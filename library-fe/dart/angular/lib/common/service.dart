@@ -22,8 +22,6 @@ class Service {
   }
 
   Future<Map<String, dynamic>> updateEntity(String url, Serializable entity) async {
-    var json = JSON.encode(entity);
-    LOGGER.info("Update entity $json");
     var response = await http.put(url, headers: _headers, body: JSON.encode(entity));
     return _handleErrors(response);
   }

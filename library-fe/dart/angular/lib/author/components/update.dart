@@ -44,7 +44,7 @@ class UpdateAuthorComponent extends ErrorHandler implements OnInit {
   Author get author => this._author;
 
   Future<Null> update() async {
-    print("Update $_author");
+    print("Update author $_author");
     _authorService.update(this._author).then((a) {
       _author = a;
       cleanValidationErrors();

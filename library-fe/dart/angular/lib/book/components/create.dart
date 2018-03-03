@@ -37,23 +37,16 @@ class CreateBookComponent extends AuthorsPageable implements OnInit {
 
   Book _book = new Book(null, "", new List<Author>());
 
-  CreateBookComponent(this._bookService, AuthorService authorService, this._router) : super(authorService);
+  CreateBookComponent(
+      AuthorService authorService, this._bookService, this._router)
+      : super(authorService);
+
+  Book get book => _book;
 
   @override
   Future<Null> ngOnInit() async {
     LOGGER.info("CreateBookComponent initialized");
     usedAuthors = _book.authors;
-    fetchAuthors(0);
-  }
-
-  void change(int pageNumber) {
-    print("Fetch $pageNumber authors page");
-    fetchAuthors(pageNumber);
-  }
-
-  Book get book => _book;
-
-  void filterAuthors() {
     fetchAuthors(0);
   }
 
@@ -70,6 +63,7 @@ class CreateBookComponent extends AuthorsPageable implements OnInit {
   }
 
   Future<Null> createBook() async {
+    LOGGER.info("Create book: $_book");
     _bookService
         .create(_book)
         .then((b) => _book = b, onError: handleError)

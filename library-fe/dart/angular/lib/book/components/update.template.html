@@ -40,7 +40,7 @@
       <div class="input-group mb-3">
         <div class="input-group-prepend">
           <button class="btn btn-outline-secondary"
-                  (click)="filterAuthors()"
+                  (click)="fetchFirstAuthors()"
                   type="button">Filter</button>
         </div>
         <input type="text"
@@ -48,7 +48,7 @@
                [(ngModel)]="authorsFilter"
                placeholder="Filter authors"
                aria-label=""
-               (keyup.enter)="filterAuthors()"
+               (keyup.enter)="fetchFirstAuthors()"
                aria-describedby="basic-addon1">
       </div>
 

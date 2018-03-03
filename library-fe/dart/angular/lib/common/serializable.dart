@@ -3,16 +3,9 @@ import 'dart:mirrors';
 abstract class Serializable {
 
   Map toJson() {
-
     InstanceMirror im = reflect(this);
     ClassMirror cm = im.type;
-
-    var m1 = _props(cm, im);
-    var m2 = _props(cm.superclass, im);
-
-    m1.addAll(m2);
-
-    return m1;
+    return _props(cm, im);
   }
 
   Map _props(ClassMirror cm, InstanceMirror im) {
@@ -28,8 +21,8 @@ abstract class Serializable {
       map[key] = val;
     });
 
+    map.addAll(_props(cm.superclass, im));
     return map;
   }
-
 
 }

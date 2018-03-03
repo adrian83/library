@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 final String PAGE = "page";
 final String SIZE = "size";
@@ -19,7 +18,7 @@ class Page<T> {
   int get current => this._current;
 
   bool get hasPrev => this._current > 0;
-  bool get isEmpty => this._elements == null || this._elements.length == 0; 
+  bool get isEmpty => this._elements == null || this._elements.length == 0;
 
 
   String toString() {
