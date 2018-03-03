@@ -10,11 +10,10 @@ import '../../common/components/validation.dart';
 import '../../common/components/pagination.dart';
 import '../../common/components/info.dart';
 import '../../common/components/errors.dart';
-import '../../common/errorhandler.dart';
-import '../../common/page.dart';
 
 import '../../author/service.dart';
 import '../../author/model.dart';
+import '../../author/components/pageable.dart';
 
 import '../service.dart';
 import '../model.dart';
@@ -30,25 +29,20 @@ import '../model.dart';
       ServerErrorsComponent,
       InfoComponent
     ])
-class CreateBookComponent extends PageSwitcher
-    with ErrorHandler
-    implements OnInit {
+class CreateBookComponent extends AuthorsPageable implements OnInit {
   static final Logger LOGGER = new Logger('CreateBookComponent');
 
   final BookService _bookService;
-  final AuthorService _authorService;
   final Router _router;
 
   Book _book = new Book(null, "", new List<Author>());
 
-  SelectableAuthorsPage _authorsPage = new SelectableAuthorsPage(0, 0, 0, new List<SelectableAuthor>());
-  String _authorsFilter = "";
-
-  CreateBookComponent(this._bookService, this._authorService, this._router);
+  CreateBookComponent(this._bookService, AuthorService authorService, this._router) : super(authorService);
 
   @override
   Future<Null> ngOnInit() async {
     LOGGER.info("CreateBookComponent initialized");
+    usedAuthors = _book.authors;
     fetchAuthors(0);
   }
 
@@ -57,28 +51,7 @@ class CreateBookComponent extends PageSwitcher
     fetchAuthors(pageNumber);
   }
 
-  bool authorUsed(Author author) {
-    return _book.authors.any((a) => a.id == author.id);
-  }
-
-  SelectableAuthorsPage toSelectableAuthorsPage(AuthorsPage authorsPage){
-    var authors = authorsPage.elements.map((a) => new SelectableAuthor(a, authorUsed(a)));
-    return new SelectableAuthorsPage(authorsPage.current, authorsPage.total, authorsPage.size, authors);
-  }
-
-  Future<Null> fetchAuthors(int pageNumber) async {
-    _authorService
-        .list(new PageRequest(pageNumber, _authorsFilter))
-        .then((p) => _authorsPage = toSelectableAuthorsPage(p), onError: handleError);
-  }
-
   Book get book => _book;
-  SelectableAuthorsPage get authorsPage => _authorsPage;
-  PageSwitcher get switcher => this;
-  String get authorsFilter => _authorsFilter;
-  void set authorsFilter(String f) {
-    _authorsFilter = f;
-  }
 
   void filterAuthors() {
     fetchAuthors(0);
