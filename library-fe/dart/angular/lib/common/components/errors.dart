@@ -23,7 +23,7 @@ class ServerErrorsComponent implements OnInit {
   ServerError get serverError => error;
 
   void hideError() {
-    new Future.delayed(new Duration(seconds: 1), () {
+    new Future.delayed(new Duration(milliseconds: 300), () {
       error = null;
     });
   }

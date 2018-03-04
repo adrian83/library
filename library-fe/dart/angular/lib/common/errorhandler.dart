@@ -11,6 +11,7 @@ class ErrorHandler {
 
   void handleError(e) {
     if (e is ValidationErrors) {
+      cleanValidationErrors();
       this.validationErrors = e.validationErrors;
       LOGGER.info("Validation errors: $validationErrors");
       return;

@@ -21,7 +21,7 @@ class ValidationErrorsComponent implements OnInit {
   }
 
   void hideError(ValidationError err) {
-    new Future.delayed(new Duration(seconds: 1), () {
+    new Future.delayed(new Duration(milliseconds: 300), () {
       errors.removeWhere((e) => e.message == err.message);
     });
   }

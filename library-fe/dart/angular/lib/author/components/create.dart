@@ -42,11 +42,10 @@ class CreateAuthorComponent extends ErrorHandler implements OnInit {
   }
 
   Future<Null> save() async {
-    LOGGER.info("Saving $author");
+    LOGGER.info("Saving author $author");
 
     _authorService.create(this._author).then((a) {
       _author = a;
-      cleanValidationErrors();
     }, onError: handleError).whenComplete(showEditPage);
   }
 

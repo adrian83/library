@@ -19,7 +19,7 @@ class InfoComponent implements OnInit {
   }
 
   void hideInfo(String msg) {
-    new Future.delayed(new Duration(seconds: 1), () {
+    new Future.delayed(new Duration(milliseconds: 300), () {
       info.removeWhere((i) => i == msg);
     });
   }
