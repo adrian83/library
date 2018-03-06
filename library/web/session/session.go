@@ -12,7 +12,7 @@ const (
 	defSessionDuration = time.Duration(1000) * time.Minute
 )
 
-type SessionHandler func(w http.ResponseWriter, r *http.Request, s session.Session) error
+type SessionHandler func(w http.ResponseWriter, r *http.Request, s session.Session)
 
 func WithSession(sessionStore session.Store, sessionHandler SessionHandler) func(http.ResponseWriter, *http.Request) error {
 
@@ -46,17 +46,14 @@ func WithSession(sessionStore session.Store, sessionHandler SessionHandler) func
 		}
 
 		// execute controller function
-		err := sessionHandler(w, r, session)
-		if err != nil {
-			return err
-		}
+		sessionHandler(w, r, session)
 
 		// save all session changes
 		if err := sessionStore.SaveSession(session); err != nil {
 			return err
 		}
 
-		return err
+		return nil
 
 	}
 }

@@ -20,6 +20,6 @@ func (nfh *NotFoundHandler) Handler() http.Handler {
 		Handler: libsession.WithSession(nfh.SessionStore, nfh.index)}
 }
 
-func (nfh *NotFoundHandler) index(w http.ResponseWriter, r *http.Request, s session.Session) error {
-	return nil
+func (nfh *NotFoundHandler) index(w http.ResponseWriter, r *http.Request, s session.Session) {
+
 }

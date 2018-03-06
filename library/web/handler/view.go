@@ -28,7 +28,7 @@ func (vh *ViewHandler) Routes() []Route {
 	}
 }
 
-func (vh *ViewHandler) index(w http.ResponseWriter, r *http.Request, s session.Session) error {
+func (vh *ViewHandler) index(w http.ResponseWriter, r *http.Request, s session.Session) {
 
 	idStr, ok := s.Get("id")
 	fmt.Printf("get val with key 'id': %v %v\n", idStr, ok)
@@ -45,7 +45,6 @@ func (vh *ViewHandler) index(w http.ResponseWriter, r *http.Request, s session.S
 
 	s.Add("id", strconv.Itoa(id+1))
 
-	return nil
 }
 
 /*

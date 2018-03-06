@@ -1,7 +1,9 @@
 package errors
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/adrian83/go-mvc-library/library/domain/common/model"
@@ -35,6 +37,21 @@ func (e *AppError) Dict() map[string]interface{} {
 	return model
 }
 
+// Write writer error (as json) to given ResponseWriter.
+func (e *AppError) Write(w http.ResponseWriter) {
+	js, err := json.Marshal(e)
+	if err != nil {
+		log.Printf("Error while marshaling error to JSON. Error: %v", err)
+		return
+	}
+	_, err = w.Write(js)
+	if err != nil {
+		log.Printf("Error while sending error. Error: %v", err)
+		return
+	}
+}
+
+// Error400 returns AppError representing 400 http status.
 func Error400(errors model.ValidationErrors) *AppError {
 	return &AppError{
 		HttpStatus: http.StatusBadRequest,
@@ -44,6 +61,7 @@ func Error400(errors model.ValidationErrors) *AppError {
 	}
 }
 
+// Error404 returns AppError representing 404 http status.
 func Error404() *AppError {
 	return &AppError{
 		HttpStatus: http.StatusNotFound,
@@ -52,6 +70,7 @@ func Error404() *AppError {
 	}
 }
 
+// Error500 returns AppError representing 500 http status.
 func Error500(err error) *AppError {
 	return &AppError{
 		HttpStatus: http.StatusInternalServerError,

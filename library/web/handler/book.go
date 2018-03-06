@@ -61,122 +61,112 @@ func (bh *BookHandler) Routes() []Route {
 	}
 }
 
-func (bh *BookHandler) addBook(w http.ResponseWriter, r *http.Request, s session.Session) error {
+func (bh *BookHandler) addBook(w http.ResponseWriter, r *http.Request, s session.Session) {
 
 	newBook := new(forms.BookForm)
 	if err := json.NewDecoder(r.Body).Decode(&newBook); err != nil {
-		return liberrors.Error500(err)
+		log.Printf("Error while decoding new book. Error: %v", err)
+		liberrors.Error500(err).Write(w)
 	}
 
 	log.Printf("Create new book. Form: %v", newBook)
 
 	if validationErrs := newBook.Validate(); !validationErrs.Empty() {
-		return liberrors.Error400(validationErrs)
+		log.Printf("Validation of new book failed. Errors: %v", validationErrs)
+		liberrors.Error400(validationErrs).Write(w)
 	}
 
 	book, err := bh.BookService.Save(newBook.ToBook())
 	if err != nil {
-		return liberrors.Error500(err)
+		log.Printf("Persisting new book failed. Errors: %v", err)
+		liberrors.Error500(err).Write(w)
 	}
 
-	// return book
-	js, err := json.Marshal(book)
-	if err != nil {
-		return liberrors.Error500(err)
+	if err = json.NewEncoder(w).Encode(book); err != nil {
+		log.Printf("Error while marshaling book to JSON. Error: %v", err)
+		liberrors.Error500(err).Write(w)
 	}
-	w.Write(js)
-
-	return nil
 }
 
-func (bh *BookHandler) getBooks(w http.ResponseWriter, r *http.Request, s session.Session) error {
+func (bh *BookHandler) getBooks(w http.ResponseWriter, r *http.Request, s session.Session) {
 
 	pageInfo := PageInfoFrom(r)
 
 	books, err := bh.BookService.Books(pageInfo)
 	if err != nil {
 		log.Printf("Error while getting books. Error: %v", err)
-		return liberrors.Error500(err)
+		liberrors.Error500(err).Write(w)
 	}
 
-	// return books
-	err = json.NewEncoder(w).Encode(books)
-	if err != nil {
+	if err = json.NewEncoder(w).Encode(books); err != nil {
 		log.Printf("Error while marshalling books to JSON. Error: %v", err)
-		return liberrors.Error500(err)
+		liberrors.Error500(err).Write(w)
 	}
-
-	return nil
 }
 
-func (bh *BookHandler) getBook(w http.ResponseWriter, r *http.Request, s session.Session) error {
+func (bh *BookHandler) getBook(w http.ResponseWriter, r *http.Request, s session.Session) {
 
 	bookID := GetPathParam(r, bookIDLabel)
 	if !model.IsIDValid(bookID) {
-		return liberrors.Error400([]*model.ValidationError{&model.InvalidID})
+		log.Printf("Invalid book ID %v", bookID)
+		liberrors.Error400([]*model.ValidationError{&model.InvalidID}).Write(w)
 	}
 
 	book, err := bh.BookService.GetBook(bookID)
 	if err != nil {
-		return liberrors.Error500(err)
+		log.Printf("Error while getting book from DB. Error: %v", err)
+		liberrors.Error500(err).Write(w)
 	}
 
-	//return liberrors.Error404()
-
-	// return book
-	js, err := json.Marshal(book)
-	if err != nil {
-		return liberrors.Error500(err)
+	if err = json.NewEncoder(w).Encode(book); err != nil {
+		log.Printf("Error while marshalling book to JSON. Error: %v", err)
+		liberrors.Error500(err).Write(w)
 	}
-	w.Write(js)
-
-	return nil
 }
 
-func (bh *BookHandler) deleteBook(w http.ResponseWriter, r *http.Request, s session.Session) error {
-
-	bookID := GetPathParam(r, bookIDLabel)
-
-	err := bh.BookService.Delete(bookID)
-	if err != nil {
-		return liberrors.Error500(err)
-	}
-
-	return nil
-}
-
-func (bh *BookHandler) updateBook(w http.ResponseWriter, r *http.Request, s session.Session) error {
+func (bh *BookHandler) deleteBook(w http.ResponseWriter, r *http.Request, s session.Session) {
 
 	bookID := GetPathParam(r, bookIDLabel)
 	if !model.IsIDValid(bookID) {
-		return liberrors.Error400([]*model.ValidationError{&model.InvalidID})
+		log.Printf("Invalid book ID %v", bookID)
+		liberrors.Error400([]*model.ValidationError{&model.InvalidID}).Write(w)
 	}
 
-	bookUpdate := new(forms.BookForm)
-	if err := json.NewDecoder(r.Body).Decode(&bookUpdate); err != nil {
-		return liberrors.Error500(err)
+	if err := bh.BookService.Delete(bookID); err != nil {
+		liberrors.Error500(err).Write(w)
+	}
+}
+
+func (bh *BookHandler) updateBook(w http.ResponseWriter, r *http.Request, s session.Session) {
+
+	bookID := GetPathParam(r, bookIDLabel)
+	if !model.IsIDValid(bookID) {
+		log.Printf("Invalid book ID %v", bookID)
+		liberrors.Error400([]*model.ValidationError{&model.InvalidID}).Write(w)
 	}
 
-	bookUpdate.ID = bookID
-
-	if validationErrs := bookUpdate.Validate(); !validationErrs.Empty() {
-		log.Printf("Book %v cannot be updated because of validation errors %v", bookUpdate, validationErrs)
-		return liberrors.Error400(validationErrs)
+	bookForm := new(forms.BookForm)
+	if err := json.NewDecoder(r.Body).Decode(&bookForm); err != nil {
+		log.Printf("Persisting new book failed. Errors: %v", err)
+		liberrors.Error500(err).Write(w)
 	}
 
-	if err := bh.BookService.Update(bookUpdate.ToBook()); err != nil {
-		log.Printf("Error while updating book %v. Error: %v", bookUpdate, err)
-		return liberrors.Error500(err)
+	bookForm.ID = bookID
+
+	if validationErrs := bookForm.Validate(); !validationErrs.Empty() {
+		log.Printf("Validation of updated book failed. Errors: %v", validationErrs)
+		liberrors.Error400(validationErrs).Write(w)
 	}
 
-	log.Printf("Book %v successfully updated", bookUpdate)
-
-	js, err := json.Marshal(bookUpdate)
-	if err != nil {
-		log.Printf("Error while marshaling book %v to JSON. Error: %v", bookUpdate, err)
-		return liberrors.Error500(err)
+	if err := bh.BookService.Update(bookForm.ToBook()); err != nil {
+		log.Printf("Error while updating book %v. Error: %v", bookForm, err)
+		liberrors.Error500(err).Write(w)
 	}
-	w.Write(js)
 
-	return nil
+	log.Printf("Book %v successfully updated", bookForm)
+
+	if err := json.NewEncoder(w).Encode(bookForm); err != nil {
+		log.Printf("Error while marshaling book %v to JSON. Error: %v", bookForm, err)
+		liberrors.Error500(err).Write(w)
+	}
 }

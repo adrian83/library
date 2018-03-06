@@ -58,70 +58,61 @@ func (ah *AuthorHandler) Routes() []Route {
 	}
 }
 
-func (ah *AuthorHandler) addAuthor(w http.ResponseWriter, r *http.Request, s session.Session) error {
+func (ah *AuthorHandler) addAuthor(w http.ResponseWriter, r *http.Request, s session.Session) {
 
-	var a libforms.AuthorForm
-	if err := json.NewDecoder(r.Body).Decode(&a); err != nil {
-		return liberrors.Error500(err)
+	var authorForm libforms.AuthorForm
+	if err := json.NewDecoder(r.Body).Decode(&authorForm); err != nil {
+		liberrors.Error500(err).Write(w)
 	}
 
-	if validationErrs := a.Validate(); !validationErrs.Empty() {
-		return liberrors.Error400(validationErrs)
+	if validationErrs := authorForm.Validate(); !validationErrs.Empty() {
+		liberrors.Error400(validationErrs).Write(w)
 	}
 
-	author := libauthor.Author{
-		ID:        a.ID,
-		FirstName: a.FirstName,
-		LastName:  a.LastName,
-	}
+	author := authorForm.ToAuthor()
 
-	newAuthor, err := ah.AuthorService.Add(&author)
+	_, err := ah.AuthorService.Add(author)
 	if err != nil {
-		return liberrors.Error500(err)
+		liberrors.Error500(err).Write(w)
 	}
 
-	// return author
-	js, err := json.Marshal(newAuthor)
-	if err != nil {
-		return liberrors.Error500(err)
+	if err := json.NewEncoder(w).Encode(authorForm); err != nil {
+		liberrors.Error500(err).Write(w)
 	}
-	w.Write(js)
 
-	return nil
 }
 
-func (ah *AuthorHandler) getAuthors(w http.ResponseWriter, r *http.Request, s session.Session) error {
+func (ah *AuthorHandler) getAuthors(w http.ResponseWriter, r *http.Request, s session.Session) {
 
 	pageInfo := PageInfoFrom(r)
 
 	authors, err := ah.AuthorService.Authors(pageInfo)
 	if err != nil {
-		return liberrors.Error500(err)
+		liberrors.Error500(err).Write(w)
 	}
 
 	// return authors
 	js, err := json.Marshal(authors)
 	if err != nil {
-		return liberrors.Error500(err)
+		liberrors.Error500(err).Write(w)
 	}
 	w.Write(js)
 
-	return nil
 }
 
-func (ah *AuthorHandler) updateAuthor(w http.ResponseWriter, r *http.Request, s session.Session) error {
+func (ah *AuthorHandler) updateAuthor(w http.ResponseWriter, r *http.Request, s session.Session) {
 
 	authorID := GetPathParam(r, authorIDLabel)
 
 	var a libforms.AuthorForm
 	if err := json.NewDecoder(r.Body).Decode(&a); err != nil {
-		return liberrors.Error500(err)
+		liberrors.Error500(err).Write(w)
 	}
 
 	a.ID = authorID
 
 	if validationErrs := a.Validate(); !validationErrs.Empty() {
-		return liberrors.Error400(validationErrs)
+		liberrors.Error400(validationErrs).Write(w)
 	}
 
 	au := libauthor.Author{
@@ -131,46 +122,43 @@ func (ah *AuthorHandler) updateAuthor(w http.ResponseWriter, r *http.Request, s 
 	}
 
 	if err := ah.AuthorService.Update(&au); err != nil {
-		return liberrors.Error500(err)
+		liberrors.Error500(err).Write(w)
 	}
 
 	if err := ah.BookService.UpdateAuthor(&au); err != nil {
-		return liberrors.Error500(err)
+		liberrors.Error500(err).Write(w)
 	}
 
-	return nil
 }
 
-func (ah *AuthorHandler) deleteAuthor(w http.ResponseWriter, r *http.Request, s session.Session) error {
+func (ah *AuthorHandler) deleteAuthor(w http.ResponseWriter, r *http.Request, s session.Session) {
 
 	authorID := GetPathParam(r, authorIDLabel)
 
 	if err := ah.AuthorService.Delete(authorID); err != nil {
-		return liberrors.Error500(err)
+		liberrors.Error500(err).Write(w)
 	}
 
 	if err := ah.BookService.DeleteAuthor(authorID); err != nil {
-		return liberrors.Error500(err)
+		liberrors.Error500(err).Write(w)
 	}
 
-	return nil
 }
 
-func (ah *AuthorHandler) getAuthor(w http.ResponseWriter, r *http.Request, s session.Session) error {
+func (ah *AuthorHandler) getAuthor(w http.ResponseWriter, r *http.Request, s session.Session) {
 
 	authorID := GetPathParam(r, authorIDLabel)
 
 	author, err := ah.AuthorService.GetByID(authorID)
 	if err != nil {
-		return liberrors.Error500(err)
+		liberrors.Error500(err).Write(w)
 	}
 
 	// return author
 	js, err := json.Marshal(author)
 	if err != nil {
-		return liberrors.Error500(err)
+		liberrors.Error500(err).Write(w)
 	}
 	w.Write(js)
 
-	return nil
 }

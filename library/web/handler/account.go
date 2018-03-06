@@ -27,7 +27,7 @@ func (ah *AccountHandler) Routes() []Route {
 	}
 }
 
-func (ah *AccountHandler) login(w http.ResponseWriter, r *http.Request, s session.Session) error {
+func (ah *AccountHandler) login(w http.ResponseWriter, r *http.Request, s session.Session) {
 
 	var user model.User
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
@@ -36,8 +36,4 @@ func (ah *AccountHandler) login(w http.ResponseWriter, r *http.Request, s sessio
 
 	s.Add("user.Login", user.Login)
 
-	//model := NewModel()
-	//model.Values["user"] = user
-
-	return nil
 }
