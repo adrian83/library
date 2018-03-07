@@ -63,20 +63,20 @@ func (bh *BookHandler) Routes() []Route {
 
 func (bh *BookHandler) addBook(w http.ResponseWriter, r *http.Request, s session.Session) {
 
-	newBook := new(forms.BookForm)
-	if err := json.NewDecoder(r.Body).Decode(&newBook); err != nil {
+	newBookForm := new(forms.BookForm)
+	if err := json.NewDecoder(r.Body).Decode(&newBookForm); err != nil {
 		log.Printf("Error while decoding new book. Error: %v", err)
 		liberrors.Error500(err).Write(w)
 	}
 
-	log.Printf("Create new book. Form: %v", newBook)
+	log.Printf("Create new book. Form: %v", newBookForm)
 
-	if validationErrs := newBook.Validate(); !validationErrs.Empty() {
+	if validationErrs := newBookForm.Validate(); !validationErrs.Empty() {
 		log.Printf("Validation of new book failed. Errors: %v", validationErrs)
 		liberrors.Error400(validationErrs).Write(w)
 	}
 
-	book, err := bh.BookService.Save(newBook.ToBook())
+	book, err := bh.BookService.Save(newBookForm.ToBook())
 	if err != nil {
 		log.Printf("Persisting new book failed. Errors: %v", err)
 		liberrors.Error500(err).Write(w)
@@ -89,7 +89,6 @@ func (bh *BookHandler) addBook(w http.ResponseWriter, r *http.Request, s session
 }
 
 func (bh *BookHandler) getBooks(w http.ResponseWriter, r *http.Request, s session.Session) {
-
 	pageInfo := PageInfoFrom(r)
 
 	books, err := bh.BookService.Books(pageInfo)
@@ -133,6 +132,7 @@ func (bh *BookHandler) deleteBook(w http.ResponseWriter, r *http.Request, s sess
 	}
 
 	if err := bh.BookService.Delete(bookID); err != nil {
+		log.Printf("Error while deleting book from DB. Error: %v", err)
 		liberrors.Error500(err).Write(w)
 	}
 }
@@ -147,7 +147,7 @@ func (bh *BookHandler) updateBook(w http.ResponseWriter, r *http.Request, s sess
 
 	bookForm := new(forms.BookForm)
 	if err := json.NewDecoder(r.Body).Decode(&bookForm); err != nil {
-		log.Printf("Persisting new book failed. Errors: %v", err)
+		log.Printf("Error while decoding book. Error: %v", err)
 		liberrors.Error500(err).Write(w)
 	}
 
@@ -162,8 +162,6 @@ func (bh *BookHandler) updateBook(w http.ResponseWriter, r *http.Request, s sess
 		log.Printf("Error while updating book %v. Error: %v", bookForm, err)
 		liberrors.Error500(err).Write(w)
 	}
-
-	log.Printf("Book %v successfully updated", bookForm)
 
 	if err := json.NewEncoder(w).Encode(bookForm); err != nil {
 		log.Printf("Error while marshaling book %v to JSON. Error: %v", bookForm, err)
