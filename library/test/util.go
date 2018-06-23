@@ -1,5 +1,6 @@
 package test
 
+/*
 import (
 	"encoding/json"
 	"io"
@@ -67,3 +68,4 @@ func AssertResponseStatus(t *testing.T, response *http.Response, expected int) {
 		t.Errorf("Response status should be '%d' but is '%d'", expected, response.StatusCode)
 	}
 }
+*/
