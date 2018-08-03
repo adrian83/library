@@ -1,9 +1,4 @@
-library-fe/build/web/**
-library-fe/.packages
-library-fe/packages/**
-library-fe/.pub/**
-library-fe/pubspec.lock
-library-fe/web/packages
+
 
 infrastructure/
 
