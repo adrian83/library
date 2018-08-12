@@ -29,9 +29,7 @@ func ReadConfig(configPath string) (*Config, error) {
 	}
 
 	configReader := bytes.NewReader(configBytes)
-
-	jsonParser := json.NewDecoder(configReader)
-	if err := jsonParser.Decode(config); err != nil {
+	if err := json.NewDecoder(configReader).Decode(config); err != nil {
 		return config, err
 	}
 

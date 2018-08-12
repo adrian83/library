@@ -8,7 +8,7 @@ import (
 
 	// ours
 	libbook "github.com/adrian83/go-mvc-library/library/domain/book"
-	"github.com/adrian83/go-mvc-library/library/domain/common/model"
+	"github.com/adrian83/go-mvc-library/library/domain/common"
 	liberrors "github.com/adrian83/go-mvc-library/library/web/errors"
 	"github.com/adrian83/go-mvc-library/library/web/forms"
 	libjson "github.com/adrian83/go-mvc-library/library/web/json"
@@ -106,9 +106,9 @@ func (bh *BookHandler) getBooks(w http.ResponseWriter, r *http.Request, s sessio
 func (bh *BookHandler) getBook(w http.ResponseWriter, r *http.Request, s session.Session) {
 
 	bookID := GetPathParam(r, bookIDLabel)
-	if !model.IsIDValid(bookID) {
+	if !common.IsIDValid(bookID) {
 		log.Printf("Invalid book ID %v", bookID)
-		liberrors.Error400([]*model.ValidationError{&model.InvalidID}).Write(w)
+		liberrors.Error400([]*common.ValidationError{&common.InvalidID}).Write(w)
 	}
 
 	book, err := bh.BookService.GetBook(bookID)
@@ -126,9 +126,9 @@ func (bh *BookHandler) getBook(w http.ResponseWriter, r *http.Request, s session
 func (bh *BookHandler) deleteBook(w http.ResponseWriter, r *http.Request, s session.Session) {
 
 	bookID := GetPathParam(r, bookIDLabel)
-	if !model.IsIDValid(bookID) {
+	if !common.IsIDValid(bookID) {
 		log.Printf("Invalid book ID %v", bookID)
-		liberrors.Error400([]*model.ValidationError{&model.InvalidID}).Write(w)
+		liberrors.Error400([]*common.ValidationError{&common.InvalidID}).Write(w)
 	}
 
 	if err := bh.BookService.Delete(bookID); err != nil {
@@ -140,9 +140,9 @@ func (bh *BookHandler) deleteBook(w http.ResponseWriter, r *http.Request, s sess
 func (bh *BookHandler) updateBook(w http.ResponseWriter, r *http.Request, s session.Session) {
 
 	bookID := GetPathParam(r, bookIDLabel)
-	if !model.IsIDValid(bookID) {
+	if !common.IsIDValid(bookID) {
 		log.Printf("Invalid book ID %v", bookID)
-		liberrors.Error400([]*model.ValidationError{&model.InvalidID}).Write(w)
+		liberrors.Error400([]*common.ValidationError{&common.InvalidID}).Write(w)
 	}
 
 	bookForm := new(forms.BookForm)

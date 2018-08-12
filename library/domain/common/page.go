@@ -1,4 +1,4 @@
-package dal
+package common
 
 import "fmt"
 

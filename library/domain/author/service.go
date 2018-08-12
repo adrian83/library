@@ -1,20 +1,20 @@
 package author
 
 import (
-	"github.com/adrian83/go-mvc-library/library/domain/common/dal"
+	"github.com/adrian83/go-mvc-library/library/domain/common"
 	"gopkg.in/mgo.v2/bson"
 )
 
 // AuthorsPage represents single page of Authors in Authors' pagination.
 type AuthorsPage struct {
-	*dal.Page
+	*common.Page
 	Authors []*Author `json:"authors"`
 }
 
 // Service is an inferface for service which manipulates Author structs.
 type Service interface {
 	Add(author *Author) (*Author, error)
-	Authors(page *dal.PageInfo) (*AuthorsPage, error)
+	Authors(page *common.PageInfo) (*AuthorsPage, error)
 	Update(author *Author) error
 	Delete(authorID string) error
 	GetByID(authorID string) (*Author, error)
@@ -22,11 +22,11 @@ type Service interface {
 
 // ServiceImpl is a default implementation of AuthorService.
 type ServiceImpl struct {
-	authorDal Dal
+	authorDal DAL
 }
 
 // NewAuthorService returns new instance of AuthorService.
-func NewAuthorService(authorDal Dal) Service {
+func NewAuthorService(authorDal DAL) Service {
 	return ServiceImpl{authorDal: authorDal}
 }
 
@@ -40,14 +40,14 @@ func (s ServiceImpl) Add(author *Author) (*Author, error) {
 }
 
 // Authors returns page of Authors.
-func (s ServiceImpl) Authors(page *dal.PageInfo) (*AuthorsPage, error) {
+func (s ServiceImpl) Authors(page *common.PageInfo) (*AuthorsPage, error) {
 	entitiesPage, err := s.authorDal.Authors(page)
 	if err != nil {
 		return nil, err
 	}
 
 	return &AuthorsPage{
-		Page: &dal.Page{
+		Page: &common.Page{
 			TotalElements: entitiesPage.TotalElements,
 			Size:          entitiesPage.Size,
 			Current:       page.Number,

@@ -117,7 +117,7 @@ func main() {
 	// ---------------------------------------
 	// dals
 	// ---------------------------------------
-	var authorDal author.Dal = author.NewAuthorMongoDal(database)
+	var authorDal author.DAL = author.NewDAL(database)
 	var bookDal book.Dal = book.NewBookMongoDal(database)
 
 	fmt.Println("DALs - OK")

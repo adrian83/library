@@ -2,20 +2,20 @@ package book
 
 import (
 	author "github.com/adrian83/go-mvc-library/library/domain/author"
-	"github.com/adrian83/go-mvc-library/library/domain/common/dal"
+	"github.com/adrian83/go-mvc-library/library/domain/common"
 	"gopkg.in/mgo.v2/bson"
 )
 
 // BooksPage represents single page of Books in Books' pagination.
 type BooksPage struct {
-	*dal.Page
+	*common.Page
 	Books []*Book `json:"books"`
 }
 
 // Service describes all operations which can be done on Book.
 type Service interface {
 	Save(book *Book) (*Book, error)
-	Books(page *dal.PageInfo) (*BooksPage, error)
+	Books(page *common.PageInfo) (*BooksPage, error)
 	Update(book *Book) error
 	Delete(bookID string) error
 	GetBook(bookID string) (*Book, error)
@@ -27,11 +27,11 @@ type Service interface {
 // ServiceImpl is a default implementation of the Service interface.
 type ServiceImpl struct {
 	bookDal   Dal
-	authorDal author.Dal
+	authorDal author.DAL
 }
 
 // NewBookServiceImpl returns newly created implementation of a Service.
-func NewBookServiceImpl(bookDal Dal, authorDal author.Dal) Service {
+func NewBookServiceImpl(bookDal Dal, authorDal author.DAL) Service {
 	return ServiceImpl{
 		bookDal:   bookDal,
 		authorDal: authorDal,
@@ -48,14 +48,14 @@ func (s ServiceImpl) Save(book *Book) (*Book, error) {
 }
 
 // Books returns slice of Books.
-func (s ServiceImpl) Books(page *dal.PageInfo) (*BooksPage, error) {
+func (s ServiceImpl) Books(page *common.PageInfo) (*BooksPage, error) {
 	entitiesPage, err := s.bookDal.Books(page)
 	if err != nil {
 		return nil, err
 	}
 
 	return &BooksPage{
-		Page: &dal.Page{
+		Page: &common.Page{
 			TotalElements: entitiesPage.TotalElements,
 			Size:          entitiesPage.Size,
 			Current:       page.Number,

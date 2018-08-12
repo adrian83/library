@@ -8,23 +8,28 @@ import (
 )
 
 // Mongo struct represents mongo connection.
-type Mongo struct {
+type Mongo interface {
+	Library() *mgo.Database
+	Close()
+}
+
+type mongo struct {
 	session *mgo.Session
 	config  *config.MongoConfig
 }
 
 // Library returns library database.
-func (m *Mongo) Library() *mgo.Database {
+func (m *mongo) Library() *mgo.Database {
 	return m.session.DB(m.config.DB)
 }
 
 // Close closes mongo session.
-func (m *Mongo) Close() {
+func (m *mongo) Close() {
 	m.session.Close()
 }
 
 // NewMongo returns new mongo 'connection'.
-func NewMongo(config *config.MongoConfig) (*Mongo, error) {
+func NewMongo(config *config.MongoConfig) (*mongo, error) {
 	session, err := mgo.Dial(config.Host + ":" + strconv.Itoa(config.Port))
 	if err != nil {
 		return nil, err
@@ -32,7 +37,7 @@ func NewMongo(config *config.MongoConfig) (*Mongo, error) {
 
 	session.SetMode(mgo.Monotonic, true)
 
-	return &Mongo{
+	return &mongo{
 		session: session,
 		config:  config,
 	}, nil

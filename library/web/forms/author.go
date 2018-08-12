@@ -4,11 +4,11 @@ import (
 	"fmt"
 
 	"github.com/adrian83/go-mvc-library/library/domain/author"
-	"github.com/adrian83/go-mvc-library/library/domain/common/model"
+	"github.com/adrian83/go-mvc-library/library/domain/common"
 )
 
 var (
-	emptyAuthorLastName = model.ValidationError{
+	emptyAuthorLastName = common.ValidationError{
 		Field:   "LastName",
 		Code:    "author.lastName",
 		Message: "Author's last name cannot be empty"}
@@ -27,10 +27,10 @@ func (a *AuthorForm) String() string {
 }
 
 // Validate implements Validable interface.
-func (a *AuthorForm) Validate() model.ValidationErrors {
-	errs := make([]*model.ValidationError, 0)
+func (a *AuthorForm) Validate() common.ValidationErrors {
+	errs := make([]*common.ValidationError, 0)
 
-	if model.IsStringEmpty(a.LastName) {
+	if common.IsStringEmpty(a.LastName) {
 		errs = append(errs, &emptyAuthorLastName)
 	}
 

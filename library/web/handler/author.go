@@ -7,7 +7,7 @@ import (
 
 	libauthor "github.com/adrian83/go-mvc-library/library/domain/author"
 	libbook "github.com/adrian83/go-mvc-library/library/domain/book"
-	"github.com/adrian83/go-mvc-library/library/domain/common/model"
+	"github.com/adrian83/go-mvc-library/library/domain/common"
 	liberrors "github.com/adrian83/go-mvc-library/library/web/errors"
 	libforms "github.com/adrian83/go-mvc-library/library/web/forms"
 	libjson "github.com/adrian83/go-mvc-library/library/web/json"
@@ -104,9 +104,9 @@ func (ah *AuthorHandler) getAuthors(w http.ResponseWriter, r *http.Request, s se
 func (ah *AuthorHandler) updateAuthor(w http.ResponseWriter, r *http.Request, s session.Session) {
 
 	authorID := GetPathParam(r, authorIDLabel)
-	if !model.IsIDValid(authorID) {
+	if !common.IsIDValid(authorID) {
 		log.Printf("Invalid author ID %v", authorID)
-		liberrors.Error400([]*model.ValidationError{&model.InvalidID}).Write(w)
+		liberrors.Error400([]*common.ValidationError{&common.InvalidID}).Write(w)
 	}
 
 	var authorForm libforms.AuthorForm
@@ -139,9 +139,9 @@ func (ah *AuthorHandler) updateAuthor(w http.ResponseWriter, r *http.Request, s 
 func (ah *AuthorHandler) deleteAuthor(w http.ResponseWriter, r *http.Request, s session.Session) {
 
 	authorID := GetPathParam(r, authorIDLabel)
-	if !model.IsIDValid(authorID) {
+	if !common.IsIDValid(authorID) {
 		log.Printf("Invalid author ID %v", authorID)
-		liberrors.Error400([]*model.ValidationError{&model.InvalidID}).Write(w)
+		liberrors.Error400([]*common.ValidationError{&common.InvalidID}).Write(w)
 	}
 
 	if err := ah.AuthorService.Delete(authorID); err != nil {
@@ -159,9 +159,9 @@ func (ah *AuthorHandler) deleteAuthor(w http.ResponseWriter, r *http.Request, s 
 func (ah *AuthorHandler) getAuthor(w http.ResponseWriter, r *http.Request, s session.Session) {
 
 	authorID := GetPathParam(r, authorIDLabel)
-	if !model.IsIDValid(authorID) {
+	if !common.IsIDValid(authorID) {
 		log.Printf("Invalid author ID %v", authorID)
-		liberrors.Error400([]*model.ValidationError{&model.InvalidID}).Write(w)
+		liberrors.Error400([]*common.ValidationError{&common.InvalidID}).Write(w)
 	}
 
 	author, err := ah.AuthorService.GetByID(authorID)

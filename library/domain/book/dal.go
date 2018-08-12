@@ -8,8 +8,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/adrian83/go-mvc-library/library/domain/author"
-	"github.com/adrian83/go-mvc-library/library/domain/common/dal"
-	"github.com/adrian83/go-mvc-library/library/domain/common/model"
+	"github.com/adrian83/go-mvc-library/library/domain/common"
 )
 
 const (
@@ -23,14 +22,14 @@ const (
 
 // EntitiesPage represents single page of Entities in pagination.
 type EntitiesPage struct {
-	*dal.Page
+	*common.Page
 	Elements []*Entity
 }
 
 // Dal is an interface for book data access layer.
 type Dal interface {
 	Add(book *Entity) (*Entity, error)
-	Books(page *dal.PageInfo) (*EntitiesPage, error)
+	Books(page *common.PageInfo) (*EntitiesPage, error)
 	Update(book *Entity) error
 	Delete(bookID bson.ObjectId) error
 	Book(bookID bson.ObjectId) (*Entity, error)
@@ -60,7 +59,7 @@ func (d MongoDal) Add(book *Entity) (*Entity, error) {
 }
 
 // Books returns slice of books.
-func (d MongoDal) Books(page *dal.PageInfo) (*EntitiesPage, error) {
+func (d MongoDal) Books(page *common.PageInfo) (*EntitiesPage, error) {
 	log.Printf("Getting books from page: %v", page)
 	entities := make([]*Entity, 0)
 	// {$regex : ".*son.*"}
@@ -79,7 +78,7 @@ func (d MongoDal) Books(page *dal.PageInfo) (*EntitiesPage, error) {
 	}
 
 	return &EntitiesPage{
-		Page: &dal.Page{
+		Page: &common.Page{
 			TotalElements: totalCount,
 			Size:          page.Size,
 			Current:       page.Number,
@@ -105,7 +104,7 @@ func (d MongoDal) Book(bookID bson.ObjectId) (*Entity, error) {
 	entity := new(Entity)
 	err := d.collection.FindId(bookID).One(entity)
 	if err == mgo.ErrNotFound {
-		return nil, &model.NotFoundError{Type: "book"}
+		return nil, &common.NotFoundError{Type: "book"}
 	}
 	return entity, err
 }

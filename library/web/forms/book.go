@@ -5,16 +5,16 @@ import (
 
 	"github.com/adrian83/go-mvc-library/library/domain/author"
 	"github.com/adrian83/go-mvc-library/library/domain/book"
-	"github.com/adrian83/go-mvc-library/library/domain/common/model"
+	"github.com/adrian83/go-mvc-library/library/domain/common"
 )
 
 var (
-	emptyTitle = model.ValidationError{
+	emptyTitle = common.ValidationError{
 		Field:   "Title",
 		Code:    "book.title",
 		Message: "Book's title cannot be empty"}
 
-	noAuthors = model.ValidationError{
+	noAuthors = common.ValidationError{
 		Field:   "Authors",
 		Code:    "book.authors",
 		Message: "At least one author has to be set"}
@@ -33,10 +33,10 @@ func (b *BookForm) String() string {
 }
 
 // Validate implements Validable interface.
-func (b *BookForm) Validate() model.ValidationErrors {
-	errs := make([]*model.ValidationError, 0)
+func (b *BookForm) Validate() common.ValidationErrors {
+	errs := make([]*common.ValidationError, 0)
 
-	if model.IsStringEmpty(b.Title) {
+	if common.IsStringEmpty(b.Title) {
 		errs = append(errs, &emptyTitle)
 	}
 

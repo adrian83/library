@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/adrian83/go-mvc-library/library/domain/common/model"
+	"github.com/adrian83/go-mvc-library/library/domain/common"
 )
 
 type AppError struct {
@@ -52,7 +52,7 @@ func (e *AppError) Write(w http.ResponseWriter) {
 }
 
 // Error400 returns AppError representing 400 http status.
-func Error400(errors model.ValidationErrors) *AppError {
+func Error400(errors common.ValidationErrors) *AppError {
 	return &AppError{
 		HttpStatus: http.StatusBadRequest,
 		Code:       "error.generic.400",

@@ -7,7 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"github.com/adrian83/go-mvc-library/library/domain/common/dal"
+	"github.com/adrian83/go-mvc-library/library/domain/common"
 )
 
 const (
@@ -27,7 +27,7 @@ type Controller interface {
 }
 
 // PageInfoFrom returns PageInfo created from GET params.
-func PageInfoFrom(r *http.Request) *dal.PageInfo {
+func PageInfoFrom(r *http.Request) *common.PageInfo {
 
 	page := 0
 	if pageStrs := r.URL.Query()["page"]; len(pageStrs) > 0 {
@@ -55,7 +55,7 @@ func PageInfoFrom(r *http.Request) *dal.PageInfo {
 		sort = sortStrs[0]
 	}
 
-	return dal.NewPageInfo(page, size, phrase, sort)
+	return common.NewPageInfo(page, size, phrase, sort)
 
 }
 
