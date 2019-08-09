@@ -89,6 +89,8 @@ func (b *Book) RemoveAuthor(id string) error {
 	return nil
 }
 
+
+
 func (b *Book) findAuthor(id string) (int, *Author) {
 	for i, author := range b.Authors {
 		if author.ID == id {

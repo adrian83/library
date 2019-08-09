@@ -20,7 +20,7 @@ func HandleBooksPersisting(bookPersister bookPersister) func(http.ResponseWriter
 		ctx, _ := context.WithTimeout(context.Background(), requestTimeout)
 
 		createBook := new(CreateBook)
-		if err := unmarshalAndValidate(r.Body, addAuthor); err != nil {
+		if err := unmarshalAndValidate(r.Body, createBook); err != nil {
 			handleError(err, w)
 			return
 		}

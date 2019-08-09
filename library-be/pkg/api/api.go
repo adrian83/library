@@ -40,7 +40,7 @@ func unmarshalAndValidate(rc io.ReadCloser, val Validable) error {
 		return err
 	}
 
-	return err
+	return nil
 }
 
 func responseText(status int, msg string, w http.ResponseWriter) {

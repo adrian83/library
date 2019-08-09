@@ -24,6 +24,29 @@ func (a *Adapter) InsertOne(ctx context.Context, doc interface{}) error {
 	return err
 }
 
+func (a *Adapter) UpdateOne(ctx context.Context, id string, str interface{}) error {
+
+	strBts, err := bson.Marshal(str)
+	if err != nil {
+		return err
+	}
+
+	var m bson.M
+	if err = bson.Unmarshal(strBts, &m); err != nil {
+		return err
+	}
+
+	filter := bson.M{"_id": id}
+	update := bson.M{"$set": m}
+	_, err = a.collection.UpdateOne(ctx, filter, update)
+	return err
+}
+
+func (a *Adapter) FindOne(ctx context.Context, id string, str interface{}) error {
+	filter := bson.M{"_id": id}
+	return a.collection.FindOne(ctx, filter).Decode(str)
+}
+
 func (a *Adapter) List(ctx context.Context, listBooks *book.ListBooks) ([]bson.M, error) {
 
 	cur, err := a.collection.Find(ctx, bson.D{})

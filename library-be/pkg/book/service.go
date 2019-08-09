@@ -9,6 +9,8 @@ import (
 type bookStore interface {
 	InsertOne(context.Context, interface{}) error
 	List(context.Context, *ListBooks) ([]bson.M, error)
+	FindOne(context.Context,  string,  interface{}) error
+	UpdateOne(ctx context.Context, id string, update interface{}) error
 }
 
 func NewService(bookStore bookStore) *Service {
@@ -22,7 +24,20 @@ type Service struct {
 }
 
 func (s *Service) Persist(ctx context.Context, book Book) error {
+	return s.store.UpdateOne(ctx, book.ID, &book)
+}
+
+func (s *Service) Update(ctx context.Context, book Book) error {
 	return s.store.InsertOne(ctx, book)
+}
+
+func (b *Service) Find(ctx context.Context, id string) (Book, error) {
+	book := new(Book)
+	
+	if err := b.store.FindOne(ctx, id, book); err != nil {
+		return Book{}, err
+	}
+	return *book, nil
 }
 
 func (s *Service) List(ctx context.Context, listBooks *ListBooks) (Page, error) {
