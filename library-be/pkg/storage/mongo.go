@@ -39,8 +39,7 @@ func (a *Adapter) List(ctx context.Context, listBooks *book.ListBooks) ([]bson.M
 	result := make([]bson.M, 0)
 	for cur.Next(ctx) {
 		var m bson.M
-		err := cur.Decode(&m)
-		if err != nil {
+		if err := cur.Decode(&m); err != nil {
 			return nil, err
 		}
 		result = append(result, m)
