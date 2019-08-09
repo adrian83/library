@@ -11,7 +11,7 @@ import (
 
 type bookReaderPersister interface {
 	Find(ctc context.Context, id string) (book.Book, error)
-	Persist(ctx context.Context, book book.Book) error
+	Update(ctx context.Context, book Book) error
 }
 
 // HandleAddingAuthor is a handler / controller for adding author to book.
@@ -42,7 +42,7 @@ func HandleAddingAuthor(service bookReaderPersister) func(http.ResponseWriter, *
 			return
 		}
 
-		if err := service.Persist(ctx, b); err != nil {
+		if err := service.Update(ctx, b); err != nil {
 			handleError(err, w)
 			return
 		}
