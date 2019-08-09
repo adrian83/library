@@ -7,8 +7,8 @@ import (
 )
 
 type bookStore interface {
-	InsertOne(ctx context.Context, doc interface{}) error
-	List(ctx context.Context) ([]bson.M, error)
+	InsertOne(context.Context, interface{}) error
+	List(context.Context, *ListBooks) ([]bson.M, error)
 }
 
 func NewService(bookStore bookStore) *Service {
@@ -25,25 +25,28 @@ func (s *Service) Persist(ctx context.Context, book Book) error {
 	return s.store.InsertOne(ctx, book)
 }
 
-func (s *Service) List(ctx context.Context) ([]Book, error) {
-	bsons, err := s.store.List(ctx)
+func (s *Service) List(ctx context.Context, listBooks *ListBooks) (Page, error) {
+	bsons, err := s.store.List(ctx, listBooks)
 	if err != nil {
-		return nil, err
+		return Page{}, err
 	}
 
 	books := make([]Book, 0)
 	for _, m := range bsons {
+
 		bsonBytes, err := bson.Marshal(m)
 		if err != nil {
-			return nil, err
+			return Page{}, err
 		}
+
 		book := new(Book)
-		err = bson.Unmarshal(bsonBytes, &book)
-		if err != nil {
-			return nil, err
+		if err = bson.Unmarshal(bsonBytes, &book); err != nil {
+			return Page{}, err
 		}
+
 		books = append(books, *book)
 	}
 
-	return books, nil
+	page := NewPage(books, listBooks.Limit, listBooks.Offset, int64(666))
+	return *page, nil
 }

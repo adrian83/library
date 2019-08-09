@@ -5,6 +5,8 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+
+	"github.com/adrian83/library/pkg/book"
 )
 
 type Adapter struct {
@@ -18,12 +20,11 @@ func NewAdapter(coll *mongo.Collection) *Adapter {
 }
 
 func (a *Adapter) InsertOne(ctx context.Context, doc interface{}) error {
-
 	_, err := a.collection.InsertOne(ctx, doc)
 	return err
 }
 
-func (a *Adapter) List(ctx context.Context) ([]bson.M, error) {
+func (a *Adapter) List(ctx context.Context, listBooks *book.ListBooks) ([]bson.M, error) {
 
 	cur, err := a.collection.Find(ctx, bson.D{})
 	if err != nil {
@@ -46,4 +47,8 @@ func (a *Adapter) List(ctx context.Context) ([]bson.M, error) {
 	}
 
 	return result, nil
+}
+
+func (a *Adapter) count(ctx context.Context, filter interface{}) (int64, error) {
+	return a.collection.CountDocuments(ctx, filter)
 }

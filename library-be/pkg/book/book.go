@@ -7,25 +7,46 @@ import (
 	"github.com/google/uuid"
 )
 
+type ListBooks struct {
+	Offset int
+	Limit  int
+	Sort   string
+}
+
+func NewListBooks(offset, limit int, sort string) *ListBooks {
+	return &ListBooks{
+		Offset: offset,
+		Limit:  limit,
+		Sort:   sort,
+	}
+}
+
+type Page struct {
+	Books  []Book `json:"books"`
+	Limit  int    `json:"limit"`
+	Offset int    `json:"offset"`
+	Total  int64  `json:"total"`
+}
+
+func NewPage(books []Book, limit, offset int, total int64) *Page {
+	return &Page{
+		Books:  books,
+		Limit:  limit,
+		Offset: offset,
+		Total:  total,
+	}
+}
+
 // Author is a representation of author data.
 type Author struct {
 	ID   string `json:"id" bson:"id,omitempty"`
 	Name string `json:"name,omitempty" bson:"name,omitempty"`
 }
 
-type Page struct {
-	Books  []Book
-	Limit  int
-	Offset int
-	Total  int
-}
-
-func NewPage(books []Book, limit, offset, total int) *Page {
-	return &Page{
-		Books:  books,
-		Limit:  limit,
-		Offset: offset,
-		Total:  total,
+func NewAuthor(id, name string) *Author {
+	return &Author{
+		ID:   id,
+		Name: name,
 	}
 }
 
@@ -47,7 +68,9 @@ func NewBook(title string) *Book {
 
 func (b *Book) AddAuthor(author Author) error {
 
-	if _, a := b.findAuthor(author.ID); a != nil {
+	if author.ID == "" {
+		author.ID = uuid.New().String()
+	} else if _, a := b.findAuthor(author.ID); a != nil {
 		return errors.New("author already added to book")
 	}
 

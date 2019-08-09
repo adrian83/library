@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"log"
 	"net/http"
 	"os"
@@ -15,39 +14,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
+	"github.com/adrian83/library/pkg/api"
 	"github.com/adrian83/library/pkg/book"
 	"github.com/adrian83/library/pkg/storage"
 )
-
-func ListBooksHandler(bookService *book.Service) func(http.ResponseWriter, *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-
-		ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-
-		books, err := bookService.List(ctx)
-		if err != nil {
-			log.Printf("err: %v", err)
-		}
-
-		json.NewEncoder(w).Encode(books)
-	}
-}
-
-func PersistBookHandler(bookService *book.Service) func(http.ResponseWriter, *http.Request) {
-
-	return func(w http.ResponseWriter, r *http.Request) {
-
-		ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-
-		book := book.NewBook("Potop")
-		err := bookService.Persist(ctx, *book)
-		if err != nil {
-			log.Printf("err: %v", err)
-		}
-
-		json.NewEncoder(w).Encode(map[string]bool{"ok": true})
-	}
-}
 
 func main() {
 
@@ -69,8 +39,9 @@ func main() {
 	bookService := book.NewService(mongoAdapter)
 
 	r := mux.NewRouter()
-	r.HandleFunc("/books", ListBooksHandler(bookService)).Methods("GET")
-	r.HandleFunc("/books", PersistBookHandler(bookService)).Methods("POST")
+	r.HandleFunc("/books", api.HandleBooksListing(bookService)).Methods("GET")
+	r.HandleFunc("/books", api.HandleBooksPersisting(bookService)).Methods("POST")
+	r.HandleFunc("/books/{bookId}/authors", api.HandleAddingAuthor(bookService)).Methods("POST")
 	http.Handle("/", r)
 
 	server := &http.Server{Addr: "0.0.0.0:" + strconv.Itoa(8080), Handler: r}
