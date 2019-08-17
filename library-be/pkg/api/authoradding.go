@@ -11,7 +11,7 @@ import (
 
 type bookReaderPersister interface {
 	Find(ctc context.Context, id string) (book.Book, error)
-	Update(ctx context.Context, book Book) error
+	Update(ctx context.Context, book book.Book) error
 }
 
 // HandleAddingAuthor is a handler / controller for adding author to book.

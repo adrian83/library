@@ -11,7 +11,7 @@ import (
 const (
 	contentType = "Content-Type"
 
-	typeJson = "application/json"
+	typeJSON = "application/json"
 	typeText = "plain/text"
 
 	requestTimeout = 10 * time.Second
@@ -50,7 +50,7 @@ func responseText(status int, msg string, w http.ResponseWriter) {
 }
 
 func responseJson(status int, respBts []byte, w http.ResponseWriter) {
-	w.Header().Add(contentType, typeJson)
+	w.Header().Add(contentType, typeJSON)
 	w.Write(respBts)
 	w.WriteHeader(status)
 }

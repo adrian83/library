@@ -10,6 +10,7 @@ const (
 	msgInternalError = "internal server error"
 )
 
+// Violation 
 type Violation struct {
 	Field   string `json:"field"`
 	Message string `json:"message"`

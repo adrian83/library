@@ -25,13 +25,13 @@ func HandleBooksPersisting(bookPersister bookPersister) func(http.ResponseWriter
 			return
 		}
 
-		book := book.NewBook(createBook.Title)
-		if err := bookPersister.Persist(ctx, *book); err != nil {
+		bkg := book.NewBook(createBook.Title)
+		if err := bookPersister.Persist(ctx, *bkg); err != nil {
 			handleError(err, w)
 			return
 		}
 
-		respBts, err := json.Marshal(book)
+		respBts, err := json.Marshal(bkg)
 		if err != nil {
 			handleError(err, w)
 			return
