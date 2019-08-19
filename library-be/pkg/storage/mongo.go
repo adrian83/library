@@ -6,8 +6,6 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-
-	"github.com/adrian83/library/pkg/book"
 )
 
 type Adapter struct {
@@ -48,9 +46,9 @@ func (a *Adapter) FindOne(ctx context.Context, id string, str interface{}) error
 	return a.collection.FindOne(ctx, filter).Decode(str)
 }
 
-func (a *Adapter) List(ctx context.Context, listBooks *book.ListBooks) ([]bson.M, error) {
+func (a *Adapter) List(ctx context.Context, criteria bson.D) ([]bson.M, error) {
 
-	cur, err := a.collection.Find(ctx, bson.D{})
+	cur, err := a.collection.Find(ctx, criteria)
 	if err != nil {
 		return nil, err
 	}

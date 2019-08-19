@@ -5,10 +5,46 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
+
+type user struct {
+	Name string `json:"name"`
+}
+
+func TestUnmarshalingBody(t *testing.T) {
+
+	// given
+	testData := map[string]struct {
+		body io.ReadCloser
+		err  bool
+	}{
+		"valid json body":   {ioutil.NopCloser(strings.NewReader(`{"name":"Jan Kowalski"}`)), false},
+		"invalid json body": {ioutil.NopCloser(strings.NewReader(`not a json`)), true},
+	}
+
+	for name, tData := range testData {
+		data := tData
+
+		t.Run(name, func(t *testing.T) {
+
+			usr := new(user)
+
+			// when
+			err := unmarshalReqBody(data.body, usr)
+
+			// then
+			if data.err {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}
 
 func TestJSONResponses(t *testing.T) {
 

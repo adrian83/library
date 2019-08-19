@@ -9,7 +9,7 @@ import (
 
 type bookStore interface {
 	InsertOne(context.Context, interface{}) error
-	List(context.Context, *ListBooks) ([]bson.M, error)
+	List(context.Context, bson.D) ([]bson.M, error)
 	FindOne(context.Context, string, interface{}) error
 	UpdateOne(ctx context.Context, id string, update interface{}) error
 }
@@ -42,7 +42,7 @@ func (b *Service) Find(ctx context.Context, id string) (Book, error) {
 }
 
 func (s *Service) List(ctx context.Context, listBooks *ListBooks) (Page, error) {
-	bsons, err := s.store.List(ctx, listBooks)
+	bsons, err := s.store.List(ctx, bson.D{})
 	if err != nil {
 		return Page{}, err
 	}
