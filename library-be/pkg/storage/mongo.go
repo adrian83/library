@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"fmt"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -61,10 +62,12 @@ func (a *Adapter) List(ctx context.Context, listBooks *book.ListBooks) ([]bson.M
 
 	result := make([]bson.M, 0)
 	for cur.Next(ctx) {
+
 		var m bson.M
 		if err := cur.Decode(&m); err != nil {
 			return nil, err
 		}
+		fmt.Printf("Next: %v", m)
 		result = append(result, m)
 	}
 

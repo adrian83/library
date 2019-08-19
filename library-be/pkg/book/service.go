@@ -2,6 +2,7 @@ package book
 
 import (
 	"context"
+	"fmt"
 
 	"go.mongodb.org/mongo-driver/bson"
 )
@@ -9,7 +10,7 @@ import (
 type bookStore interface {
 	InsertOne(context.Context, interface{}) error
 	List(context.Context, *ListBooks) ([]bson.M, error)
-	FindOne(context.Context,  string,  interface{}) error
+	FindOne(context.Context, string, interface{}) error
 	UpdateOne(ctx context.Context, id string, update interface{}) error
 }
 
@@ -24,16 +25,16 @@ type Service struct {
 }
 
 func (s *Service) Persist(ctx context.Context, book Book) error {
-	return s.store.UpdateOne(ctx, book.ID, &book)
+	return s.store.InsertOne(ctx, &book)
 }
 
 func (s *Service) Update(ctx context.Context, book Book) error {
-	return s.store.InsertOne(ctx, book)
+	return s.store.UpdateOne(ctx, book.ID,book)
 }
 
 func (b *Service) Find(ctx context.Context, id string) (Book, error) {
 	book := new(Book)
-	
+
 	if err := b.store.FindOne(ctx, id, book); err != nil {
 		return Book{}, err
 	}
@@ -46,9 +47,7 @@ func (s *Service) List(ctx context.Context, listBooks *ListBooks) (Page, error) 
 		return Page{}, err
 	}
 
-
-
-
+	fmt.Printf("Bsons: %v", bsons)
 
 	books := make([]Book, 0)
 	for _, m := range bsons {

@@ -7,6 +7,7 @@ github.com/adrian83/go-redis-session v0.0.0-20170113212537-69df6ad2f510 h1:34Iw5
 github.com/adrian83/go-redis-session v0.0.0-20170113212537-69df6ad2f510/go.mod h1:z81adYFLeXV1Hn0V2MzHs8DiwMjUOtzz5CVx2EcCwes=
 github.com/adrian83/library v0.0.0-20190809141653-0547eb5ac45e h1:VHN4qc0eEUwh0cXHb9MHYUbtnBGk8ML9piOf95+QOB8=
 github.com/adrian83/library v0.0.0-20190809200526-f747003ffd45 h1:OGlztf4D4xvu+PFIVo89cQZmq7AVn4FN/86Ym3N5kfE=
+github.com/adrian83/library v0.0.0-20190817200714-68ffbae97a04 h1:E36Bp7sBvcuX0V3tO7Pw0J135UdZWzjSdVAobuYggMk=
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=

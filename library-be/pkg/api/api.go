@@ -45,14 +45,14 @@ func unmarshalAndValidate(rc io.ReadCloser, val Validable) error {
 
 func responseText(status int, msg string, w http.ResponseWriter) {
 	w.Header().Add(contentType, typeText)
-	w.Write([]byte(msg))
 	w.WriteHeader(status)
+	w.Write([]byte(msg))
 }
 
 func responseJson(status int, respBts []byte, w http.ResponseWriter) {
 	w.Header().Add(contentType, typeJSON)
-	w.Write(respBts)
 	w.WriteHeader(status)
+	w.Write(respBts)
 }
 
 type Validable interface {
