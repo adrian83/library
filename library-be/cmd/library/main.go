@@ -42,6 +42,7 @@ func main() {
 	r.HandleFunc("/books", api.HandleBooksListing(bookService)).Methods("GET")
 	r.HandleFunc("/books", api.HandleBooksPersisting(bookService)).Methods("POST")
 	r.HandleFunc("/books/{bookId}/authors", api.HandleAddingAuthor(bookService)).Methods("POST")
+	r.HandleFunc("/books/{bookId}/authors/{authorId}", api.HandleRemovingAuthor(bookService)).Methods("DELETE")
 	http.Handle("/", r)
 
 	server := &http.Server{Addr: "0.0.0.0:" + strconv.Itoa(8080), Handler: r}
