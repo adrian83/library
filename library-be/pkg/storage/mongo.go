@@ -46,7 +46,7 @@ func (a *Adapter) FindOne(ctx context.Context, id string, str interface{}) error
 	return a.collection.FindOne(ctx, filter).Decode(str)
 }
 
-func (a *Adapter) List(ctx context.Context, criteria bson.D) ([]bson.M, error) {
+func (a *Adapter) List(ctx context.Context, criteria bson.D) ([]map[string]interface{}, error) {
 
 	cur, err := a.collection.Find(ctx, criteria)
 	if err != nil {
@@ -58,10 +58,10 @@ func (a *Adapter) List(ctx context.Context, criteria bson.D) ([]bson.M, error) {
 		return nil, err
 	}
 
-	result := make([]bson.M, 0)
+	result := make([]map[string]interface{}, 0)
 	for cur.Next(ctx) {
 
-		var m bson.M
+		var m map[string]interface{}
 		if err := cur.Decode(&m); err != nil {
 			return nil, err
 		}
@@ -72,6 +72,6 @@ func (a *Adapter) List(ctx context.Context, criteria bson.D) ([]bson.M, error) {
 	return result, nil
 }
 
-func (a *Adapter) count(ctx context.Context, filter interface{}) (int64, error) {
+func (a *Adapter) Count(ctx context.Context, filter interface{}) (int64, error) {
 	return a.collection.CountDocuments(ctx, filter)
 }

@@ -10,7 +10,7 @@ const (
 	msgInternalError = "internal server error"
 )
 
-// Violation 
+// Violation
 type Violation struct {
 	Field   string `json:"field"`
 	Message string `json:"message"`
@@ -38,7 +38,7 @@ func NewValidationError(violations ...*Violation) *ValidationError {
 	}
 }
 
-func handleError(err error, w http.ResponseWriter) {
+func HandleError(err error, w http.ResponseWriter) {
 
 	fmt.Printf("Error in API: %v", err)
 
@@ -47,12 +47,12 @@ func handleError(err error, w http.ResponseWriter) {
 
 		respBts, err := json.Marshal(t.Violations)
 		if err != nil {
-			handleError(err, w)
+			HandleError(err, w)
 			return
 		}
 
-		responseJson(http.StatusBadRequest, respBts, w)
+		ResponseJson(http.StatusBadRequest, respBts, w)
 	default:
-		responseText(http.StatusInternalServerError, msgInternalError, w)
+		ResponseText(http.StatusInternalServerError, msgInternalError, w)
 	}
 }

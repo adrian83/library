@@ -9,9 +9,10 @@ import (
 
 type bookStore interface {
 	InsertOne(context.Context, interface{}) error
-	List(context.Context, bson.D) ([]bson.M, error)
+	List(context.Context, bson.D) ([]map[string]interface{}, error)
 	FindOne(context.Context, string, interface{}) error
 	UpdateOne(ctx context.Context, id string, update interface{}) error
+	Count(ctx context.Context, filter interface{}) (int64, error)
 }
 
 func NewService(bookStore bookStore) *Service {
@@ -42,29 +43,37 @@ func (b *Service) Find(ctx context.Context, id string) (Book, error) {
 }
 
 func (s *Service) List(ctx context.Context, listBooks *ListBooks) (Page, error) {
-	bsons, err := s.store.List(ctx, bson.D{})
+
+	filter := bson.D{}
+
+	maps, err := s.store.List(ctx, filter)
 	if err != nil {
 		return Page{}, err
 	}
 
-	fmt.Printf("Bsons: %v", bsons)
+	fmt.Printf("Maps: %v", maps)
 
 	books := make([]Book, 0)
-	for _, m := range bsons {
+	for _, m := range maps {
 
-		bsonBytes, err := bson.Marshal(m)
+		bookBytes, err := bson.Marshal(m)
 		if err != nil {
 			return Page{}, err
 		}
 
 		book := new(Book)
-		if err = bson.Unmarshal(bsonBytes, &book); err != nil {
+		if err = bson.Unmarshal(bookBytes, &book); err != nil {
 			return Page{}, err
 		}
 
 		books = append(books, *book)
 	}
 
-	page := NewPage(books, listBooks.Limit, listBooks.Offset, int64(666))
+	count, err  := s.store.Count(ctx, filter)
+	if err != nil {
+		return Page{}, err
+	}
+
+	page := NewPage(books, listBooks.Limit, listBooks.Offset, count)
 	return *page, nil
 }

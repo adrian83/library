@@ -58,8 +58,12 @@ type Book struct {
 }
 
 func NewBook(title string) *Book {
+	return NewBookWithID(uuid.New().String(), title)
+}
+
+func NewBookWithID(id, title string) *Book {
 	return &Book{
-		ID:           uuid.New().String(),
+		ID:           id,
 		Title:        title,
 		Authors:      make([]Author, 0),
 		CreationDate: time.Now().UTC(),
@@ -88,8 +92,6 @@ func (b *Book) RemoveAuthor(id string) error {
 	b.Authors = append(b.Authors[:i], b.Authors[i+1:]...)
 	return nil
 }
-
-
 
 func (b *Book) findAuthor(id string) (int, *Author) {
 	for i, author := range b.Authors {

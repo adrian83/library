@@ -14,10 +14,10 @@ const (
 	typeJSON = "application/json"
 	typeText = "plain/text"
 
-	requestTimeout = 10 * time.Second
+	RequestTimeout = 10 * time.Second
 )
 
-func unmarshalReqBody(rc io.ReadCloser, str interface{}) error {
+func UnmarshalReqBody(rc io.ReadCloser, str interface{}) error {
 	bodyBts, err := ioutil.ReadAll(rc)
 	if err != nil {
 		return err
@@ -30,9 +30,9 @@ func unmarshalReqBody(rc io.ReadCloser, str interface{}) error {
 	return nil
 }
 
-func unmarshalAndValidate(rc io.ReadCloser, val Validable) error {
+func UnmarshalAndValidate(rc io.ReadCloser, val Validable) error {
 
-	if err := unmarshalReqBody(rc, val); err != nil {
+	if err := UnmarshalReqBody(rc, val); err != nil {
 		return err
 	}
 
@@ -43,13 +43,13 @@ func unmarshalAndValidate(rc io.ReadCloser, val Validable) error {
 	return nil
 }
 
-func responseText(status int, msg string, w http.ResponseWriter) {
+func ResponseText(status int, msg string, w http.ResponseWriter) {
 	w.Header().Add(contentType, typeText)
 	w.WriteHeader(status)
 	w.Write([]byte(msg))
 }
 
-func responseJson(status int, respBts []byte, w http.ResponseWriter) {
+func ResponseJson(status int, respBts []byte, w http.ResponseWriter) {
 	w.Header().Add(contentType, typeJSON)
 	w.WriteHeader(status)
 	w.Write(respBts)

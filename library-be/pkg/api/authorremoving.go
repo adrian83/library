@@ -13,7 +13,7 @@ func HandleRemovingAuthor(service bookReaderPersister) func(http.ResponseWriter,
 
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		ctx, _ := context.WithTimeout(context.Background(), requestTimeout)
+		ctx, _ := context.WithTimeout(context.Background(), RequestTimeout)
 
 		vars := mux.Vars(r)
 		bookID := vars["bookId"]
@@ -24,33 +24,33 @@ func HandleRemovingAuthor(service bookReaderPersister) func(http.ResponseWriter,
 			AuthorID: authorID,
 		}
 		if err := removeAuthor.Validate(); err != nil {
-			handleError(err, w)
+			HandleError(err, w)
 			return
 		}
 
 		b, err := service.Find(ctx, removeAuthor.BookID)
 		if err != nil {
-			handleError(err, w)
+			HandleError(err, w)
 			return
 		}
 
 		if err := b.RemoveAuthor(removeAuthor.AuthorID); err != nil {
-			handleError(err, w)
+			HandleError(err, w)
 			return
 		}
 
 		if err := service.Update(ctx, b); err != nil {
-			handleError(err, w)
+			HandleError(err, w)
 			return
 		}
 
 		respBts, err := json.Marshal(b)
 		if err != nil {
-			handleError(err, w)
+			HandleError(err, w)
 			return
 		}
 
-		responseJson(http.StatusCreated, respBts, w)
+		ResponseJson(http.StatusCreated, respBts, w)
 	}
 }
 

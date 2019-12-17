@@ -15,6 +15,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/adrian83/library/pkg/api"
+	bookapi "github.com/adrian83/library/pkg/api/book"
 	"github.com/adrian83/library/pkg/book"
 	"github.com/adrian83/library/pkg/storage"
 )
@@ -23,7 +24,7 @@ func main() {
 
 	//mux.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("../library-fe/"))))
 
-	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
+	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27018"))
 	if err != nil {
 		log.Printf("Cannot create mongodb client: %v", true)
 	}
@@ -39,10 +40,11 @@ func main() {
 	bookService := book.NewService(mongoAdapter)
 
 	r := mux.NewRouter()
-	r.HandleFunc("/books", api.HandleBooksListing(bookService)).Methods("GET")
-	r.HandleFunc("/books", api.HandleBooksPersisting(bookService)).Methods("POST")
-	r.HandleFunc("/books/{bookId}/authors", api.HandleAddingAuthor(bookService)).Methods("POST")
-	r.HandleFunc("/books/{bookId}/authors/{authorId}", api.HandleRemovingAuthor(bookService)).Methods("DELETE")
+	r.HandleFunc("/books", bookapi.HandleListing(bookService)).Methods(http.MethodGet)
+	r.HandleFunc("/books", bookapi.HandlePersisting(bookService)).Methods(http.MethodPost)
+	r.HandleFunc("/books/{bookId}", bookapi.HandleUpdating(bookService)).Methods(http.MethodPut)
+	r.HandleFunc("/books/{bookId}/authors", api.HandleAddingAuthor(bookService)).Methods(http.MethodPost)
+	r.HandleFunc("/books/{bookId}/authors/{authorId}", api.HandleRemovingAuthor(bookService)).Methods(http.MethodDelete)
 	http.Handle("/", r)
 
 	server := &http.Server{Addr: "0.0.0.0:" + strconv.Itoa(8080), Handler: r}

@@ -19,41 +19,41 @@ func HandleAddingAuthor(service bookReaderPersister) func(http.ResponseWriter, *
 
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		ctx, _ := context.WithTimeout(context.Background(), requestTimeout)
+		ctx, _ := context.WithTimeout(context.Background(), RequestTimeout)
 
 		vars := mux.Vars(r)
 		bookID := vars["bookId"]
 
 		addAuthor := new(AddAuthor)
-		if err := unmarshalAndValidate(r.Body, addAuthor); err != nil {
-			handleError(err, w)
+		if err := UnmarshalAndValidate(r.Body, addAuthor); err != nil {
+			HandleError(err, w)
 			return
 		}
 
 		b, err := service.Find(ctx, bookID)
 		if err != nil {
-			handleError(err, w)
+			HandleError(err, w)
 			return
 		}
 
 		author := book.NewAuthor(addAuthor.ID, addAuthor.Name)
 		if err := b.AddAuthor(*author); err != nil {
-			handleError(err, w)
+			HandleError(err, w)
 			return
 		}
 
 		if err := service.Update(ctx, b); err != nil {
-			handleError(err, w)
+			HandleError(err, w)
 			return
 		}
 
 		respBts, err := json.Marshal(b)
 		if err != nil {
-			handleError(err, w)
+			HandleError(err, w)
 			return
 		}
 
-		responseJson(http.StatusCreated, respBts, w)
+		ResponseJson(http.StatusCreated, respBts, w)
 	}
 }
 
