@@ -46,6 +46,12 @@ func (a *Adapter) FindOne(ctx context.Context, id string, str interface{}) error
 	return a.collection.FindOne(ctx, filter).Decode(str)
 }
 
+func (a *Adapter) DeleteOne(ctx context.Context, id string) error {
+	filter := bson.M{"_id": id}
+	_, err := a.collection.DeleteOne(ctx, filter)
+	return err
+}
+
 func (a *Adapter) List(ctx context.Context, criteria bson.D) ([]map[string]interface{}, error) {
 
 	cur, err := a.collection.Find(ctx, criteria)
