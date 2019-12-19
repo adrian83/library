@@ -1,0 +1,14 @@
+targets:
+  $default:
+    builders:
+      todo_fe|constant_builder:
+        options:
+          backendHost: http://localhost:9090
+
+builders:
+  constant_builder:
+    import: "package:todo_fe/builder.dart"
+    builder_factories: ["constantBuilder"]
+    build_to: source
+    build_extensions:
+      "$lib$": ["generated_consts.dart"]

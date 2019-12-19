@@ -50,7 +50,7 @@ func HandleRemovingAuthor(service bookReaderPersister) func(http.ResponseWriter,
 			return
 		}
 
-		ResponseJson(http.StatusCreated, respBts, w)
+		ResponseJSON(http.StatusCreated, respBts, w)
 	}
 }
 

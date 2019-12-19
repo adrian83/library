@@ -10,12 +10,13 @@ const (
 	msgInternalError = "internal server error"
 )
 
-// Violation
+// Violation contains information about which structure's field is invalida and why.
 type Violation struct {
 	Field   string `json:"field"`
 	Message string `json:"message"`
 }
 
+// NewViolation is a constructor for Violation struct.
 func NewViolation(field, msg string) *Violation {
 	return &Violation{
 		Field:   field,
@@ -51,7 +52,7 @@ func HandleError(err error, w http.ResponseWriter) {
 			return
 		}
 
-		ResponseJson(http.StatusBadRequest, respBts, w)
+		ResponseJSON(http.StatusBadRequest, respBts, w)
 	default:
 		ResponseText(http.StatusInternalServerError, msgInternalError, w)
 	}

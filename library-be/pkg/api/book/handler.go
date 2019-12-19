@@ -52,7 +52,7 @@ func HandlePersisting(bookPersister bookPersister) func(http.ResponseWriter, *ht
 			return
 		}
 
-		api.ResponseJson(http.StatusCreated, respBts, w)
+		api.ResponseJSON(http.StatusCreated, respBts, w)
 	}
 }
 
@@ -84,7 +84,7 @@ func HandleUpdating(bookUpdater bookUpdater) func(http.ResponseWriter, *http.Req
 			return
 		}
 
-		api.ResponseJson(http.StatusOK, respBts, w)
+		api.ResponseJSON(http.StatusOK, respBts, w)
 	}
 }
 
@@ -108,6 +108,6 @@ func HandleListing(booksLister booksLister) func(http.ResponseWriter, *http.Requ
 			return
 		}
 
-		api.ResponseJson(http.StatusOK, respBts, w)
+		api.ResponseJSON(http.StatusOK, respBts, w)
 	}
 }

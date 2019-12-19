@@ -6,6 +6,7 @@ github.com/Shopify/toxiproxy v2.1.4+incompatible/go.mod h1:OXgGpZ6Cli1/URJOF1DMx
 github.com/adrian83/go-redis-session v0.0.0-20170113212537-69df6ad2f510 h1:34Iw5lVaT3L2vtpmZPqLuh/V55Xy41huvPYmPnP+x/0=
 github.com/adrian83/go-redis-session v0.0.0-20170113212537-69df6ad2f510/go.mod h1:z81adYFLeXV1Hn0V2MzHs8DiwMjUOtzz5CVx2EcCwes=
 github.com/adrian83/library v0.0.0-20190823185803-ea2f4bd954b6 h1:TZ6jeqS8uCSLXTQYZoAxz2365+nYWdvM20a+bONuBGg=
+github.com/adrian83/library v0.0.0-20191218131748-b0886ba254c7 h1:jwuXb3ZcGkV51+GGD2Rj7Yk5Y8ASJTRqekRgL5UM4yA=
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=

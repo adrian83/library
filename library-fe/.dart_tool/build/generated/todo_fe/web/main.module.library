@@ -1,0 +1,1 @@
+{"isEntrypoint":true,"deps":["angular|lib/angular.dart","angular_router|lib/angular_router.dart","todo_fe|lib/app_component.template.dart","http|lib/http.dart","http|lib/browser_client.dart","todo_fe|web/main.template.dart"],"parts":[],"conditionalDeps":[],"sdkDeps":[],"hasMain":true}

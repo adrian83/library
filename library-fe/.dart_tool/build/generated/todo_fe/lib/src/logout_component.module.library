@@ -1,0 +1,1 @@
+{"isEntrypoint":false,"deps":["angular|lib/angular.dart","todo_fe|lib/src/store.dart","todo_fe|lib/src/event_bus.dart"],"parts":[],"conditionalDeps":[],"sdkDeps":[],"hasMain":false}

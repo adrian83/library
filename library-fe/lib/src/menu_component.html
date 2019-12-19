@@ -1,0 +1,29 @@
+<div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
+
+    <h5 class="my-0 mr-md-auto font-weight-normal">Todos</h5>
+
+    <nav class="my-2 my-md-0 mr-md-3">
+
+        <a class="p-2 text-dark"
+            *ngIf="!signedIn" 
+            [routerLink]="RoutePaths.register.toUrl()" 
+            [routerLinkActive]="'active'">Register</a>
+
+        <a class="p-2 text-dark" 
+            *ngIf="signedIn" 
+            [routerLink]="RoutePaths.todos.toUrl()" 
+            [routerLinkActive]="'active'">Todos</a>
+
+    </nav>
+
+    <a class="btn btn-outline-primary" 
+        *ngIf="!signedIn" 
+        [routerLink]="RoutePaths.login.toUrl()" 
+        [routerLinkActive]="'active'">Login</a>
+
+    <a class="btn btn-outline-primary" 
+        *ngIf="signedIn" 
+        [routerLink]="RoutePaths.logout.toUrl()" 
+        [routerLinkActive]="'active'">Logout</a>
+
+</div>

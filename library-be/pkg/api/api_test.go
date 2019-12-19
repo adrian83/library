@@ -30,11 +30,10 @@ func TestUnmarshalingBody(t *testing.T) {
 		data := tData
 
 		t.Run(name, func(t *testing.T) {
-
 			usr := new(user)
 
 			// when
-			err := unmarshalReqBody(data.body, usr)
+			err := UnmarshalReqBody(data.body, usr)
 
 			// then
 			if data.err {
@@ -62,11 +61,10 @@ func TestJSONResponses(t *testing.T) {
 		data := tData
 
 		t.Run(name, func(t *testing.T) {
-
 			w := httptest.NewRecorder()
 
 			// when
-			responseJson(data.status, data.body, w)
+			ResponseJSON(data.status, data.body, w)
 
 			// then
 			resp := w.Result()
@@ -86,9 +84,9 @@ func TestTextResponses(t *testing.T) {
 		status int
 		body   string
 	}{
-		"ok with json":           {http.StatusOK, "it works"},
-		"server error with json": {http.StatusInternalServerError, "opsss"},
-		"not found with json":    {http.StatusNotFound, "not found"},
+		"ok with text":           {http.StatusOK, "it works"},
+		"server error with text": {http.StatusInternalServerError, "opsss"},
+		"not found with text":    {http.StatusNotFound, "not found"},
 	}
 
 	for name, tData := range testData {
@@ -99,7 +97,7 @@ func TestTextResponses(t *testing.T) {
 			w := httptest.NewRecorder()
 
 			// when
-			responseText(data.status, data.body, w)
+			ResponseText(data.status, data.body, w)
 
 			// then
 			resp := w.Result()
@@ -117,5 +115,6 @@ func readBody(t *testing.T, rc io.ReadCloser) []byte {
 	if err != nil {
 		t.Errorf("error while reading bytes from response body")
 	}
+
 	return body
 }
