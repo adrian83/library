@@ -13,6 +13,7 @@ type bookStore interface {
 	FindOne(context.Context, string, interface{}) error
 	UpdateOne(ctx context.Context, id string, update interface{}) error
 	Count(ctx context.Context, filter interface{}) (int64, error)
+	DeleteOne(ctx context.Context, bookID string) error
 }
 
 func NewService(bookStore bookStore) *Service {
@@ -30,15 +31,19 @@ func (s *Service) Persist(ctx context.Context, book Book) error {
 }
 
 func (s *Service) Update(ctx context.Context, book Book) error {
-	return s.store.UpdateOne(ctx, book.ID,book)
+	return s.store.UpdateOne(ctx, book.ID, book)
+}
+
+func (s *Service) Delete(ctx context.Context, bookID string) error {
+	return s.store.DeleteOne(ctx, bookID)
 }
 
 func (b *Service) Find(ctx context.Context, id string) (Book, error) {
 	book := new(Book)
-
 	if err := b.store.FindOne(ctx, id, book); err != nil {
 		return Book{}, err
 	}
+
 	return *book, nil
 }
 
@@ -69,7 +74,7 @@ func (s *Service) List(ctx context.Context, listBooks *ListBooks) (Page, error) 
 		books = append(books, *book)
 	}
 
-	count, err  := s.store.Count(ctx, filter)
+	count, err := s.store.Count(ctx, filter)
 	if err != nil {
 		return Page{}, err
 	}

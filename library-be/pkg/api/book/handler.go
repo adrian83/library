@@ -26,6 +26,28 @@ type bookUpdater interface {
 	Update(ctx context.Context, b book.Book) error
 }
 
+type bookDeleter interface {
+	Delete(ctx context.Context, bookID string) error
+}
+
+// HandleDeleting is a handler / controller for deleting books.
+func HandleDeleting(bookDeleter bookDeleter) func(http.ResponseWriter, *http.Request) {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx, cancel := context.WithTimeout(context.Background(), api.RequestTimeout)
+		defer cancel()
+
+		bookID := mux.Vars(r)[bookIDParam]
+
+		if err := bookDeleter.Delete(ctx, bookID); err != nil {
+			api.HandleError(err, w)
+			return
+		}
+
+		api.ResponseJSON(http.StatusOK, nil, w)
+	}
+}
+
 // HandlePersisting is a handler / controller for persisting book.
 func HandlePersisting(bookPersister bookPersister) func(http.ResponseWriter, *http.Request) {
 
@@ -88,6 +110,7 @@ func HandleUpdating(bookUpdater bookUpdater) func(http.ResponseWriter, *http.Req
 	}
 }
 
+// HandleListing is a handler / controller for listing books.
 func HandleListing(booksLister booksLister) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 

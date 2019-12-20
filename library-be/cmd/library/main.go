@@ -14,9 +14,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	"github.com/adrian83/library/pkg/api"
 	bookapi "github.com/adrian83/library/pkg/api/book"
+	authorapi "github.com/adrian83/library/pkg/api/author"
 	"github.com/adrian83/library/pkg/book"
+	"github.com/adrian83/library/pkg/author"
 	"github.com/adrian83/library/pkg/storage"
 )
 
@@ -34,17 +35,27 @@ func main() {
 		log.Printf("Cannot connect to mongodb: %v", true)
 	}
 
-	booksCollection := client.Database("library").Collection("books")
+	database := client.Database("library")
 
-	mongoAdapter := storage.NewAdapter(booksCollection)
-	bookService := book.NewService(mongoAdapter)
+	booksCollection := database.Collection("books")
+	authorCollection := database.Collection("author")
+
+	mongoBookAdapter := storage.NewAdapter(booksCollection)
+	mongoAuthorAdapter := storage.NewAdapter(authorCollection)
+
+	bookService := book.NewService(mongoBookAdapter)
+	authorService := author.NewService(mongoAuthorAdapter)
 
 	r := mux.NewRouter()
 	r.HandleFunc("/books", bookapi.HandleListing(bookService)).Methods(http.MethodGet)
 	r.HandleFunc("/books", bookapi.HandlePersisting(bookService)).Methods(http.MethodPost)
 	r.HandleFunc("/books/{bookId}", bookapi.HandleUpdating(bookService)).Methods(http.MethodPut)
-	r.HandleFunc("/books/{bookId}/authors", api.HandleAddingAuthor(bookService)).Methods(http.MethodPost)
-	r.HandleFunc("/books/{bookId}/authors/{authorId}", api.HandleRemovingAuthor(bookService)).Methods(http.MethodDelete)
+	r.HandleFunc("/books/{bookId}", bookapi.HandleDeleting(bookService)).Methods(http.MethodDelete)
+	//r.HandleFunc("/books/{bookId}/authors", api.HandleAddingAuthor(bookService)).Methods(http.MethodPost)
+	//r.HandleFunc("/books/{bookId}/authors/{authorId}", api.HandleRemovingAuthor(bookService)).Methods(http.MethodDelete)
+
+	r.HandleFunc("/authors", authorapi.HandlePersisting(authorService)).Methods(http.MethodPost)
+
 	http.Handle("/", r)
 
 	server := &http.Server{Addr: "0.0.0.0:" + strconv.Itoa(8080), Handler: r}

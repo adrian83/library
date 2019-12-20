@@ -5,14 +5,17 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
+// ListBooks is a structure that contains data used for listing books.
 type ListBooks struct {
 	Offset int
 	Limit  int
 	Sort   string
 }
 
+// NewListBooks is a constructor for ListBooks.
 func NewListBooks(offset, limit int, sort string) *ListBooks {
 	return &ListBooks{
 		Offset: offset,
@@ -21,6 +24,7 @@ func NewListBooks(offset, limit int, sort string) *ListBooks {
 	}
 }
 
+// Page is a structure that contains slice of Books and some data regarding that slice.
 type Page struct {
 	Books  []Book `json:"books"`
 	Limit  int    `json:"limit"`
@@ -28,6 +32,7 @@ type Page struct {
 	Total  int64  `json:"total"`
 }
 
+// NewPage is a constructor for Page.
 func NewPage(books []Book, limit, offset int, total int64) *Page {
 	return &Page{
 		Books:  books,
@@ -68,6 +73,21 @@ func NewBookWithID(id, title string) *Book {
 		Authors:      make([]Author, 0),
 		CreationDate: time.Now().UTC(),
 	}
+}
+
+func NewBookFromDoc(doc map[string]interface{}) (*Book, error) {
+
+	docBytes, err := bson.Marshal(doc)
+	if err != nil {
+		return nil, err
+	}
+
+	var book Book
+	if err = bson.Unmarshal(docBytes, &book); err != nil {
+		return nil, err
+	}
+
+	return &book, nil
 }
 
 func (b *Book) AddAuthor(author Author) error {
