@@ -7,6 +7,7 @@ import (
 
 	"github.com/adrian83/library/pkg/api"
 	"github.com/adrian83/library/pkg/book"
+	"github.com/adrian83/library/pkg/common"
 	"github.com/gorilla/mux"
 )
 
@@ -19,7 +20,7 @@ type bookPersister interface {
 }
 
 type booksLister interface {
-	List(ctx context.Context, listBooks *book.ListBooks) (book.Page, error)
+	List(ctx context.Context, listBooks *common.ListRequest) (*book.BooksPage, error)
 }
 
 type bookUpdater interface {
@@ -117,7 +118,7 @@ func HandleListing(booksLister booksLister) func(http.ResponseWriter, *http.Requ
 		ctx, cancel := context.WithTimeout(context.Background(), api.RequestTimeout)
 		defer cancel()
 
-		listBooks := book.NewListBooks(0, 100, "title")
+		listBooks := common.NewListRequest(0, 100, "title")
 
 		page, err := booksLister.List(ctx, listBooks)
 		if err != nil {

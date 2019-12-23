@@ -30,10 +30,10 @@ func TestUnmarshalingBody(t *testing.T) {
 		data := tData
 
 		t.Run(name, func(t *testing.T) {
-			usr := new(user)
+			var usr user
 
 			// when
-			err := UnmarshalReqBody(data.body, usr)
+			err := UnmarshalReqBody(data.body, &usr)
 
 			// then
 			if data.err {

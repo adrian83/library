@@ -5,6 +5,8 @@ import (
 	"fmt"
 
 	"go.mongodb.org/mongo-driver/bson"
+
+	"github.com/adrian83/library/pkg/common"
 )
 
 type bookStore interface {
@@ -38,47 +40,47 @@ func (s *Service) Delete(ctx context.Context, bookID string) error {
 	return s.store.DeleteOne(ctx, bookID)
 }
 
-func (b *Service) Find(ctx context.Context, id string) (Book, error) {
-	book := new(Book)
-	if err := b.store.FindOne(ctx, id, book); err != nil {
-		return Book{}, err
+func (b *Service) Find(ctx context.Context, id string) (*Book, error) {
+	var book Book
+	if err := b.store.FindOne(ctx, id, &book); err != nil {
+		return nil, err
 	}
 
-	return *book, nil
+	return &book, nil
 }
 
-func (s *Service) List(ctx context.Context, listBooks *ListBooks) (Page, error) {
+func (s *Service) List(ctx context.Context, listBooks *common.ListRequest) (*BooksPage, error) {
 
 	filter := bson.D{}
 
 	maps, err := s.store.List(ctx, filter)
 	if err != nil {
-		return Page{}, err
+		return nil, err
 	}
 
 	fmt.Printf("Maps: %v", maps)
 
-	books := make([]Book, 0)
+	books := make([]*Book, 0)
 	for _, m := range maps {
 
 		bookBytes, err := bson.Marshal(m)
 		if err != nil {
-			return Page{}, err
+			return nil, err
 		}
 
-		book := new(Book)
+		var book Book
 		if err = bson.Unmarshal(bookBytes, &book); err != nil {
-			return Page{}, err
+			return nil, err
 		}
 
-		books = append(books, *book)
+		books = append(books, &book)
 	}
 
 	count, err := s.store.Count(ctx, filter)
 	if err != nil {
-		return Page{}, err
+		return nil, err
 	}
 
-	page := NewPage(books, listBooks.Limit, listBooks.Offset, count)
-	return *page, nil
+	page := NewBooksPage(books, listBooks.Limit, listBooks.Offset, count)
+	return page, nil
 }
