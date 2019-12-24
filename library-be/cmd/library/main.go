@@ -25,7 +25,7 @@ func main() {
 
 	//mux.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("../library-fe/"))))
 
-	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27018"))
+	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
 	if err != nil {
 		log.Printf("Cannot create mongodb client: %v", true)
 	}
