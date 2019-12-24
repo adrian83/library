@@ -1,1 +1,0 @@
-{"isEntrypoint":false,"deps":["angular_router|lib/angular_router.dart","http|lib/http.dart","todo_fe|lib/src/error.dart","todo_fe|lib/src/user.dart","todo_fe|lib/src/route_paths.dart"],"parts":[],"conditionalDeps":[],"sdkDeps":["convert","async"],"hasMain":false}

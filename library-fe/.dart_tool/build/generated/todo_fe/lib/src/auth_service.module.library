@@ -1,1 +1,0 @@
-{"isEntrypoint":false,"deps":["http|lib/http.dart","todo_fe|lib/src/user.dart","todo_fe|lib/generated_consts.dart"],"parts":[],"conditionalDeps":[],"sdkDeps":["async","convert"],"hasMain":false}

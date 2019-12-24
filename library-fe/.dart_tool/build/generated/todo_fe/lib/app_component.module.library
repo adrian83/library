@@ -1,1 +1,0 @@
-{"isEntrypoint":true,"deps":["angular|lib/angular.dart","angular_router|lib/angular_router.dart","todo_fe|lib/src/routes.dart","todo_fe|lib/src/route_paths.dart","todo_fe|lib/src/menu_component.dart","todo_fe|lib/src/auth_service.dart","todo_fe|lib/src/todo_service.dart","todo_fe|lib/src/store.dart"],"parts":[],"conditionalDeps":[],"sdkDeps":[],"hasMain":false}

@@ -1,1 +1,0 @@
-{"isEntrypoint":true,"deps":["build|lib/build.dart"],"parts":[],"conditionalDeps":[],"sdkDeps":["async"],"hasMain":false}

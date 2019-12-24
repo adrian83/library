@@ -1,1 +1,0 @@
-{"isEntrypoint":false,"deps":["todo_fe|lib/src/form_component.dart","todo_fe|lib/src/error.template.dart","angular_router|lib/angular_router.template.dart","todo_fe|lib/src/route_paths.template.dart","todo_fe|lib/src/user.template.dart"],"parts":[],"conditionalDeps":[],"sdkDeps":[],"hasMain":false}
