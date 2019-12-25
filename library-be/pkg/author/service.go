@@ -28,11 +28,11 @@ func NewService(authorStore authorStore) *Service {
 	}
 }
 
-func (s *Service) Persist(ctx context.Context, author Author) error {
+func (s *Service) Persist(ctx context.Context, author *Author) error {
 	return s.store.InsertOne(ctx, &author)
 }
 
-func (s *Service) Update(ctx context.Context, author Author) error {
+func (s *Service) Update(ctx context.Context, author *Author) error {
 	return s.store.UpdateOne(ctx, author.ID, author)
 }
 

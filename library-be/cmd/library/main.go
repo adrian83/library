@@ -47,14 +47,14 @@ func main() {
 	authorService := author.NewService(mongoAuthorAdapter)
 
 	r := mux.NewRouter()
+
 	r.HandleFunc("/books", bookapi.HandleListing(bookService)).Methods(http.MethodGet)
 	r.HandleFunc("/books", bookapi.HandlePersisting(bookService)).Methods(http.MethodPost)
 	r.HandleFunc("/books/{bookId}", bookapi.HandleUpdating(bookService)).Methods(http.MethodPut)
 	r.HandleFunc("/books/{bookId}", bookapi.HandleDeleting(bookService)).Methods(http.MethodDelete)
-	//r.HandleFunc("/books/{bookId}/authors", api.HandleAddingAuthor(bookService)).Methods(http.MethodPost)
-	//r.HandleFunc("/books/{bookId}/authors/{authorId}", api.HandleRemovingAuthor(bookService)).Methods(http.MethodDelete)
 
 	r.HandleFunc("/authors", authorapi.HandlePersisting(authorService)).Methods(http.MethodPost)
+	r.HandleFunc("/authors/{authorId}", authorapi.HandleDeleting(authorService)).Methods(http.MethodDelete)
 
 	http.Handle("/", r)
 

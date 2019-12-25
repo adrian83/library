@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"encoding/json"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -45,16 +46,20 @@ func TestUnmarshalingBody(t *testing.T) {
 	}
 }
 
+type TestBody struct {
+	Status string `json:"status"`
+}
+
 func TestJSONResponses(t *testing.T) {
 
 	// given
 	testData := map[string]struct {
 		status int
-		body   []byte
+		body   TestBody
 	}{
-		"ok with json":           {http.StatusOK, []byte("{\"status\":\"ok\"}")},
-		"server error with json": {http.StatusInternalServerError, []byte("{\"status\":\"error\"}")},
-		"not found with json":    {http.StatusNotFound, []byte("{\"status\":\"not found\"}")},
+		"ok with json":           {http.StatusOK, TestBody{Status: "ok"}},
+		"server error with json": {http.StatusInternalServerError, TestBody{Status: "error"}},
+		"not found with json":    {http.StatusNotFound, TestBody{Status: "not found"}},
 	}
 
 	for name, tData := range testData {
@@ -68,10 +73,12 @@ func TestJSONResponses(t *testing.T) {
 
 			// then
 			resp := w.Result()
-			body := readBody(t, resp.Body)
+			body := readJSON(t, resp.Body)
+
+
 
 			assert.Equal(t, data.status, resp.StatusCode)
-			assert.Equal(t, data.body, body)
+			assert.Equal(t, data.body.Status, body.Status)
 			assert.Equal(t, typeJSON, resp.Header.Get(contentType))
 		})
 	}
@@ -101,7 +108,7 @@ func TestTextResponses(t *testing.T) {
 
 			// then
 			resp := w.Result()
-			body := readBody(t, resp.Body)
+			body := readText(t, resp.Body)
 
 			assert.Equal(t, data.status, resp.StatusCode)
 			assert.Equal(t, data.body, string(body))
@@ -110,11 +117,25 @@ func TestTextResponses(t *testing.T) {
 	}
 }
 
-func readBody(t *testing.T, rc io.ReadCloser) []byte {
-	body, err := ioutil.ReadAll(rc)
+func readJSON(t *testing.T, rc io.ReadCloser) *TestBody {
+	bts, err := ioutil.ReadAll(rc)
 	if err != nil {
 		t.Errorf("error while reading bytes from response body")
 	}
 
-	return body
+	var body TestBody
+	if err := json.Unmarshal(bts, &body); err != nil {
+		t.Errorf("cannot transform bytes to TestBody instance")
+	}
+
+	return &body
+}
+
+func readText(t *testing.T, rc io.ReadCloser) []byte {
+	bts, err := ioutil.ReadAll(rc)
+	if err != nil {
+		t.Errorf("error while reading bytes from response body")
+	}
+
+	return bts
 }

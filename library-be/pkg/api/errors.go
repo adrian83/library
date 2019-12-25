@@ -46,13 +46,8 @@ func HandleError(err error, w http.ResponseWriter) {
 	switch t := err.(type) {
 	case *ValidationError:
 
-		respBts, err := json.Marshal(t.Violations)
-		if err != nil {
-			HandleError(err, w)
-			return
-		}
-
-		ResponseJSON(http.StatusBadRequest, respBts, w)
+		fmt.Printf("Violations: %v", t.Violations)
+		ResponseJSON(http.StatusBadRequest, t.Violations, w)
 	default:
 		ResponseText(http.StatusInternalServerError, msgInternalError, w)
 	}

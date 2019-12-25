@@ -45,8 +45,19 @@ func ResponseText(status int, msg string, w http.ResponseWriter) {
 	w.Write([]byte(msg))
 }
 
-// ResponseJSON writes given bytes and status into ResponseWritercin form of json.
-func ResponseJSON(status int, respBts []byte, w http.ResponseWriter) {
+// ResponseJSON writes given interface{} and status into ResponseWritercin form of json.
+func ResponseJSON(status int, resp interface{}, w http.ResponseWriter) {
+
+	var respBts []byte
+	if resp != nil {
+		bts, err := json.Marshal(resp)
+		if err != nil {
+			HandleError(err, w)
+			return
+		}
+		respBts = bts
+	}
+
 	w.Header().Add(contentType, typeJSON)
 	w.WriteHeader(status)
 	w.Write(respBts)
@@ -54,5 +65,5 @@ func ResponseJSON(status int, respBts []byte, w http.ResponseWriter) {
 
 // Validable is an interface for all structures that can be validated.
 type Validable interface {
-	Validate() *ValidationError
+	Validate() error
 }

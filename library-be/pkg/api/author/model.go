@@ -2,46 +2,41 @@ package author
 
 import "github.com/adrian83/library/pkg/api"
 
-// AddAuthor represents data in request body.
-type AddAuthor struct {
-	ID   string `json:"id"`
+
+// CreateAuthor represents data in request body.
+type CreateAuthor struct {
 	Name string `json:"name"`
 }
 
-// Validate returns Validation error if AddAuthor data is invalid.
-func (aa *AddAuthor) Validate() *api.ValidationError {
+func (ca *CreateAuthor) Validate() error {
 	violations := make([]*api.Violation, 0)
 
-	if aa.Name == "" {
+	if ca.Name == "" {
 		violations = append(violations, api.NewViolation("name", "name cannot be empty"))
 	}
 
 	if len(violations) > 0 {
 		return api.NewValidationError(violations...)
 	}
+	
 	return nil
 }
 
-// RemoveAuthor represents data taken from request.
-type RemoveAuthor struct {
-	BookID   string
-	AuthorID string
+
+type UpdateAuthor struct {
+	Name string `json:"name"`
 }
 
-// Validate returns Validation error if RemoveAuthor data is invalid.
-func (ra *RemoveAuthor) Validate() *api.ValidationError {
+func (ua *UpdateAuthor) Validate() error {
 	violations := make([]*api.Violation, 0)
 
-	if ra.BookID == "" {
-		violations = append(violations, api.NewViolation("bookID", "bookId cannot be empty"))
-	}
-
-	if ra.AuthorID == "" {
-		violations = append(violations, api.NewViolation("authorID", "authorID cannot be empty"))
+	if ua.Name == "" {
+		violations = append(violations, api.NewViolation("name", "name cannot be empty"))
 	}
 
 	if len(violations) > 0 {
 		return api.NewValidationError(violations...)
 	}
+
 	return nil
 }

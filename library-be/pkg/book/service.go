@@ -28,11 +28,11 @@ type Service struct {
 	store bookStore
 }
 
-func (s *Service) Persist(ctx context.Context, book Book) error {
+func (s *Service) Persist(ctx context.Context, book *Book) error {
 	return s.store.InsertOne(ctx, &book)
 }
 
-func (s *Service) Update(ctx context.Context, book Book) error {
+func (s *Service) Update(ctx context.Context, book *Book) error {
 	return s.store.UpdateOne(ctx, book.ID, book)
 }
 

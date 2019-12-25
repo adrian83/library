@@ -7,7 +7,7 @@ type CreateBook struct {
 	Title string `json:"title"`
 }
 
-func (cb *CreateBook) Validate() *api.ValidationError {
+func (cb *CreateBook) Validate() error {
 	violations := make([]*api.Violation, 0)
 
 	if cb.Title == "" {
@@ -17,6 +17,7 @@ func (cb *CreateBook) Validate() *api.ValidationError {
 	if len(violations) > 0 {
 		return api.NewValidationError(violations...)
 	}
+	
 	return nil
 }
 
@@ -24,7 +25,7 @@ type UpdateBook struct {
 	Title string `json:"title"`
 }
 
-func (cb *UpdateBook) Validate() *api.ValidationError {
+func (cb *UpdateBook) Validate() error {
 	violations := make([]*api.Violation, 0)
 
 	if cb.Title == "" {
@@ -34,5 +35,6 @@ func (cb *UpdateBook) Validate() *api.ValidationError {
 	if len(violations) > 0 {
 		return api.NewValidationError(violations...)
 	}
+
 	return nil
 }

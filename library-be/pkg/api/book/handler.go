@@ -2,8 +2,8 @@ package book
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
+	"fmt"
 
 	"github.com/adrian83/library/pkg/api"
 	"github.com/adrian83/library/pkg/book"
@@ -16,7 +16,7 @@ const (
 )
 
 type bookPersister interface {
-	Persist(ctx context.Context, b book.Book) error
+	Persist(ctx context.Context, b *book.Book) error
 }
 
 type booksLister interface {
@@ -24,7 +24,7 @@ type booksLister interface {
 }
 
 type bookUpdater interface {
-	Update(ctx context.Context, b book.Book) error
+	Update(ctx context.Context, b *book.Book) error
 }
 
 type bookDeleter interface {
@@ -58,24 +58,20 @@ func HandlePersisting(bookPersister bookPersister) func(http.ResponseWriter, *ht
 		defer cancel()
 
 		var createBook CreateBook
-		if err := api.UnmarshalAndValidate(r.Body, &createBook); err != nil {
-			api.HandleError(err, w)
-			return
-		}
-
-		bkg := book.NewBook(createBook.Title)
-		if err := bookPersister.Persist(ctx, *bkg); err != nil {
-			api.HandleError(err, w)
-			return
-		}
-
-		respBts, err := json.Marshal(bkg)
+		err := api.UnmarshalAndValidate(r.Body, &createBook)
+		fmt.Printf("ERROR: %t", err)
 		if err != nil {
 			api.HandleError(err, w)
 			return
 		}
 
-		api.ResponseJSON(http.StatusCreated, respBts, w)
+		bkg := book.NewBook(createBook.Title)
+		if err := bookPersister.Persist(ctx, bkg); err != nil {
+			api.HandleError(err, w)
+			return
+		}
+
+		api.ResponseJSON(http.StatusCreated, bkg, w)
 	}
 }
 
@@ -96,18 +92,12 @@ func HandleUpdating(bookUpdater bookUpdater) func(http.ResponseWriter, *http.Req
 		}
 
 		bkg := book.NewBookWithID(bookID, updateBook.Title)
-		if err := bookUpdater.Update(ctx, *bkg); err != nil {
+		if err := bookUpdater.Update(ctx, bkg); err != nil {
 			api.HandleError(err, w)
 			return
 		}
 
-		respBts, err := json.Marshal(bkg)
-		if err != nil {
-			api.HandleError(err, w)
-			return
-		}
-
-		api.ResponseJSON(http.StatusOK, respBts, w)
+		api.ResponseJSON(http.StatusOK, bkg, w)
 	}
 }
 
@@ -126,12 +116,6 @@ func HandleListing(booksLister booksLister) func(http.ResponseWriter, *http.Requ
 			return
 		}
 
-		respBts, err := json.Marshal(page)
-		if err != nil {
-			api.HandleError(err, w)
-			return
-		}
-
-		api.ResponseJSON(http.StatusOK, respBts, w)
+		api.ResponseJSON(http.StatusOK, page, w)
 	}
 }
