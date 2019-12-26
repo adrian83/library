@@ -14,10 +14,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	bookapi "github.com/adrian83/library/pkg/api/book"
 	authorapi "github.com/adrian83/library/pkg/api/author"
-	"github.com/adrian83/library/pkg/book"
+	bookapi "github.com/adrian83/library/pkg/api/book"
 	"github.com/adrian83/library/pkg/author"
+	"github.com/adrian83/library/pkg/book"
 	"github.com/adrian83/library/pkg/storage"
 )
 
@@ -30,7 +30,9 @@ func main() {
 		log.Printf("Cannot create mongodb client: %v", true)
 	}
 
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
 	if err = client.Connect(ctx); err != nil {
 		log.Printf("Cannot connect to mongodb: %v", true)
 	}
@@ -52,9 +54,13 @@ func main() {
 	r.HandleFunc("/books", bookapi.HandlePersisting(bookService)).Methods(http.MethodPost)
 	r.HandleFunc("/books/{bookId}", bookapi.HandleUpdating(bookService)).Methods(http.MethodPut)
 	r.HandleFunc("/books/{bookId}", bookapi.HandleDeleting(bookService)).Methods(http.MethodDelete)
+	r.HandleFunc("/books/{bookId}", bookapi.HandleGetting(bookService)).Methods(http.MethodGet)
 
+	r.HandleFunc("/authors", authorapi.HandleListing(authorService)).Methods(http.MethodGet)
 	r.HandleFunc("/authors", authorapi.HandlePersisting(authorService)).Methods(http.MethodPost)
+	r.HandleFunc("/authors/{authorId}", authorapi.HandleUpdating(authorService)).Methods(http.MethodPut)
 	r.HandleFunc("/authors/{authorId}", authorapi.HandleDeleting(authorService)).Methods(http.MethodDelete)
+	r.HandleFunc("/authors/{authorId}", authorapi.HandleGetting(authorService)).Methods(http.MethodGet)
 
 	http.Handle("/", r)
 

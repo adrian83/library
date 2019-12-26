@@ -2,8 +2,8 @@ package book
 
 import (
 	"context"
-	"net/http"
 	"fmt"
+	"net/http"
 
 	"github.com/adrian83/library/pkg/api"
 	"github.com/adrian83/library/pkg/book"
@@ -29,6 +29,28 @@ type bookUpdater interface {
 
 type bookDeleter interface {
 	Delete(ctx context.Context, bookID string) error
+}
+
+type bookGetter interface {
+	Find(ctx context.Context, id string) (*book.Book, error)
+}
+
+func HandleGetting(bookGetter bookGetter) func(http.ResponseWriter, *http.Request) {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx, cancel := context.WithTimeout(context.Background(), api.RequestTimeout)
+		defer cancel()
+
+		bookID := mux.Vars(r)[bookIDParam]
+
+		bkg, err := bookGetter.Find(ctx, bookID)
+		if err != nil {
+			api.HandleError(err, w)
+			return
+		}
+
+		api.ResponseJSON(http.StatusOK, bkg, w)
+	}
 }
 
 // HandleDeleting is a handler / controller for deleting books.

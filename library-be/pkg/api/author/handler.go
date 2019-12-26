@@ -6,6 +6,7 @@ import (
 
 	"github.com/adrian83/library/pkg/api"
 	"github.com/adrian83/library/pkg/author"
+	"github.com/adrian83/library/pkg/common"
 	"github.com/gorilla/mux"
 )
 
@@ -23,6 +24,52 @@ type authorDeleter interface {
 
 type authorUpdater interface {
 	Update(context.Context, *author.Author) error
+}
+
+type authorGetter interface {
+	Find(ctx context.Context, id string) (*author.Author, error)
+}
+
+type authorLister interface {
+	List(ctx context.Context, listAuthors *common.ListRequest) (*author.AuthorsPage, error)
+}
+
+// HandleListing is a handler / controller for listing authors.
+func HandleListing(authorLister authorLister) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		ctx, cancel := context.WithTimeout(context.Background(), api.RequestTimeout)
+		defer cancel()
+
+		listAuthors := common.NewListRequest(0, 100, "name")
+
+		page, err := authorLister.List(ctx, listAuthors)
+		if err != nil {
+			api.HandleError(err, w)
+			return
+		}
+
+		api.ResponseJSON(http.StatusOK, page, w)
+	}
+}
+
+// HandleGetting is a handler / controller for getting Author by its Id.
+func HandleGetting(authorGetter authorGetter) func(http.ResponseWriter, *http.Request) {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx, cancel := context.WithTimeout(context.Background(), api.RequestTimeout)
+		defer cancel()
+
+		authorID := mux.Vars(r)[authorIDParam]
+
+		athr, err := authorGetter.Find(ctx, authorID)
+		if err != nil {
+			api.HandleError(err, w)
+			return
+		}
+
+		api.ResponseJSON(http.StatusOK, athr, w)
+	}
 }
 
 // HandleUpdating is a handler / controller for updating author.
