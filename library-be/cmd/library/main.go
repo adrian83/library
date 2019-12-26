@@ -14,6 +14,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
+	"go.uber.org/zap"
+
 	authorapi "github.com/adrian83/library/pkg/api/author"
 	bookapi "github.com/adrian83/library/pkg/api/book"
 	"github.com/adrian83/library/pkg/author"
@@ -42,8 +44,15 @@ func main() {
 	booksCollection := database.Collection("books")
 	authorCollection := database.Collection("author")
 
-	mongoBookAdapter := storage.NewAdapter(booksCollection)
-	mongoAuthorAdapter := storage.NewAdapter(authorCollection)
+
+	bookAdapterLogger, _ := zap.NewProduction()
+	defer bookAdapterLogger.Sync()
+
+	authorAdapterLogger, _ := zap.NewProduction()
+	defer authorAdapterLogger.Sync()
+
+	mongoBookAdapter := storage.NewAdapter(booksCollection, bookAdapterLogger)
+	mongoAuthorAdapter := storage.NewAdapter(authorCollection, authorAdapterLogger)
 
 	bookService := book.NewService(mongoBookAdapter)
 	authorService := author.NewService(mongoAuthorAdapter)

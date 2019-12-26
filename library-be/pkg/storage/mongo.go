@@ -8,13 +8,18 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type Adapter struct {
-	collection *mongo.Collection
+type logger interface {
 }
 
-func NewAdapter(coll *mongo.Collection) *Adapter {
+type Adapter struct {
+	collection *mongo.Collection
+	logger     logger
+}
+
+func NewAdapter(coll *mongo.Collection, logger logger) *Adapter {
 	return &Adapter{
 		collection: coll,
+		logger:     logger,
 	}
 }
 
