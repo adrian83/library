@@ -9,3 +9,4 @@ library-fe/dart/angular/.pub
 library-fe/dart/angular/pubspec.lock
 
 library-fe/.dart_tool
+library-fe/build
