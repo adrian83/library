@@ -23,6 +23,10 @@ import (
 	"github.com/adrian83/library/pkg/storage"
 )
 
+const (
+	v1Api = "/api/v1"
+)
+
 func main() {
 
 	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
@@ -56,17 +60,17 @@ func main() {
 
 	r := mux.NewRouter()
 
-	r.HandleFunc("/books", bookapi.HandleListing(bookService)).Methods(http.MethodGet)
-	r.HandleFunc("/books", bookapi.HandlePersisting(bookService)).Methods(http.MethodPost)
-	r.HandleFunc("/books/{bookId}", bookapi.HandleUpdating(bookService)).Methods(http.MethodPut)
-	r.HandleFunc("/books/{bookId}", bookapi.HandleDeleting(bookService)).Methods(http.MethodDelete)
-	r.HandleFunc("/books/{bookId}", bookapi.HandleGetting(bookService)).Methods(http.MethodGet)
+	r.HandleFunc(v1Api+"/books", bookapi.HandleListing(bookService)).Methods(http.MethodGet)
+	r.HandleFunc(v1Api+"/books", bookapi.HandlePersisting(bookService)).Methods(http.MethodPost)
+	r.HandleFunc(v1Api+"/books/{bookId}", bookapi.HandleUpdating(bookService)).Methods(http.MethodPut)
+	r.HandleFunc(v1Api+"/books/{bookId}", bookapi.HandleDeleting(bookService)).Methods(http.MethodDelete)
+	r.HandleFunc(v1Api+"/books/{bookId}", bookapi.HandleGetting(bookService)).Methods(http.MethodGet)
 
-	r.HandleFunc("/authors", authorapi.HandleListing(authorService)).Methods(http.MethodGet)
-	r.HandleFunc("/authors", authorapi.HandlePersisting(authorService)).Methods(http.MethodPost)
-	r.HandleFunc("/authors/{authorId}", authorapi.HandleUpdating(authorService)).Methods(http.MethodPut)
-	r.HandleFunc("/authors/{authorId}", authorapi.HandleDeleting(authorService)).Methods(http.MethodDelete)
-	r.HandleFunc("/authors/{authorId}", authorapi.HandleGetting(authorService)).Methods(http.MethodGet)
+	r.HandleFunc(v1Api+"/authors", authorapi.HandleListing(authorService)).Methods(http.MethodGet)
+	r.HandleFunc(v1Api+"/authors", authorapi.HandlePersisting(authorService)).Methods(http.MethodPost)
+	r.HandleFunc(v1Api+"/authors/{authorId}", authorapi.HandleUpdating(authorService)).Methods(http.MethodPut)
+	r.HandleFunc(v1Api+"/authors/{authorId}", authorapi.HandleDeleting(authorService)).Methods(http.MethodDelete)
+	r.HandleFunc(v1Api+"/authors/{authorId}", authorapi.HandleGetting(authorService)).Methods(http.MethodGet)
 
 	r.PathPrefix("").Handler(http.StripPrefix("", http.FileServer(http.Dir("../../../library-fe/build"))))
 
