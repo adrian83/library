@@ -25,8 +25,6 @@ import (
 
 func main() {
 
-	//mux.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("../library-fe/"))))
-
 	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
 	if err != nil {
 		log.Printf("Cannot create mongodb client: %v", true)
@@ -43,7 +41,6 @@ func main() {
 
 	booksCollection := database.Collection("books")
 	authorCollection := database.Collection("author")
-
 
 	bookAdapterLogger, _ := zap.NewProduction()
 	defer bookAdapterLogger.Sync()
@@ -70,6 +67,8 @@ func main() {
 	r.HandleFunc("/authors/{authorId}", authorapi.HandleUpdating(authorService)).Methods(http.MethodPut)
 	r.HandleFunc("/authors/{authorId}", authorapi.HandleDeleting(authorService)).Methods(http.MethodDelete)
 	r.HandleFunc("/authors/{authorId}", authorapi.HandleGetting(authorService)).Methods(http.MethodGet)
+
+	r.PathPrefix("").Handler(http.StripPrefix("", http.FileServer(http.Dir("../../../library-fe/build"))))
 
 	http.Handle("/", r)
 
