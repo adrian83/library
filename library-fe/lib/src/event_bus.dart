@@ -17,6 +17,6 @@ class EventBus {
     }
 
     onEvent(bool signedIn) {
-      _onLoginEvent.add(signedIn);
+      //_onLoginEvent.add(signedIn);
     }
 }

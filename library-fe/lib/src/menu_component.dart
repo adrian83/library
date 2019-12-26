@@ -20,12 +20,6 @@ class MenuComponent implements OnInit {
 
   MenuComponent(this._eventBus);
 
-  bool signedIn = false;
-
-  void ngOnInit(){
-    _eventBus.onLoginStream.listen((bool sIn){ 
-      signedIn = sIn;
-    });
-  }
+  void ngOnInit(){}
 
 }

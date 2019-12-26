@@ -6,6 +6,8 @@ import 'register_component.template.dart' as register_template;
 import 'login_component.template.dart' as login_template;
 import 'logout_component.template.dart' as logout_template;
 
+import 'books_list_component.template.dart' as books_list_template;
+
 import 'route_paths.dart';
 
 class Routes {
@@ -35,12 +37,18 @@ class Routes {
     component: todo_list_template.TodoListComponentNgFactory,
   );
 
+  static final books = RouteDefinition(
+    routePath: RoutePaths.books,
+    component: books_list_template.BookListComponentNgFactory,
+  );
+
   static final all = <RouteDefinition>[
     register,
     login,
     logout,
     todos,
     dashboard,
+    books,
     RouteDefinition.redirect(
       path: '',
       redirectTo: RoutePaths.dashboard.toUrl(),

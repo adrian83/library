@@ -36,5 +36,5 @@ import 'src/store.dart';
   exports: [RoutePaths, Routes], 
 )
 class AppComponent {
-  final title = 'Todos';
+  final title = 'Library';
 }

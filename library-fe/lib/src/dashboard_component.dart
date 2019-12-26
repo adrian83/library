@@ -20,9 +20,7 @@ class DashboardComponent implements OnInit {
   DashboardComponent(this._store, this._router);
 
   void ngOnInit(){
-    if(_store.getAuthToken() == null){
-      _router.navigate(RoutePaths.login.toUrl());
-    }
+
   }
 
 }

@@ -6,4 +6,5 @@ class RoutePaths {
   static final login = RoutePath(path: 'login');
   static final logout = RoutePath(path: 'logout');
   static final todos = RoutePath(path: 'todos');
+  static final books = RoutePath(path: 'books');
 }
