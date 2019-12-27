@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/kelseyhightower/envconfig"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -21,15 +22,28 @@ import (
 	"github.com/adrian83/library/pkg/author"
 	"github.com/adrian83/library/pkg/book"
 	"github.com/adrian83/library/pkg/storage"
+	"github.com/adrian83/library/pkg/config"
 )
 
 const (
 	v1Api = "/api/v1"
 )
 
+
+
+
 func main() {
 
-	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
+
+	var cfg config.Config
+    err := envconfig.Process("library", &cfg)
+    if err != nil {
+        log.Printf("cannot read Configuration, error: %v", err)
+	}
+	log.Printf("Configuration: %v", &cfg)
+
+	mongoURI := "mongodb://" + cfg.DatabaseHost + ":" + strconv.Itoa(cfg.DatabasePort)
+	client, err := mongo.NewClient(options.Client().ApplyURI(mongoURI))
 	if err != nil {
 		log.Printf("Cannot create mongodb client: %v", true)
 	}
@@ -41,7 +55,7 @@ func main() {
 		log.Printf("Cannot connect to mongodb: %v", true)
 	}
 
-	database := client.Database("library")
+	database := client.Database(cfg.DatabaseName)
 
 	booksCollection := database.Collection("books")
 	authorCollection := database.Collection("author")
@@ -72,11 +86,12 @@ func main() {
 	r.HandleFunc(v1Api+"/authors/{authorId}", authorapi.HandleDeleting(authorService)).Methods(http.MethodDelete)
 	r.HandleFunc(v1Api+"/authors/{authorId}", authorapi.HandleGetting(authorService)).Methods(http.MethodGet)
 
-	r.PathPrefix("").Handler(http.StripPrefix("", http.FileServer(http.Dir("../../../library-fe/build"))))
+	r.PathPrefix("").Handler(http.StripPrefix("", http.FileServer(http.Dir(cfg.StaticsPath))))
 
 	http.Handle("/", r)
 
-	server := &http.Server{Addr: "0.0.0.0:" + strconv.Itoa(8080), Handler: r}
+	serverAddress := cfg.ServerHost + ":" + strconv.Itoa(cfg.ServerPort)
+	server := &http.Server{Addr: serverAddress, Handler: r}
 
 	idleConnsClosed := make(chan struct{})
 	go func() {

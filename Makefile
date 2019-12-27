@@ -25,6 +25,13 @@ go-test:
 	echo "running backend tests"
 	cd library-be && go test ./... -cover
 
+go-run: export SERVER_PORT=7070
+go-run: export SERVER_HOST=0.0.0.0
+go-run: export DATABASE_NAME=library
+go-run: export DATABASE_HOST=localhost
+go-run: export DATABASE_PORT=27017
+go-run: export STATICS_PATH=../../../library-fe/build
+
 go-run: go-test
 	echo "running backend"
 	cd library-be/cmd/library && go run main.go
