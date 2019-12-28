@@ -17,7 +17,7 @@ func (cb *CreateBook) Validate() error {
 	if len(violations) > 0 {
 		return api.NewValidationError(violations...)
 	}
-	
+
 	return nil
 }
 

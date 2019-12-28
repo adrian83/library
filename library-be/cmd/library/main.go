@@ -21,24 +21,20 @@ import (
 	bookapi "github.com/adrian83/library/pkg/api/book"
 	"github.com/adrian83/library/pkg/author"
 	"github.com/adrian83/library/pkg/book"
-	"github.com/adrian83/library/pkg/storage"
 	"github.com/adrian83/library/pkg/config"
+	"github.com/adrian83/library/pkg/storage"
 )
 
 const (
 	v1Api = "/api/v1"
 )
 
-
-
-
 func main() {
 
-
 	var cfg config.Config
-    err := envconfig.Process("library", &cfg)
-    if err != nil {
-        log.Printf("cannot read Configuration, error: %v", err)
+	err := envconfig.Process("library", &cfg)
+	if err != nil {
+		log.Printf("cannot read Configuration, error: %v", err)
 	}
 	log.Printf("Configuration: %v", &cfg)
 

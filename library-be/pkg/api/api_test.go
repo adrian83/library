@@ -1,13 +1,13 @@
 package api
 
 import (
+	"encoding/json"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
-	"encoding/json"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -74,8 +74,6 @@ func TestJSONResponses(t *testing.T) {
 			// then
 			resp := w.Result()
 			body := readJSON(t, resp.Body)
-
-
 
 			assert.Equal(t, data.status, resp.StatusCode)
 			assert.Equal(t, data.body.Status, body.Status)

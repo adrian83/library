@@ -29,11 +29,13 @@ func NewService(authorStore authorStore) *Service {
 }
 
 func (s *Service) Persist(ctx context.Context, author *Author) error {
-	return s.store.InsertOne(ctx, &author)
+	entity := NewEntity(author)
+	return s.store.InsertOne(ctx, &entity)
 }
 
 func (s *Service) Update(ctx context.Context, author *Author) error {
-	return s.store.UpdateOne(ctx, author.ID, author)
+	entity := NewEntity(author)
+	return s.store.UpdateOne(ctx, entity.ID, entity)
 }
 
 func (s *Service) Delete(ctx context.Context, authorID string) error {
@@ -41,12 +43,12 @@ func (s *Service) Delete(ctx context.Context, authorID string) error {
 }
 
 func (b *Service) Find(ctx context.Context, id string) (*Author, error) {
-	var author Author
-	if err := b.store.FindOne(ctx, id, &author); err != nil {
+	var entity Entity
+	if err := b.store.FindOne(ctx, id, &entity); err != nil {
 		return nil, err
 	}
 
-	return &author, nil
+	return NewAuthorFromEntity(&entity), nil
 }
 
 func (s *Service) List(ctx context.Context, listAuthors *common.ListRequest) (*AuthorsPage, error) {
@@ -63,17 +65,13 @@ func (s *Service) List(ctx context.Context, listAuthors *common.ListRequest) (*A
 	authors := make([]*Author, 0)
 	for _, m := range maps {
 
-		authorBytes, err := bson.Marshal(m)
+		entity, err := NewEntityFromDoc(m)
 		if err != nil {
 			return nil, err
 		}
 
-		var author Author
-		if err = bson.Unmarshal(authorBytes, &author); err != nil {
-			return nil, err
-		}
-
-		authors = append(authors, &author)
+		author := NewAuthorFromEntity(entity)
+		authors = append(authors, author)
 	}
 
 	count, err := s.store.Count(ctx, filter)

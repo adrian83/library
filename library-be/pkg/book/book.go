@@ -3,11 +3,49 @@ package book
 import (
 	"time"
 
+	"github.com/adrian83/library/pkg/author"
 	"github.com/adrian83/library/pkg/common"
 	"github.com/google/uuid"
-	
+
 	"go.mongodb.org/mongo-driver/bson"
 )
+
+type Entity struct {
+	ID           string    `bson:"_id,omitempty"`
+	Title        string    `bson:"title,omitempty"`
+	Authors      []string  `bson:"authors,omitempty"`
+	CreationDate time.Time `bson:"creationDate,omitempty"`
+}
+
+func NewEntityFromBook(bkg *Book) *Entity {
+
+	ids := make([]string, len(bkg.Authors))
+	for i := 0; i < len(bkg.Authors); i++ {
+		ids[i] = bkg.Authors[i].ID
+	}
+
+	return &Entity{
+		ID:           bkg.ID,
+		Title:        bkg.Title,
+		Authors:      ids,
+		CreationDate: bkg.CreationDate,
+	}
+}
+
+func NewEntityFromDoc(doc map[string]interface{}) (*Entity, error) {
+
+	docBytes, err := bson.Marshal(doc)
+	if err != nil {
+		return nil, err
+	}
+
+	var entity Entity
+	if err = bson.Unmarshal(docBytes, &entity); err != nil {
+		return nil, err
+	}
+
+	return &entity, nil
+}
 
 // BooksPage is a structure that contains slice of Books and some data regarding that slice.
 type BooksPage struct {
@@ -25,10 +63,10 @@ func NewBooksPage(books Books, limit, offset int, total int64) *BooksPage {
 }
 
 type Book struct {
-	ID    string `json:"id" bson:"_id,omitempty"`
-	Title string `json:"title,omitempty" bson:"title,omitempty"`
-	//Authors      []Author  `json:"authors,omitempty" bson:"authors,omitempty"`
-	CreationDate time.Time `json:"creationDate,omitempty" bson:"creationDate,omitempty"`
+	ID           string           `json:"id"`
+	Title        string           `json:"title,omitempty"`
+	Authors      []*author.Author `json:"authors,omitempty"`
+	CreationDate time.Time        `json:"creationDate,omitempty"`
 }
 
 type Books []*Book
@@ -41,22 +79,16 @@ func NewBookWithID(id, title string) *Book {
 	return &Book{
 		ID:           id,
 		Title:        title,
-		//Authors:      make([]Author, 0),
+		Authors:      nil,
 		CreationDate: time.Now().UTC(),
 	}
 }
 
-func NewBookFromDoc(doc map[string]interface{}) (*Book, error) {
-
-	docBytes, err := bson.Marshal(doc)
-	if err != nil {
-		return nil, err
+func NewBookFromEntity(entity *Entity) *Book {
+	return &Book{
+		ID:           entity.ID,
+		Title:        entity.Title,
+		Authors:      nil,
+		CreationDate: entity.CreationDate,
 	}
-
-	var book Book
-	if err = bson.Unmarshal(docBytes, &book); err != nil {
-		return nil, err
-	}
-
-	return &book, nil
 }

@@ -2,7 +2,6 @@ package author
 
 import "github.com/adrian83/library/pkg/api"
 
-
 // CreateAuthor represents data in request body.
 type CreateAuthor struct {
 	Name string `json:"name"`
@@ -18,10 +17,9 @@ func (ca *CreateAuthor) Validate() error {
 	if len(violations) > 0 {
 		return api.NewValidationError(violations...)
 	}
-	
+
 	return nil
 }
-
 
 type UpdateAuthor struct {
 	Name string `json:"name"`

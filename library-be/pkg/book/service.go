@@ -6,6 +6,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 
+	"github.com/adrian83/library/pkg/author"
 	"github.com/adrian83/library/pkg/common"
 )
 
@@ -29,11 +30,13 @@ type Service struct {
 }
 
 func (s *Service) Persist(ctx context.Context, book *Book) error {
-	return s.store.InsertOne(ctx, &book)
+	entity := NewEntityFromBook(book)
+	return s.store.InsertOne(ctx, &entity)
 }
 
 func (s *Service) Update(ctx context.Context, book *Book) error {
-	return s.store.UpdateOne(ctx, book.ID, book)
+	entity := NewEntityFromBook(book)
+	return s.store.UpdateOne(ctx, entity.ID, entity)
 }
 
 func (s *Service) Delete(ctx context.Context, bookID string) error {
@@ -41,12 +44,15 @@ func (s *Service) Delete(ctx context.Context, bookID string) error {
 }
 
 func (b *Service) Find(ctx context.Context, id string) (*Book, error) {
-	var book Book
-	if err := b.store.FindOne(ctx, id, &book); err != nil {
+	var entity Entity
+	if err := b.store.FindOne(ctx, id, &entity); err != nil {
 		return nil, err
 	}
 
-	return &book, nil
+	// TODO get Authors
+
+	book := NewBookFromEntity(&entity)
+	return book, nil
 }
 
 func (s *Service) List(ctx context.Context, listBooks *common.ListRequest) (*BooksPage, error) {
@@ -60,20 +66,31 @@ func (s *Service) List(ctx context.Context, listBooks *common.ListRequest) (*Boo
 
 	fmt.Printf("Maps: %v", maps)
 
-	books := make([]*Book, 0)
+	entities := make([]*Entity, 0)
 	for _, m := range maps {
 
-		bookBytes, err := bson.Marshal(m)
+		entity, err := NewEntityFromDoc(m)
 		if err != nil {
 			return nil, err
 		}
 
-		var book Book
-		if err = bson.Unmarshal(bookBytes, &book); err != nil {
-			return nil, err
-		}
+		entities = append(entities, entity)
+	}
 
-		books = append(books, &book)
+	authorsMap, err := s.findAuthors(entities)
+	if err != nil {
+		return nil, err
+	}
+
+	books := make([]*Book, 0)
+	for _, e := range entities {
+
+		authors := s.selectAuthors(authorsMap, e.Authors)
+
+		book := NewBookFromEntity(e)
+		book.Authors = authors
+
+		books = append(books, book)
 	}
 
 	count, err := s.store.Count(ctx, filter)
@@ -83,4 +100,33 @@ func (s *Service) List(ctx context.Context, listBooks *common.ListRequest) (*Boo
 
 	page := NewBooksPage(books, listBooks.Limit, listBooks.Offset, count)
 	return page, nil
+}
+
+func (s *Service) selectAuthors(authorsMap map[string]*author.Author, authorIDs []string) []*author.Author {
+
+	authors := make([]*author.Author, 0)
+	for _, authorID := range authorIDs {
+		author, ok := authorsMap[authorID]
+		if ok {
+			authors = append(authors, author)
+		}
+	}
+	return authors
+}
+
+func (s *Service) findAuthors(entities []*Entity) (map[string]*author.Author, error) {
+
+	idsMap := make(map[string]bool)
+	for _, b := range entities {
+		for _, aID := range b.Authors {
+			idsMap[aID] = true
+		}
+	}
+
+	ids := make([]string, 0)
+	for id := range idsMap {
+		ids = append(ids, id)
+	}
+
+	return map[string]*author.Author{}, nil
 }

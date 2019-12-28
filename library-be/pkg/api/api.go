@@ -41,6 +41,7 @@ func UnmarshalAndValidate(rc io.ReadCloser, val Validable) error {
 // ResponseText writes given text and status into ResponseWriter in form of text.
 func ResponseText(status int, msg string, w http.ResponseWriter) {
 	w.Header().Add(contentType, typeText)
+	w.Header().Add("Access-Control-Allow-Origin", "*")
 	w.WriteHeader(status)
 	w.Write([]byte(msg))
 }
@@ -59,6 +60,7 @@ func ResponseJSON(status int, resp interface{}, w http.ResponseWriter) {
 	}
 
 	w.Header().Add(contentType, typeJSON)
+	w.Header().Add("Access-Control-Allow-Origin", "*")
 	w.WriteHeader(status)
 	w.Write(respBts)
 }
