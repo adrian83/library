@@ -15,13 +15,18 @@ dart-get:
 
 dart-build: dart-get 
 	echo "building frontend"
-	cd library-fe && webdev build
+	pub global activate webdev
+	cd library-fe && pub run build_runner build --delete-conflicting-outputs
 
 dart-run: dart-build
 	echo "running frontend"
-	cd library-fe && webdev serve
+	cd library-fe && webdev serve --hostname 0.0.0.0 --release
 
-go-test:
+go-fmt:
+	echo "formatting go code"
+	cd library-be && gofmt -w .
+
+go-test: go-fmt
 	echo "running backend tests"
 	cd library-be && go test ./... -cover
 
