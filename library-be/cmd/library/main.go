@@ -65,8 +65,8 @@ func main() {
 	mongoBookAdapter := storage.NewAdapter(booksCollection, bookAdapterLogger)
 	mongoAuthorAdapter := storage.NewAdapter(authorCollection, authorAdapterLogger)
 
-	bookService := book.NewService(mongoBookAdapter)
 	authorService := author.NewService(mongoAuthorAdapter)
+	bookService := book.NewService(mongoBookAdapter, authorService)
 
 	r := mux.NewRouter()
 

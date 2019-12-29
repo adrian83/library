@@ -51,16 +51,36 @@ func (b *Service) Find(ctx context.Context, id string) (*Author, error) {
 	return NewAuthorFromEntity(&entity), nil
 }
 
-func (s *Service) List(ctx context.Context, listAuthors *common.ListRequest) (*AuthorsPage, error) {
+func (s *Service) FindAuthorsByIDs(ctx context.Context, ids []string) (map[string]*Author, error) {
 
-	filter := bson.D{}
+	criteria := bson.D{{
+		"_id",
+		bson.D{{
+			"$in",
+			ids,
+		}},
+	}}
 
-	maps, err := s.store.List(ctx, filter)
+	maps, err := s.store.List(ctx, criteria)
 	if err != nil {
 		return nil, err
 	}
 
-	fmt.Printf("Maps: %v", maps)
+	authorsMap := make(map[string]*Author)
+	for _, m := range maps {
+		entity, err := NewEntityFromDoc(m)
+		if err != nil {
+			return nil, err
+		}
+
+		author := NewAuthorFromEntity(entity)
+		authorsMap[author.ID] = author
+	}
+
+	return authorsMap, nil
+}
+
+func (s *Service) mapsToAuthors(maps []map[string]interface{}) ([]*Author, error) {
 
 	authors := make([]*Author, 0)
 	for _, m := range maps {
@@ -72,6 +92,24 @@ func (s *Service) List(ctx context.Context, listAuthors *common.ListRequest) (*A
 
 		author := NewAuthorFromEntity(entity)
 		authors = append(authors, author)
+	}
+	return authors, nil
+}
+
+func (s *Service) List(ctx context.Context, listAuthors *common.ListRequest) (*AuthorsPage, error) {
+
+	filter := bson.D{}
+
+	maps, err := s.store.List(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Printf("Maps: %v", maps)
+
+	authors, err := s.mapsToAuthors(maps)
+	if err != nil {
+		return nil, err
 	}
 
 	count, err := s.store.Count(ctx, filter)

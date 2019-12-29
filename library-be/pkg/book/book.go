@@ -32,6 +32,15 @@ func NewEntityFromBook(bkg *Book) *Entity {
 	}
 }
 
+func NewEntityFromCreateBookReq(req *CreateBookReq) *Entity {
+	return &Entity{
+		ID:           uuid.New().String(),
+		Title:        req.Title,
+		Authors:      req.Authors,
+		CreationDate: time.Now().UTC(),
+	}
+}
+
 func NewEntityFromDoc(doc map[string]interface{}) (*Entity, error) {
 
 	docBytes, err := bson.Marshal(doc)
@@ -59,6 +68,18 @@ func NewBooksPage(books Books, limit, offset int, total int64) *BooksPage {
 	return &BooksPage{
 		Page:  page,
 		Books: books,
+	}
+}
+
+type CreateBookReq struct {
+	Title   string
+	Authors []string
+}
+
+func NewCreateBookReq(title string, authors []string) *CreateBookReq {
+	return &CreateBookReq{
+		Title:   title,
+		Authors: authors,
 	}
 }
 

@@ -10,6 +10,10 @@ import (
 	"github.com/adrian83/library/pkg/common"
 )
 
+type authorService interface {
+	FindAuthorsByIDs(context.Context, []string) (map[string]*author.Author, error)
+}
+
 type bookStore interface {
 	InsertOne(context.Context, interface{}) error
 	List(context.Context, bson.D) ([]map[string]interface{}, error)
@@ -19,19 +23,39 @@ type bookStore interface {
 	DeleteOne(ctx context.Context, bookID string) error
 }
 
-func NewService(bookStore bookStore) *Service {
+func NewService(bookStore bookStore, authorService authorService) *Service {
 	return &Service{
-		store: bookStore,
+		store:         bookStore,
+		authorService: authorService,
 	}
 }
 
 type Service struct {
-	store bookStore
+	store         bookStore
+	authorService authorService
 }
 
-func (s *Service) Persist(ctx context.Context, book *Book) error {
-	entity := NewEntityFromBook(book)
-	return s.store.InsertOne(ctx, &entity)
+func (s *Service) Persist(ctx context.Context, createBookReq *CreateBookReq) (*Book, error) {
+	entity := NewEntityFromCreateBookReq(createBookReq)
+	err := s.store.InsertOne(ctx, &entity)
+	if err != nil {
+		return nil, err
+	}
+
+	authorsMap, err := s.authorService.FindAuthorsByIDs(ctx, entity.Authors)
+	if err != nil {
+		return nil, err
+	}
+
+	authors := make([]*author.Author, 0)
+	for _, author := range authorsMap {
+		authors = append(authors, author)
+	}
+
+	book := NewBookFromEntity(entity)
+	book.Authors = authors
+
+	return book, err
 }
 
 func (s *Service) Update(ctx context.Context, book *Book) error {
@@ -43,15 +67,25 @@ func (s *Service) Delete(ctx context.Context, bookID string) error {
 	return s.store.DeleteOne(ctx, bookID)
 }
 
-func (b *Service) Find(ctx context.Context, id string) (*Book, error) {
+func (s *Service) Find(ctx context.Context, id string) (*Book, error) {
 	var entity Entity
-	if err := b.store.FindOne(ctx, id, &entity); err != nil {
+	if err := s.store.FindOne(ctx, id, &entity); err != nil {
 		return nil, err
 	}
 
-	// TODO get Authors
+	authorsMap, err := s.authorService.FindAuthorsByIDs(ctx, entity.Authors)
+	if err != nil {
+		return nil, err
+	}
+
+	authors := make([]*author.Author, 0)
+	for _, author := range authorsMap {
+		authors = append(authors, author)
+	}
 
 	book := NewBookFromEntity(&entity)
+	book.Authors = authors
+
 	return book, nil
 }
 
@@ -77,7 +111,7 @@ func (s *Service) List(ctx context.Context, listBooks *common.ListRequest) (*Boo
 		entities = append(entities, entity)
 	}
 
-	authorsMap, err := s.findAuthors(entities)
+	authorsMap, err := s.findAuthors(ctx, entities)
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +148,7 @@ func (s *Service) selectAuthors(authorsMap map[string]*author.Author, authorIDs 
 	return authors
 }
 
-func (s *Service) findAuthors(entities []*Entity) (map[string]*author.Author, error) {
+func (s *Service) findAuthors(ctx context.Context, entities []*Entity) (map[string]*author.Author, error) {
 
 	idsMap := make(map[string]bool)
 	for _, b := range entities {
@@ -128,5 +162,10 @@ func (s *Service) findAuthors(entities []*Entity) (map[string]*author.Author, er
 		ids = append(ids, id)
 	}
 
-	return map[string]*author.Author{}, nil
+	authors, err := s.authorService.FindAuthorsByIDs(ctx, ids)
+	if err != nil {
+		return nil, err
+	}
+
+	return authors, nil
 }

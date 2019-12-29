@@ -4,7 +4,8 @@ import "github.com/adrian83/library/pkg/api"
 
 // CreateBook represents data in request body.
 type CreateBook struct {
-	Title string `json:"title"`
+	Title   string   `json:"title"`
+	Authors []string `json:"authors"`
 }
 
 func (cb *CreateBook) Validate() error {
@@ -22,7 +23,8 @@ func (cb *CreateBook) Validate() error {
 }
 
 type UpdateBook struct {
-	Title string `json:"title"`
+	Title   string   `json:"title"`
+	Authors []string `json:"authors"`
 }
 
 func (cb *UpdateBook) Validate() error {

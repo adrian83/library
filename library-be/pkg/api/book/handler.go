@@ -16,7 +16,7 @@ const (
 )
 
 type bookPersister interface {
-	Persist(ctx context.Context, b *book.Book) error
+	Persist(ctx context.Context, req *book.CreateBookReq) (*book.Book, error)
 }
 
 type booksLister interface {
@@ -87,8 +87,9 @@ func HandlePersisting(bookPersister bookPersister) func(http.ResponseWriter, *ht
 			return
 		}
 
-		bkg := book.NewBook(createBook.Title)
-		if err := bookPersister.Persist(ctx, bkg); err != nil {
+		req := book.NewCreateBookReq(createBook.Title, createBook.Authors)
+		bkg, err := bookPersister.Persist(ctx, req)
+		if err != nil {
 			api.HandleError(err, w)
 			return
 		}
