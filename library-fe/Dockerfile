@@ -1,17 +1,13 @@
-FROM google/dart:2.6
+FROM node:10.15.3-jessie-slim
 
-ADD . /todo-fe/
-WORKDIR /todo-fe
+ADD . /library-fe
+WORKDIR /library-fe
+RUN rm -rf node_modules
 
-RUN dart --version
-RUN pub --version
+RUN npm --version
+RUN ls -al
+RUN pwd
 
-RUN pub get
+RUN npm install react-scripts@latest
 
-RUN pub global activate webdev
-
-RUN pub run build_runner build --delete-conflicting-outputs
-
-EXPOSE 8080
-CMD ["/root/.pub-cache/bin/webdev", "serve", "--hostname", "0.0.0.0", "--release"]
-
+CMD ["npm", "start"]
