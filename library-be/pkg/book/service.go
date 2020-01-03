@@ -37,9 +37,13 @@ type Service struct {
 
 func (s *Service) Persist(ctx context.Context, createBookReq *CreateBookReq) (*Book, error) {
 	entity := NewEntityFromCreateBookReq(createBookReq)
-	err := s.store.InsertOne(ctx, &entity)
-	if err != nil {
+	
+	if err := s.store.InsertOne(ctx, &entity); err != nil {
 		return nil, err
+	}
+
+	if len(entity.Authors) == 0 {
+		return NewBookFromEntity(entity), nil
 	}
 
 	authorsMap, err := s.authorService.FindAuthorsByIDs(ctx, entity.Authors)
@@ -55,7 +59,7 @@ func (s *Service) Persist(ctx context.Context, createBookReq *CreateBookReq) (*B
 	book := NewBookFromEntity(entity)
 	book.Authors = authors
 
-	return book, err
+	return book, nil
 }
 
 func (s *Service) Update(ctx context.Context, book *Book) error {
@@ -73,6 +77,12 @@ func (s *Service) Find(ctx context.Context, id string) (*Book, error) {
 		return nil, err
 	}
 
+	book := NewBookFromEntity(&entity)
+
+	if len(entity.Authors) == 0 {
+		return book, nil
+	}
+
 	authorsMap, err := s.authorService.FindAuthorsByIDs(ctx, entity.Authors)
 	if err != nil {
 		return nil, err
@@ -83,7 +93,6 @@ func (s *Service) Find(ctx context.Context, id string) (*Book, error) {
 		authors = append(authors, author)
 	}
 
-	book := NewBookFromEntity(&entity)
 	book.Authors = authors
 
 	return book, nil

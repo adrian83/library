@@ -68,7 +68,7 @@ type Authors []*Author
 
 type AuthorsPage struct {
 	*common.Page
-	Authors Authors `json:"total"`
+	Authors Authors `json:"authors"`
 }
 
 func NewAuthorsPage(authors Authors, limit, offset int, total int64) *AuthorsPage {
