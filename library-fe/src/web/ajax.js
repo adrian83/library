@@ -133,4 +133,22 @@ export function unsecuredGet(url) {
     .then(handleBadRequestResponse);
 }
 
+export function execGet(url) {
+    return fetch(buildUrl(url), {
+        method: 'GET',
+        mode: 'cors',
+        headers: headers()
+    })
+    .then(handleServerSideError)
+    .then(handleBadRequestResponse);
+}
 
+export function execDelete(url) {
+    return fetch(buildUrl(url), {
+        method: 'DELETE',
+        mode: 'cors',
+        headers: headers()
+    })
+    .then(handleServerSideError)
+    .then(handleBadRequestResponse);
+}

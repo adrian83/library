@@ -24,10 +24,6 @@ export function activitiesBeUrl(tableId, stageId) {
     return `/tables/${tableId}/stages/${stageId}/activities`;
 }
 
-export function loginBeUrl() { 
-    return `/auth/login`;
-}
-
 export function registerBeUrl() {
     return `/auth/register`;
 }
@@ -64,10 +60,6 @@ export function editActivityUrl(tableId, stageId, activityId) {
     return `/tables/show/${tableId}/stages/show/${stageId}/activities/edit/${activityId}`;
 }
 
-export function loginUrl() {
-    return `/login/`;
-}
-
 export function logoutUrl() {
     return `/logout/`;
 }
@@ -78,4 +70,33 @@ export function registerUrl() {
 
 export function healthUrl() {
     return `/health/`;
+}
+
+
+export function booksBeUrl() {
+    return `/api/v1/books`;
+}
+
+export function bookBeUrl(bookId) {
+    return `/api/v1/books/${bookId}`;
+}
+
+export function createBookUrl() {
+    return `/books/create/`;
+}
+
+export function editBookUrl(bookId) {
+    return `/books/edit/${bookId}`;
+}
+
+export function showBookUrl(bookId) {
+    return `/books/show/${bookId}`;
+}
+
+export function listBooksUrl() {
+    return `/books/list`;
+}
+
+export function listAuthors() {
+    return `/authors/`;
 }
