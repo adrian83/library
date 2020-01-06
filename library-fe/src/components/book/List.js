@@ -65,7 +65,7 @@ class ListBooks extends Base {
         const createUrl = createBookUrl();
 
         var no = 1
-        const books = (this.state && this.state.page.books) ? this.state.page.books : [];
+        const books = (this.state && this.state.page && this.state.page.books) ? this.state.page.books : [];
         var rows = books.map(book => self.renderTableRow(no++, book));
 
         return (
