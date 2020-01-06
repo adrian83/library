@@ -37,7 +37,7 @@ type Service struct {
 
 func (s *Service) Persist(ctx context.Context, createBookReq *CreateBookReq) (*Book, error) {
 	entity := NewEntityFromCreateBookReq(createBookReq)
-	
+
 	if err := s.store.InsertOne(ctx, &entity); err != nil {
 		return nil, err
 	}

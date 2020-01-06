@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/kelseyhightower/envconfig"
 
@@ -68,6 +69,10 @@ func main() {
 	authorService := author.NewService(mongoAuthorAdapter)
 	bookService := book.NewService(mongoBookAdapter, authorService)
 
+	allowedHeaders := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
+	allowedMethods := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "OPTIONS"})
+	allowedOrigins := handlers.AllowedOrigins([]string{"*"})
+
 	r := mux.NewRouter()
 
 	r.HandleFunc(v1Api+"/books", bookapi.HandleListing(bookService)).Methods(http.MethodGet)
@@ -86,8 +91,10 @@ func main() {
 
 	http.Handle("/", r)
 
+	router := handlers.CORS(allowedHeaders, allowedMethods, allowedOrigins)(r)
+
 	serverAddress := cfg.ServerHost + ":" + strconv.Itoa(cfg.ServerPort)
-	server := &http.Server{Addr: serverAddress, Handler: r}
+	server := &http.Server{Addr: serverAddress, Handler: router}
 
 	idleConnsClosed := make(chan struct{})
 	go func() {
