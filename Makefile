@@ -5,6 +5,12 @@ hello:
 docker:
 	sudo systemctl start docker
 
+compose-build:
+	sudo docker-compose build
+
+compose-up:
+	sudo docker-compose up
+
 deps:
 	echo "starting mongodb image (version 3.4)"
 	docker run -p 27017:27017 -d mongo:3.4
