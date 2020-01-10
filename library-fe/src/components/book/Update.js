@@ -1,76 +1,72 @@
 import React from 'react';
-import { connect } from 'react-redux';
-import { Redirect } from 'react-router-dom';
-import PropTypes from 'prop-types';
 
 import Error from '../notification/Error';
 import Info from '../notification/Info';
 import Title from '../tiles/Title';
 import Base from '../Base';
 
-import { securedPost } from '../../web/ajax';
-import { tablesBeUrl, editTableUrl } from '../../web/url';
+import { execPut, execGet } from '../../web/ajax';
+import { bookBeUrl } from '../../web/url';
 
-
-class CreateTable extends Base {
-
-    static propTypes = {
-        authToken: PropTypes.string
-    };
+class UpdateBook extends Base {
 
     constructor(props) { 
         super(props);
 
-        this.state =  {
-            title: '', 
-            description: ''
-        };
-
-        this.hideError = this.hideError.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleTitleChange = this.handleTitleChange.bind(this);
         this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
     }
 
     handleTitleChange(event) {
-        this.setState({title: event.target.value});
+        var book = this.state.book ? this.state.book : {};
+        book.title = event.target.value;
+        this.setState({book: book});
     }
 
     handleDescriptionChange(event) {
-        this.setState({description: event.target.value});
+        var book = this.state.book ? this.state.book : {};
+        book.description = event.target.value;
+        this.setState({book: book});
     }
 
     handleSubmit(event) {
-
         const self = this;
-        const authToken = this.props.authToken;
+        const bookId = this.props.match.params.bookId
 
-        const form = {
-            title: this.state.title,
-            description: this.state.description
-        }
-
-        securedPost(tablesBeUrl(), authToken, form)
+        const book = {
+            title: self.state.book.title, 
+            description: self.state.book.description
+        };
+        
+        execPut(bookBeUrl(bookId), book)
             .then(response => response.json())
-            .then(data => self.setState({table: data}))
-            //.then(data => self.registerInfo("Table added"))
+            .then(data => self.setState({book: data}))
+            .then(data => self.registerInfo("Book updated"))
             .catch(error => self.registerError(error));
 
         event.preventDefault();
     }
 
+    componentDidMount() {
+        const self = this;
+        const bookId = this.props.match.params.bookId;
+        
+        execGet(bookBeUrl(bookId))
+            .then(response => response.json())
+            .then(data => self.setState({book: data}))
+            .catch(error => self.registerError(error));
+    }
+
     render() {
 
-        if(this.state && this.state.table) {
-            var editUrl = editTableUrl(
-                this.state.table.key.tableId);
-
-            return (<Redirect to={editUrl} />);
+        if(!this.state || ! this.state.book){
+            return (<div>waiting for data</div>);
         }
 
         return (
             <div>
-                <Title title="Create table" description="create table"></Title>
+                <Title title={this.state.book.title} description={this.state.book.description}></Title>
 
                 <Error errors={this.errors()} hideError={this.hideError} ></Error>
                 <Info info={this.info()} hideInfo={this.hideInfo} ></Info>
@@ -78,41 +74,35 @@ class CreateTable extends Base {
                 <form onSubmit={this.handleSubmit}>
 
                     <div className="form-group">
+
                         <label htmlFor="titleInput">Title</label>
+
                         <input type="title" 
                                 className="form-control" 
                                 id="titleInput" 
                                 placeholder="Enter title" 
-                                value={this.state.title}
+                                value={this.state.book.title}
                                 onChange={this.handleTitleChange} />
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="descriptionInput">Title</label>
+
+                        <label htmlFor="descriptionInput">Description</label>
+
                         <input type="description" 
                                 className="form-control" 
                                 id="descriptionInput" 
                                 placeholder="Enter description" 
-                                value={this.state.description}
+                                value={this.state.book.description}
                                 onChange={this.handleDescriptionChange} />
                     </div>
 
                     <button type="submit" 
-                            className="btn btn-primary">Create</button>
+                            className="btn btn-primary">Submit</button>
+
                 </form>
-            </div>
-        );
+            </div>);
     }
 }
 
-const mapStateToProps = (state) => {
-    return {authToken: state.authToken};
-};
-
-const mapDispatchToProps = (dispatch) => {
-    return {};
-};
-
-CreateTable = connect(mapStateToProps, mapDispatchToProps)(CreateTable);
-
-export default CreateTable;
+export default UpdateBook;

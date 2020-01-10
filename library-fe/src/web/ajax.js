@@ -152,3 +152,26 @@ export function execDelete(url) {
     .then(handleServerSideError)
     .then(handleBadRequestResponse);
 }
+
+export function execPost(url, data) {
+    return fetch(buildUrl(url), {
+        method: 'POST',
+        mode: 'cors',
+        body: JSON.stringify(data),
+        headers: headers()
+    })
+    .then(handleServerSideError)
+    .then(handleBadRequestResponse);
+}
+
+
+export function execPut(url, data) {
+    return fetch(buildUrl(url), {
+        method: 'PUT',
+        mode: 'cors',
+        body: JSON.stringify(data),
+        headers: headers()
+    })
+    .then(handleServerSideError)
+    .then(handleBadRequestResponse);
+}

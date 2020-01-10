@@ -2,38 +2,23 @@ import React, { Component } from 'react';
 import { Route, Redirect, Switch as RSwitch } from 'react-router-dom';
 
 import Home from './../../Home';
-import Health from './../../Health';
-
-import CreateTable from './../table/Create';
-import ListTables from './../table/List';
-import ShowTable from './../table/Show';
-import UpdateTable from './../table/Update';
-
-import CreateStage from './../stage/Create';
-import UpdateStage from './../stage/Update';
 
 import ListBooks from './../book/List';
+import CreateBook from './../book/Create';
+import UpdateBook from './../book/Update';
+import ShowBook from './../book/Show';
 
-import { listTablesUrl, 
-    healthUrl, createTableUrl, createStageUrl, editStageUrl, 
-    editTableUrl, showTableUrl, listBooksUrl } from '../../web/url';
+import { createBookUrl, showBookUrl, listBooksUrl, editBookUrl } from '../../web/url';
 
 class Switch extends Component {
 
     render() {
-
-        const renderListTables = () => <ListTables/>; 
-
         return (
             <RSwitch>
                 <Route exact path="/" component={Home} />
-                <Route path={healthUrl()} component={() => <Health/>} />
-                <Route path={listTablesUrl()} component={ renderListTables } />
-                <Route path={createTableUrl()} component={() => <CreateTable/>} />
-                <Route path={createStageUrl(":tableId")} render={(props) => <CreateStage {...props}/>} />
-                <Route path={editStageUrl(":tableId", ":stageId")} render={(props) => <UpdateStage {...props}/>} />
-                <Route path={showTableUrl(":tableId")} render={(props) =>  <ShowTable {...props}/>} />
-                <Route path={editTableUrl(":tableId")} render={(props) =>  <UpdateTable {...props}/>} />
+                <Route path={createBookUrl()} component={() => <CreateBook/>} />
+                <Route path={showBookUrl(":bookId")} render={(props) =>  <ShowBook {...props}/>} />
+                <Route path={editBookUrl(":bookId")} render={(props) =>  <UpdateBook {...props}/>} />
                 <Route path={listBooksUrl()} component={() => <ListBooks/>} />
                 <Redirect to="/" />
             </RSwitch>
