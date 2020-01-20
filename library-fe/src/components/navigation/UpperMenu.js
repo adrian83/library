@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 
-import { listBooksUrl, listAuthors } from '../../web/url';
+import { listBooksUrl, listAuthorsUrl } from '../../web/url';
 
 
 class UpperMenu extends Component {
@@ -12,7 +12,7 @@ class UpperMenu extends Component {
                 <h5 className="my-0 mr-md-auto font-weight-normal">library</h5>
                 <nav className="my-2 my-md-0 mr-md-3">
                     <Link key="1" className="p-2 text-dark" to={listBooksUrl()}>Books</Link>
-                    <Link key="2" className="p-2 text-dark" to={listAuthors()}>Authors</Link>
+                    <Link key="2" className="p-2 text-dark" to={listAuthorsUrl()}>Authors</Link>
                 </nav>
             </div>
         );
