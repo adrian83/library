@@ -67,15 +67,13 @@ class ListAuthors extends Base {
     }
 
     changePage(no, size) {
-        console.log("page number ", no, " size ", size);
-
-        if(this.state && this.state.page) {
-            var page = this.state.page;
-            page.offset = no * size;
-            this.setState({page: page});
-        }
-
-        this.forceUpdate();
+        //console.log("page number ", no, " size ", size);
+        const self = this;
+        execGet(authorsBeUrl() + "?limit=" + size + "&offset=" + (no * size) + "&sort=_id")
+            .then(response => response.json())
+            .then(data => self.setState({page: data}))
+            .then(_ => self.forceUpdate())
+            .catch(error => self.registerError(error));
     }
 
     render() {
@@ -83,7 +81,6 @@ class ListAuthors extends Base {
         if(!this.state || ! this.state.page){
             return (<div>waiting for data</div>);
         }
-
 
         const self = this;
         const createUrl = createAuthorUrl();

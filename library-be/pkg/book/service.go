@@ -16,7 +16,7 @@ type authorService interface {
 
 type bookStore interface {
 	InsertOne(context.Context, interface{}) error
-	List(context.Context, bson.D) ([]map[string]interface{}, error)
+	List(context.Context, bson.D, int64, int64) ([]map[string]interface{}, error)
 	FindOne(context.Context, string, interface{}) error
 	UpdateOne(ctx context.Context, id string, update interface{}) error
 	Count(ctx context.Context, filter interface{}) (int64, error)
@@ -102,7 +102,7 @@ func (s *Service) List(ctx context.Context, listBooks *common.ListRequest) (*Boo
 
 	filter := bson.D{}
 
-	maps, err := s.store.List(ctx, filter)
+	maps, err := s.store.List(ctx, filter, listBooks.Offset, listBooks.Limit)
 	if err != nil {
 		return nil, err
 	}

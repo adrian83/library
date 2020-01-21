@@ -6,6 +6,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type logger interface {
@@ -57,9 +58,9 @@ func (a *Adapter) DeleteOne(ctx context.Context, id string) error {
 	return err
 }
 
-func (a *Adapter) List(ctx context.Context, criteria bson.D) ([]map[string]interface{}, error) {
+func (a *Adapter) List(ctx context.Context, criteria bson.D, offset, size int64) ([]map[string]interface{}, error) {
 
-	cur, err := a.collection.Find(ctx, criteria)
+	cur, err := a.collection.Find(ctx, criteria, a.Skip(offset), a.Limit(size))
 	if err != nil {
 		return nil, err
 	}
@@ -85,4 +86,16 @@ func (a *Adapter) List(ctx context.Context, criteria bson.D) ([]map[string]inter
 
 func (a *Adapter) Count(ctx context.Context, filter interface{}) (int64, error) {
 	return a.collection.CountDocuments(ctx, filter)
+}
+
+func (a *Adapter) Skip(offset int64) *options.FindOptions {
+	return &options.FindOptions{
+		Skip: &offset,
+	}
+}
+
+func (a *Adapter) Limit(size int64) *options.FindOptions {
+	return &options.FindOptions{
+		Limit: &size,
+	}
 }

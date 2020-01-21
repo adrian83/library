@@ -11,7 +11,7 @@ import (
 
 type authorStore interface {
 	InsertOne(context.Context, interface{}) error
-	List(context.Context, bson.D) ([]map[string]interface{}, error)
+	List(context.Context, bson.D, int64, int64) ([]map[string]interface{}, error)
 	FindOne(context.Context, string, interface{}) error
 	UpdateOne(context.Context, string, interface{}) error
 	Count(context.Context, interface{}) (int64, error)
@@ -51,6 +51,11 @@ func (b *Service) Find(ctx context.Context, id string) (*Author, error) {
 	return NewAuthorFromEntity(&entity), nil
 }
 
+const (
+	zeroOffset         int64 = 0
+	maxAuthorsPageSize int64 = 10000
+)
+
 func (s *Service) FindAuthorsByIDs(ctx context.Context, ids []string) (map[string]*Author, error) {
 
 	criteria := bson.D{{
@@ -61,7 +66,7 @@ func (s *Service) FindAuthorsByIDs(ctx context.Context, ids []string) (map[strin
 		}},
 	}}
 
-	maps, err := s.store.List(ctx, criteria)
+	maps, err := s.store.List(ctx, criteria, zeroOffset, maxAuthorsPageSize)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +105,7 @@ func (s *Service) List(ctx context.Context, listAuthors *common.ListRequest) (*A
 
 	filter := bson.D{}
 
-	maps, err := s.store.List(ctx, filter)
+	maps, err := s.store.List(ctx, filter, listAuthors.Offset, listAuthors.Limit)
 	if err != nil {
 		return nil, err
 	}

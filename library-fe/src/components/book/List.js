@@ -6,17 +6,33 @@ import Info from '../notification/Info';
 import Title from '../tiles/Title';
 import Base from '../Base';
 
+import Pagination from '../navigation/Pagination';
+
 import { execGet, execDelete } from '../../web/ajax';
 import { booksBeUrl, bookBeUrl, createBookUrl, showBookUrl, editBookUrl } from '../../web/url';
 
 class ListBooks extends Base {
 
+    constructor(props) {
+        super(props);
+        this.changePage = this.changePage.bind(this);
+    }
 
     componentDidMount() {
         const self = this;
         execGet(booksBeUrl())
             .then(response => response.json())
             .then(data => self.setState({page: data}))
+            .catch(error => self.registerError(error));
+    }
+
+    changePage(no, size) {
+        //console.log("page number ", no, " size ", size);
+        const self = this;
+        execGet(booksBeUrl() + "?limit=" + size + "&offset=" + (no * size) + "&sort=_id")
+            .then(response => response.json())
+            .then(data => self.setState({page: data}))
+            .then(_ => self.forceUpdate())
             .catch(error => self.registerError(error));
     }
 
@@ -61,6 +77,10 @@ class ListBooks extends Base {
     }
 
     render() {
+        if(!this.state || ! this.state.page){
+            return (<div>waiting for data</div>);
+        }
+
         const self = this;
         const createUrl = createBookUrl();
 
@@ -93,6 +113,13 @@ class ListBooks extends Base {
                             {rows}
                         </tbody>
                     </table>
+
+                    <br/>
+
+                    <Pagination total={this.state.page.total}
+                                limit={this.state.page.limit}
+                                offset={this.state.page.offset}
+                                action={this.changePage}></Pagination>
                 </div>
             </div>
         );

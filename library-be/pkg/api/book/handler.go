@@ -131,7 +131,7 @@ func HandleListing(booksLister booksLister) func(http.ResponseWriter, *http.Requ
 		ctx, cancel := context.WithTimeout(context.Background(), api.RequestTimeout)
 		defer cancel()
 
-		listBooks := common.NewListRequest(0, 100, "title")
+		listBooks := api.ParseListRequest(r.URL.Query())
 
 		page, err := booksLister.List(ctx, listBooks)
 		if err != nil {

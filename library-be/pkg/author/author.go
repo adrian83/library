@@ -71,7 +71,7 @@ type AuthorsPage struct {
 	Authors Authors `json:"authors"`
 }
 
-func NewAuthorsPage(authors Authors, limit, offset int, total int64) *AuthorsPage {
+func NewAuthorsPage(authors Authors, limit, offset, total int64) *AuthorsPage {
 	page := common.NewPage(limit, offset, total)
 	return &AuthorsPage{
 		Page:    page,

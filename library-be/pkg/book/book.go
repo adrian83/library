@@ -63,7 +63,7 @@ type BooksPage struct {
 }
 
 // NewBooksPage is a constructor for BooksPage.
-func NewBooksPage(books Books, limit, offset int, total int64) *BooksPage {
+func NewBooksPage(books Books, limit, offset, total int64) *BooksPage {
 	page := common.NewPage(limit, offset, total)
 	return &BooksPage{
 		Page:  page,

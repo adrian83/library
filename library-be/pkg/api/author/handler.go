@@ -41,7 +41,7 @@ func HandleListing(authorLister authorLister) func(http.ResponseWriter, *http.Re
 		ctx, cancel := context.WithTimeout(context.Background(), api.RequestTimeout)
 		defer cancel()
 
-		listAuthors := common.NewListRequest(0, 100, "name")
+		listAuthors := api.ParseListRequest(r.URL.Query())
 
 		page, err := authorLister.List(ctx, listAuthors)
 		if err != nil {

@@ -2,10 +2,14 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"time"
+
+	"github.com/adrian83/library/pkg/common"
 )
 
 const (
@@ -66,4 +70,40 @@ func ResponseJSON(status int, resp interface{}, w http.ResponseWriter) {
 // Validable is an interface for all structures that can be validated.
 type Validable interface {
 	Validate() error
+}
+
+const (
+	defaultLimit  int64 = 2
+	defaultOffset int64 = 0
+	defaultSort         = "_id"
+)
+
+func ParseListRequest(params map[string][]string) *common.ListRequest {
+
+	limit, offset, sort := defaultLimit, defaultOffset, defaultSort
+
+	limits := params["limit"]
+	if len(limits) > 0 {
+		fmt.Printf("\nLimits: %v\n", limits)
+		limitStr := limits[0]
+		limit, _ = strconv.ParseInt(limitStr, 10, 64)
+	}
+
+	offsets := params["offset"]
+	if len(offsets) > 0 {
+		fmt.Printf("\nOffsets: %v\n", offsets)
+		offsetStr := offsets[0]
+		offset, _ = strconv.ParseInt(offsetStr, 10, 64)
+	}
+
+	sorts := params["sort"]
+	if len(sorts) > 0 {
+		fmt.Printf("\nSorts: %v\n", sorts)
+		sort = sorts[0]
+	}
+
+	fmt.Printf("limit: %v, offer: %v, sort: %v\n", limit, offset, sort)
+
+	return common.NewListRequest(offset, limit, sort)
+
 }
