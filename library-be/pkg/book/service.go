@@ -62,8 +62,8 @@ func (s *Service) Persist(ctx context.Context, createBookReq *CreateBookReq) (*B
 	return book, nil
 }
 
-func (s *Service) Update(ctx context.Context, book *Book) error {
-	entity := NewEntityFromBook(book)
+func (s *Service) Update(ctx context.Context, req *UpdateBookReq) error {
+	entity := NewEntityFromUpdateBookReq(req)
 	return s.store.UpdateOne(ctx, entity.ID, entity)
 }
 
@@ -76,6 +76,8 @@ func (s *Service) Find(ctx context.Context, id string) (*Book, error) {
 	if err := s.store.FindOne(ctx, id, &entity); err != nil {
 		return nil, err
 	}
+
+	fmt.Printf("\n\nBook: %v\n\n", entity)
 
 	book := NewBookFromEntity(&entity)
 

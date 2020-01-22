@@ -24,7 +24,7 @@ type booksLister interface {
 }
 
 type bookUpdater interface {
-	Update(ctx context.Context, b *book.Book) error
+	Update(ctx context.Context, req *book.UpdateBookReq) error
 }
 
 type bookDeleter interface {
@@ -114,13 +114,13 @@ func HandleUpdating(bookUpdater bookUpdater) func(http.ResponseWriter, *http.Req
 			return
 		}
 
-		bkg := book.NewBookWithID(bookID, updateBook.Title)
-		if err := bookUpdater.Update(ctx, bkg); err != nil {
+		req := book.NewUpdateBookReq(bookID, updateBook.Title, updateBook.Authors)
+		if err := bookUpdater.Update(ctx, req); err != nil {
 			api.HandleError(err, w)
 			return
 		}
 
-		api.ResponseJSON(http.StatusOK, bkg, w)
+		api.ResponseJSON(http.StatusOK, updateBook, w)
 	}
 }
 

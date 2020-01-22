@@ -41,6 +41,14 @@ func NewEntityFromCreateBookReq(req *CreateBookReq) *Entity {
 	}
 }
 
+func NewEntityFromUpdateBookReq(req *UpdateBookReq) *Entity {
+	return &Entity{
+		ID:      req.ID,
+		Title:   req.Title,
+		Authors: req.Authors,
+	}
+}
+
 func NewEntityFromDoc(doc map[string]interface{}) (*Entity, error) {
 
 	docBytes, err := bson.Marshal(doc)
@@ -80,6 +88,18 @@ func NewCreateBookReq(title string, authors []string) *CreateBookReq {
 	return &CreateBookReq{
 		Title:   title,
 		Authors: authors,
+	}
+}
+
+type UpdateBookReq struct {
+	*CreateBookReq
+	ID string
+}
+
+func NewUpdateBookReq(id, title string, authors []string) *UpdateBookReq {
+	return &UpdateBookReq{
+		CreateBookReq: NewCreateBookReq(title, authors),
+		ID:            id,
 	}
 }
 
