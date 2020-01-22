@@ -9,7 +9,7 @@ import Base from '../Base';
 import Pagination from '../navigation/Pagination';
 
 import { execGet, execDelete } from '../../web/ajax';
-import { booksBeUrl, bookBeUrl, createBookUrl, showBookUrl, editBookUrl } from '../../web/url';
+import { booksBeUrl, bookBeUrl, createBookUrl, showBookUrl, editBookUrl, showAuthorUrl } from '../../web/url';
 
 class ListBooks extends Base {
 
@@ -56,18 +56,26 @@ class ListBooks extends Base {
         }
     }
 
-    renderTableRow(no, book) {
+    renderAuthors(authors) {
+        
+        var links = (authors ? authors : []).map(a => <span><Link to={showAuthorUrl(a.id)} >{a.name}</Link>&nbsp;&nbsp;&nbsp;</span>);
+    return (<span>{links}</span>)
+    }
+
+    renderTableRow(book) {
         const bookId = book.id;
         const title = book.title;
         const description = book.description;
+        const authors = this.renderAuthors(book.authors);
+
 
         const showUrl = showBookUrl(bookId);
         const editUrl = editBookUrl(bookId);
 
         return (
             <tr key={bookId}>
-                <th scope="row">{no++}</th>
                 <td><Link to={showUrl}>{title}</Link></td>
+                <td>{authors}</td>
                 <td>{description}</td>
                 <td>
                     <Link to={editUrl} >edit</Link>&nbsp;&nbsp;&nbsp;
@@ -84,9 +92,9 @@ class ListBooks extends Base {
         const self = this;
         const createUrl = createBookUrl();
 
-        var no = 1
+
         const books = (this.state && this.state.page && this.state.page.books) ? this.state.page.books : [];
-        var rows = books.map(book => self.renderTableRow(no++, book));
+        var rows = books.map(book => self.renderTableRow(book));
 
         return (
             <div>
@@ -103,8 +111,8 @@ class ListBooks extends Base {
                     <table className="table table-striped">
                         <thead>
                             <tr>
-                                <th scope="col">#</th>
                                 <th scope="col">Title</th>
+                                <th scope="col">Author(s)</th>
                                 <th scope="col">Description</th>
                                 <th scope="col">Operations</th>
                             </tr>

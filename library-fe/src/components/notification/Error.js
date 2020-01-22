@@ -9,10 +9,10 @@ class Error extends Component {
     }
 
     hideError(errId){
-        console.log("hide", errId);
+        //console.log("hide", errId);
         const self = this;
         return function(event) {
-            console.log("real hide", errId);
+            //console.log("real hide", errId);
             self.props.hideError(errId);
             event.preventDefault();
         }
@@ -37,9 +37,9 @@ class Error extends Component {
 
         var self = this;
         if(this.props && this.props.errors) {
-            console.log("render errors", this.props.errors);
+            //console.log("render errors", this.props.errors);
             var errors = this.props.errors.map(function(error){ 
-                console.log("render error", error);
+                //console.log("render error", error);
 
                 if(error.status) {
 

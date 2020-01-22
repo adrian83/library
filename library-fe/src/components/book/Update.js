@@ -5,6 +5,8 @@ import Info from '../notification/Info';
 import Title from '../tiles/Title';
 import Base from '../Base';
 
+import SelectAuthors from '../author/Select';
+
 import { execPut, execGet } from '../../web/ajax';
 import { bookBeUrl } from '../../web/url';
 
@@ -16,6 +18,9 @@ class UpdateBook extends Base {
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleTitleChange = this.handleTitleChange.bind(this);
         this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
+
+        this.notAnAuthor = this.notAnAuthor.bind(this);
+        this.addAuthor = this.addAuthor.bind(this)
     }
 
     handleTitleChange(event) {
@@ -33,11 +38,15 @@ class UpdateBook extends Base {
     handleSubmit(event) {
         const self = this;
         const bookId = this.props.match.params.bookId
+        const ids = (this.state.authors ? this.state.authors : []).map(a => a.id);
 
         const book = {
             title: self.state.book.title, 
-            description: self.state.book.description
+            description: self.state.book.description,
+            authors: ids
         };
+
+        console.log("book ", book);
         
         execPut(bookBeUrl(bookId), book)
             .then(response => response.json())
@@ -54,8 +63,46 @@ class UpdateBook extends Base {
         
         execGet(bookBeUrl(bookId))
             .then(response => response.json())
-            .then(data => self.setState({book: data}))
+            .then(function(data) {
+                self.setState({book: data});
+                self.setState({authors: data.authors});
+            })
             .catch(error => self.registerError(error));
+    }
+
+    notAnAuthor(author) {
+        //console.log("check author ", author);
+        if(!this.state || !this.state.authors){
+            return true;
+        }
+        var authors = this.state.authors.filter((a, index, arr) => a.id === author.id);
+        //console.log("author ", author.name, "is an book author", (authors.length > 0));
+        
+        return authors.length === 0;
+    }
+
+    addAuthor(author) {
+        //console.log("author ", author.id);
+        var authors = ((this.state && this.state.authors) ? this.state.authors : [])
+            .filter((a, index, arr) => a.id !== author.id);
+        authors.push(author);
+        this.setState({authors: authors});
+
+        this.forceUpdate();
+    }
+
+    removeAuthor(authorId) {
+        return (e) => {
+            var authors = this.state.authors.filter((a, index, arr) => a.id !== authorId);
+            this.setState({authors: authors});
+            e.preventDefault();
+        }
+    }
+
+    authorsList() {
+        var self = this;
+        return ((this.state && this.state.authors) ? this.state.authors : [])
+            .map(a => (<li key={a.id}><div><span>{a.name}</span><a href="#" onClick={self.removeAuthor(a.id)}>[remove]</a></div></li>));
     }
 
     render() {
@@ -95,6 +142,22 @@ class UpdateBook extends Base {
                                 placeholder="Enter description" 
                                 value={this.state.book.description}
                                 onChange={this.handleDescriptionChange} />
+                    </div>
+
+                    <div className="form-group">
+
+                        <label>Authors</label>
+
+                        <ul>
+                            {this.authorsList()}    
+                        </ul>
+                    </div>
+
+                    <div className="form-group">
+                        <SelectAuthors 
+                            filter={this.notAnAuthor}
+                            select={this.addAuthor}
+                            selected={this.state.authors}></SelectAuthors>
                     </div>
 
                     <button type="submit" 
