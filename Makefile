@@ -33,6 +33,9 @@ be-test:
 	echo "running backend tests"
 	cd library-be && go test ./... -cover
 
+be-lint:
+	cd library-be && golangci-lint run ./...
+
 be-run: export SERVER_PORT=7070
 be-run: export SERVER_HOST=0.0.0.0
 be-run: export DATABASE_NAME=library
@@ -44,4 +47,4 @@ be-run:
 	echo "running backend"
 	cd library-be/cmd/library && go run main.go
 
-be-all: be-fmt be-test be-run
+be-all: be-fmt be-lint be-test be-run

@@ -40,12 +40,10 @@ func NewValidationError(violations ...*Violation) *ValidationError {
 }
 
 func HandleError(err error, w http.ResponseWriter) {
-
 	fmt.Printf("Error in API: %v", err)
 
 	switch t := err.(type) {
 	case *ValidationError:
-
 		fmt.Printf("Violations: %v", t.Violations)
 		ResponseJSON(http.StatusBadRequest, t.Violations, w)
 	default:

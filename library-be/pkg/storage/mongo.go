@@ -30,20 +30,20 @@ func (a *Adapter) InsertOne(ctx context.Context, doc interface{}) error {
 }
 
 func (a *Adapter) UpdateOne(ctx context.Context, id string, str interface{}) error {
-
 	strBts, err := bson.Marshal(str)
 	if err != nil {
 		return err
 	}
 
 	var m bson.M
-	if err = bson.Unmarshal(strBts, &m); err != nil {
-		return err
+	if uEerr := bson.Unmarshal(strBts, &m); err != nil {
+		return uEerr
 	}
 
 	filter := bson.M{"_id": id}
 	update := bson.M{"$set": m}
 	_, err = a.collection.UpdateOne(ctx, filter, update)
+
 	return err
 }
 
@@ -55,11 +55,11 @@ func (a *Adapter) FindOne(ctx context.Context, id string, str interface{}) error
 func (a *Adapter) DeleteOne(ctx context.Context, id string) error {
 	filter := bson.M{"_id": id}
 	_, err := a.collection.DeleteOne(ctx, filter)
+
 	return err
 }
 
 func (a *Adapter) List(ctx context.Context, criteria bson.D, offset, size int64) ([]map[string]interface{}, error) {
-
 	cur, err := a.collection.Find(ctx, criteria, a.Skip(offset), a.Limit(size))
 	if err != nil {
 		return nil, err
@@ -71,12 +71,13 @@ func (a *Adapter) List(ctx context.Context, criteria bson.D, offset, size int64)
 	}
 
 	result := make([]map[string]interface{}, 0)
-	for cur.Next(ctx) {
 
+	for cur.Next(ctx) {
 		var m map[string]interface{}
 		if err := cur.Decode(&m); err != nil {
 			return nil, err
 		}
+
 		fmt.Printf("Next: %v", m)
 		result = append(result, m)
 	}

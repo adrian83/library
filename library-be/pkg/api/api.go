@@ -23,7 +23,7 @@ const (
 )
 
 // UnmarshalReqBody transforms UnmarshalAndValidate into given interface{}.
-func UnmarshalReqBody(rc io.ReadCloser, str interface{}) error {
+func UnmarshalReqBody(rc io.Reader, str interface{}) error {
 	bodyBts, err := ioutil.ReadAll(rc)
 	if err != nil {
 		return err
@@ -34,7 +34,7 @@ func UnmarshalReqBody(rc io.ReadCloser, str interface{}) error {
 
 // UnmarshalAndValidate transforms UnmarshalAndValidate into given instance of
 // Validable, taen validates if the struct is correct.
-func UnmarshalAndValidate(rc io.ReadCloser, val Validable) error {
+func UnmarshalAndValidate(rc io.Reader, val Validable) error {
 	if err := UnmarshalReqBody(rc, val); err != nil {
 		return err
 	}
@@ -46,25 +46,32 @@ func UnmarshalAndValidate(rc io.ReadCloser, val Validable) error {
 func ResponseText(status int, msg string, w http.ResponseWriter) {
 	w.Header().Add(contentType, typeText)
 	w.WriteHeader(status)
-	w.Write([]byte(msg))
+
+	if _, err := w.Write([]byte(msg)); err != nil {
+		fmt.Println("TODO")
+	}
 }
 
 // ResponseJSON writes given interface{} and status into ResponseWritercin form of json.
 func ResponseJSON(status int, resp interface{}, w http.ResponseWriter) {
-
 	var respBts []byte
+
 	if resp != nil {
 		bts, err := json.Marshal(resp)
 		if err != nil {
 			HandleError(err, w)
 			return
 		}
+
 		respBts = bts
 	}
 
 	w.Header().Add(contentType, typeJSON)
 	w.WriteHeader(status)
-	w.Write(respBts)
+
+	if _, err := w.Write(respBts); err != nil {
+		fmt.Println("TODO")
+	}
 }
 
 // Validable is an interface for all structures that can be validated.
@@ -79,7 +86,6 @@ const (
 )
 
 func ParseListRequest(params map[string][]string) *common.ListRequest {
-
 	limit, offset, sort := defaultLimit, defaultOffset, defaultSort
 
 	limits := params["limit"]
@@ -105,5 +111,4 @@ func ParseListRequest(params map[string][]string) *common.ListRequest {
 	fmt.Printf("limit: %v, offer: %v, sort: %v\n", limit, offset, sort)
 
 	return common.NewListRequest(offset, limit, sort)
-
 }

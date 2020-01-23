@@ -37,7 +37,6 @@ type authorLister interface {
 // HandleListing is a handler / controller for listing authors.
 func HandleListing(authorLister authorLister) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		ctx, cancel := context.WithTimeout(context.Background(), api.RequestTimeout)
 		defer cancel()
 
@@ -55,7 +54,6 @@ func HandleListing(authorLister authorLister) func(http.ResponseWriter, *http.Re
 
 // HandleGetting is a handler / controller for getting Author by its Id.
 func HandleGetting(authorGetter authorGetter) func(http.ResponseWriter, *http.Request) {
-
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx, cancel := context.WithTimeout(context.Background(), api.RequestTimeout)
 		defer cancel()
@@ -74,9 +72,7 @@ func HandleGetting(authorGetter authorGetter) func(http.ResponseWriter, *http.Re
 
 // HandleUpdating is a handler / controller for updating author.
 func HandleUpdating(authorUpdater authorUpdater) func(http.ResponseWriter, *http.Request) {
-
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		ctx, cancel := context.WithTimeout(context.Background(), api.RequestTimeout)
 		defer cancel()
 
@@ -100,7 +96,6 @@ func HandleUpdating(authorUpdater authorUpdater) func(http.ResponseWriter, *http
 
 // HandleDeleting is a handler / controller for deleting author.
 func HandleDeleting(authorDeleter authorDeleter) func(http.ResponseWriter, *http.Request) {
-
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx, cancel := context.WithTimeout(context.Background(), api.RequestTimeout)
 		defer cancel()
@@ -118,14 +113,12 @@ func HandleDeleting(authorDeleter authorDeleter) func(http.ResponseWriter, *http
 
 // HandlePersisting is a handler / controller for persisting authors.
 func HandlePersisting(authorPersister authorPersister) func(http.ResponseWriter, *http.Request) {
-
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx, cancel := context.WithTimeout(context.Background(), api.RequestTimeout)
 		defer cancel()
 
 		var createAuthor CreateAuthor
-		err := api.UnmarshalAndValidate(r.Body, &createAuthor)
-		if err != nil {
+		if err := api.UnmarshalAndValidate(r.Body, &createAuthor); err != nil {
 			api.HandleError(err, w)
 			return
 		}

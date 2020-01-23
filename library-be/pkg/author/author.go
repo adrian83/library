@@ -24,14 +24,13 @@ func NewEntity(athr *Author) *Entity {
 }
 
 func NewEntityFromDoc(doc map[string]interface{}) (*Entity, error) {
-
 	docBytes, err := bson.Marshal(doc)
 	if err != nil {
 		return nil, err
 	}
 
 	var entity Entity
-	if err = bson.Unmarshal(docBytes, &entity); err != nil {
+	if err := bson.Unmarshal(docBytes, &entity); err != nil {
 		return nil, err
 	}
 
@@ -72,9 +71,8 @@ type AuthorsPage struct {
 }
 
 func NewAuthorsPage(authors Authors, limit, offset, total int64) *AuthorsPage {
-	page := common.NewPage(limit, offset, total)
 	return &AuthorsPage{
-		Page:    page,
+		Page:    common.NewPage(limit, offset, total),
 		Authors: authors,
 	}
 }

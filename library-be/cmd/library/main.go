@@ -2,11 +2,13 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"strconv"
+	"syscall"
 	"time"
 
 	"github.com/gorilla/handlers"
@@ -27,19 +29,33 @@ import (
 )
 
 const (
+	configPrefix = "library"
+
 	v1Api = "/api/v1"
 )
 
-func main() {
-
+func readConfiguration() *config.Config {
 	var cfg config.Config
-	err := envconfig.Process("library", &cfg)
-	if err != nil {
+	if err := envconfig.Process(configPrefix, &cfg); err != nil {
 		log.Printf("cannot read Configuration, error: %v", err)
 	}
+
 	log.Printf("Configuration: %v", &cfg)
 
+	return &cfg
+}
+
+func syncLogger(logger *zap.Logger) {
+	if err := logger.Sync(); err != nil {
+		fmt.Println("cannot sync logger")
+	}
+}
+
+func main() {
+	cfg := readConfiguration()
+
 	mongoURI := "mongodb://" + cfg.DatabaseHost + ":" + strconv.Itoa(cfg.DatabasePort)
+
 	client, err := mongo.NewClient(options.Client().ApplyURI(mongoURI))
 	if err != nil {
 		log.Printf("Cannot create mongodb client: %v", true)
@@ -58,10 +74,10 @@ func main() {
 	authorCollection := database.Collection("author")
 
 	bookAdapterLogger, _ := zap.NewProduction()
-	defer bookAdapterLogger.Sync()
+	defer syncLogger(bookAdapterLogger)
 
 	authorAdapterLogger, _ := zap.NewProduction()
-	defer authorAdapterLogger.Sync()
+	defer syncLogger(authorAdapterLogger)
 
 	mongoBookAdapter := storage.NewAdapter(booksCollection, bookAdapterLogger)
 	mongoAuthorAdapter := storage.NewAdapter(authorCollection, authorAdapterLogger)
@@ -73,6 +89,49 @@ func main() {
 	allowedMethods := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS"})
 	allowedOrigins := handlers.AllowedOrigins([]string{"*"})
 
+	r := createRouter(cfg, authorService, bookService)
+
+	http.Handle("/", r)
+
+	router := handlers.CORS(allowedHeaders, allowedMethods, allowedOrigins)(r)
+
+	startServer(cfg, router)
+}
+
+func startServer(cfg *config.Config, router http.Handler) {
+	serverAddress := cfg.ServerHost + ":" + strconv.Itoa(cfg.ServerPort)
+	server := &http.Server{Addr: serverAddress, Handler: router}
+
+	idleConnsClosed := make(chan struct{})
+
+	go func() {
+		sigint := make(chan os.Signal, 1)
+		signal.Notify(sigint, os.Interrupt)
+		signal.Notify(sigint, syscall.SIGTERM)
+
+		<-sigint
+
+		log.Printf("Shutdown: %v", true)
+		// We received an interrupt signal, shut down.
+		if err := server.Shutdown(context.Background()); err != nil {
+			// Error from closing listeners, or context timeout:
+			log.Printf("HTTP server Shutdown: %v", err)
+		}
+
+		close(idleConnsClosed)
+	}()
+
+	if err := server.ListenAndServe(); err != http.ErrServerClosed {
+		// Error starting or closing listener:
+		log.Printf("HTTP server ListenAndServe: %v", err)
+	}
+
+	log.Printf("Exiting: %v", true)
+
+	<-idleConnsClosed
+}
+
+func createRouter(cfg *config.Config, authorService *author.Service, bookService *book.Service) *mux.Router {
 	r := mux.NewRouter()
 
 	r.HandleFunc(v1Api+"/books", bookapi.HandleListing(bookService)).Methods(http.MethodGet)
@@ -89,37 +148,5 @@ func main() {
 
 	r.PathPrefix("").Handler(http.StripPrefix("", http.FileServer(http.Dir(cfg.StaticsPath))))
 
-	http.Handle("/", r)
-
-	router := handlers.CORS(allowedHeaders, allowedMethods, allowedOrigins)(r)
-
-	serverAddress := cfg.ServerHost + ":" + strconv.Itoa(cfg.ServerPort)
-	server := &http.Server{Addr: serverAddress, Handler: router}
-
-	idleConnsClosed := make(chan struct{})
-	go func() {
-		sigint := make(chan os.Signal, 1)
-		signal.Notify(sigint, os.Interrupt)
-		signal.Notify(sigint, os.Kill)
-
-		<-sigint
-
-		log.Printf("Shutdown: %v", true)
-		// We received an interrupt signal, shut down.
-		if err := server.Shutdown(context.Background()); err != nil {
-			// Error from closing listeners, or context timeout:
-			log.Printf("HTTP server Shutdown: %v", err)
-		}
-		close(idleConnsClosed)
-	}()
-
-	if err := server.ListenAndServe(); err != http.ErrServerClosed {
-		// Error starting or closing listener:
-		log.Printf("HTTP server ListenAndServe: %v", err)
-	}
-
-	log.Printf("Exiting: %v", true)
-
-	<-idleConnsClosed
-
+	return r
 }

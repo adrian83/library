@@ -17,7 +17,6 @@ type user struct {
 }
 
 func TestUnmarshalingBody(t *testing.T) {
-
 	// given
 	testData := map[string]struct {
 		body io.ReadCloser
@@ -51,7 +50,6 @@ type TestBody struct {
 }
 
 func TestJSONResponses(t *testing.T) {
-
 	// given
 	testData := map[string]struct {
 		status int
@@ -74,6 +72,7 @@ func TestJSONResponses(t *testing.T) {
 			// then
 			resp := w.Result()
 			body := readJSON(t, resp.Body)
+			defer resp.Body.Close()
 
 			assert.Equal(t, data.status, resp.StatusCode)
 			assert.Equal(t, data.body.Status, body.Status)
@@ -83,7 +82,6 @@ func TestJSONResponses(t *testing.T) {
 }
 
 func TestTextResponses(t *testing.T) {
-
 	// given
 	testData := map[string]struct {
 		status int
@@ -98,7 +96,6 @@ func TestTextResponses(t *testing.T) {
 		data := tData
 
 		t.Run(name, func(t *testing.T) {
-
 			w := httptest.NewRecorder()
 
 			// when
@@ -107,6 +104,7 @@ func TestTextResponses(t *testing.T) {
 			// then
 			resp := w.Result()
 			body := readText(t, resp.Body)
+			defer resp.Body.Close()
 
 			assert.Equal(t, data.status, resp.StatusCode)
 			assert.Equal(t, data.body, string(body))
@@ -115,7 +113,7 @@ func TestTextResponses(t *testing.T) {
 	}
 }
 
-func readJSON(t *testing.T, rc io.ReadCloser) *TestBody {
+func readJSON(t *testing.T, rc io.Reader) *TestBody {
 	bts, err := ioutil.ReadAll(rc)
 	if err != nil {
 		t.Errorf("error while reading bytes from response body")
@@ -129,7 +127,7 @@ func readJSON(t *testing.T, rc io.ReadCloser) *TestBody {
 	return &body
 }
 
-func readText(t *testing.T, rc io.ReadCloser) []byte {
+func readText(t *testing.T, rc io.Reader) []byte {
 	bts, err := ioutil.ReadAll(rc)
 	if err != nil {
 		t.Errorf("error while reading bytes from response body")

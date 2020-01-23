@@ -42,9 +42,9 @@ func (s *Service) Delete(ctx context.Context, authorID string) error {
 	return s.store.DeleteOne(ctx, authorID)
 }
 
-func (b *Service) Find(ctx context.Context, id string) (*Author, error) {
+func (s *Service) Find(ctx context.Context, id string) (*Author, error) {
 	var entity Entity
-	if err := b.store.FindOne(ctx, id, &entity); err != nil {
+	if err := s.store.FindOne(ctx, id, &entity); err != nil {
 		return nil, err
 	}
 
@@ -57,7 +57,6 @@ const (
 )
 
 func (s *Service) FindAuthorsByIDs(ctx context.Context, ids []string) (map[string]*Author, error) {
-
 	criteria := bson.D{{
 		"_id",
 		bson.D{{
@@ -72,6 +71,7 @@ func (s *Service) FindAuthorsByIDs(ctx context.Context, ids []string) (map[strin
 	}
 
 	authorsMap := make(map[string]*Author)
+
 	for _, m := range maps {
 		entity, err := NewEntityFromDoc(m)
 		if err != nil {
@@ -86,10 +86,9 @@ func (s *Service) FindAuthorsByIDs(ctx context.Context, ids []string) (map[strin
 }
 
 func (s *Service) mapsToAuthors(maps []map[string]interface{}) ([]*Author, error) {
-
 	authors := make([]*Author, 0)
-	for _, m := range maps {
 
+	for _, m := range maps {
 		entity, err := NewEntityFromDoc(m)
 		if err != nil {
 			return nil, err
@@ -98,11 +97,11 @@ func (s *Service) mapsToAuthors(maps []map[string]interface{}) ([]*Author, error
 		author := NewAuthorFromEntity(entity)
 		authors = append(authors, author)
 	}
+
 	return authors, nil
 }
 
 func (s *Service) List(ctx context.Context, listAuthors *common.ListRequest) (*AuthorsPage, error) {
-
 	filter := bson.D{}
 
 	maps, err := s.store.List(ctx, filter, listAuthors.Offset, listAuthors.Limit)
@@ -123,5 +122,6 @@ func (s *Service) List(ctx context.Context, listAuthors *common.ListRequest) (*A
 	}
 
 	page := NewAuthorsPage(authors, listAuthors.Limit, listAuthors.Offset, count)
+
 	return page, nil
 }

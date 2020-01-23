@@ -2,7 +2,6 @@ package book
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"github.com/adrian83/library/pkg/api"
@@ -36,7 +35,6 @@ type bookGetter interface {
 }
 
 func HandleGetting(bookGetter bookGetter) func(http.ResponseWriter, *http.Request) {
-
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx, cancel := context.WithTimeout(context.Background(), api.RequestTimeout)
 		defer cancel()
@@ -55,7 +53,6 @@ func HandleGetting(bookGetter bookGetter) func(http.ResponseWriter, *http.Reques
 
 // HandleDeleting is a handler / controller for deleting books.
 func HandleDeleting(bookDeleter bookDeleter) func(http.ResponseWriter, *http.Request) {
-
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx, cancel := context.WithTimeout(context.Background(), api.RequestTimeout)
 		defer cancel()
@@ -73,21 +70,18 @@ func HandleDeleting(bookDeleter bookDeleter) func(http.ResponseWriter, *http.Req
 
 // HandlePersisting is a handler / controller for persisting book.
 func HandlePersisting(bookPersister bookPersister) func(http.ResponseWriter, *http.Request) {
-
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		ctx, cancel := context.WithTimeout(context.Background(), api.RequestTimeout)
 		defer cancel()
 
 		var createBook CreateBook
-		err := api.UnmarshalAndValidate(r.Body, &createBook)
-		fmt.Printf("ERROR: %t", err)
-		if err != nil {
+		if err := api.UnmarshalAndValidate(r.Body, &createBook); err != nil {
 			api.HandleError(err, w)
 			return
 		}
 
 		req := book.NewCreateBookReq(createBook.Title, createBook.Authors)
+
 		bkg, err := bookPersister.Persist(ctx, req)
 		if err != nil {
 			api.HandleError(err, w)
@@ -100,9 +94,7 @@ func HandlePersisting(bookPersister bookPersister) func(http.ResponseWriter, *ht
 
 // HandleUpdating is a handler / controller for updating book.
 func HandleUpdating(bookUpdater bookUpdater) func(http.ResponseWriter, *http.Request) {
-
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		ctx, cancel := context.WithTimeout(context.Background(), api.RequestTimeout)
 		defer cancel()
 
@@ -127,7 +119,6 @@ func HandleUpdating(bookUpdater bookUpdater) func(http.ResponseWriter, *http.Req
 // HandleListing is a handler / controller for listing books.
 func HandleListing(booksLister booksLister) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		ctx, cancel := context.WithTimeout(context.Background(), api.RequestTimeout)
 		defer cancel()
 

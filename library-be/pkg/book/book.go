@@ -18,7 +18,6 @@ type Entity struct {
 }
 
 func NewEntityFromBook(bkg *Book) *Entity {
-
 	ids := make([]string, len(bkg.Authors))
 	for i := 0; i < len(bkg.Authors); i++ {
 		ids[i] = bkg.Authors[i].ID
@@ -50,15 +49,14 @@ func NewEntityFromUpdateBookReq(req *UpdateBookReq) *Entity {
 }
 
 func NewEntityFromDoc(doc map[string]interface{}) (*Entity, error) {
-
 	docBytes, err := bson.Marshal(doc)
 	if err != nil {
 		return nil, err
 	}
 
 	var entity Entity
-	if err = bson.Unmarshal(docBytes, &entity); err != nil {
-		return nil, err
+	if uErr := bson.Unmarshal(docBytes, &entity); uErr != nil {
+		return nil, uErr
 	}
 
 	return &entity, nil
@@ -72,9 +70,8 @@ type BooksPage struct {
 
 // NewBooksPage is a constructor for BooksPage.
 func NewBooksPage(books Books, limit, offset, total int64) *BooksPage {
-	page := common.NewPage(limit, offset, total)
 	return &BooksPage{
-		Page:  page,
+		Page:  common.NewPage(limit, offset, total),
 		Books: books,
 	}
 }

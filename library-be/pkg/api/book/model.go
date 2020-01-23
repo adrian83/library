@@ -40,4 +40,3 @@ func (cb *UpdateBook) Validate() error {
 
 	return nil
 }
-

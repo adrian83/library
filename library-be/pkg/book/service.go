@@ -101,7 +101,6 @@ func (s *Service) Find(ctx context.Context, id string) (*Book, error) {
 }
 
 func (s *Service) List(ctx context.Context, listBooks *common.ListRequest) (*BooksPage, error) {
-
 	filter := bson.D{}
 
 	maps, err := s.store.List(ctx, filter, listBooks.Offset, listBooks.Limit)
@@ -112,11 +111,11 @@ func (s *Service) List(ctx context.Context, listBooks *common.ListRequest) (*Boo
 	fmt.Printf("Maps: %v", maps)
 
 	entities := make([]*Entity, 0)
-	for _, m := range maps {
 
-		entity, err := NewEntityFromDoc(m)
-		if err != nil {
-			return nil, err
+	for _, m := range maps {
+		entity, eErr := NewEntityFromDoc(m)
+		if eErr != nil {
+			return nil, eErr
 		}
 
 		entities = append(entities, entity)
@@ -128,8 +127,8 @@ func (s *Service) List(ctx context.Context, listBooks *common.ListRequest) (*Boo
 	}
 
 	books := make([]*Book, 0)
-	for _, e := range entities {
 
+	for _, e := range entities {
 		authors := s.selectAuthors(authorsMap, e.Authors)
 
 		book := NewBookFromEntity(e)
@@ -144,24 +143,25 @@ func (s *Service) List(ctx context.Context, listBooks *common.ListRequest) (*Boo
 	}
 
 	page := NewBooksPage(books, listBooks.Limit, listBooks.Offset, count)
+
 	return page, nil
 }
 
 func (s *Service) selectAuthors(authorsMap map[string]*author.Author, authorIDs []string) []*author.Author {
-
 	authors := make([]*author.Author, 0)
+
 	for _, authorID := range authorIDs {
-		author, ok := authorsMap[authorID]
-		if ok {
-			authors = append(authors, author)
+		if athr, ok := authorsMap[authorID]; ok {
+			authors = append(authors, athr)
 		}
 	}
+
 	return authors
 }
 
 func (s *Service) findAuthors(ctx context.Context, entities []*Entity) (map[string]*author.Author, error) {
-
 	idsMap := make(map[string]bool)
+
 	for _, b := range entities {
 		for _, aID := range b.Authors {
 			idsMap[aID] = true
