@@ -27,7 +27,6 @@ class ListBooks extends Base {
     }
 
     changePage(no, size) {
-        //console.log("page number ", no, " size ", size);
         const self = this;
         execGet(booksBeUrl() + "?limit=" + size + "&offset=" + (no * size) + "&sort=_id")
             .then(response => response.json())
@@ -41,7 +40,6 @@ class ListBooks extends Base {
         const deleteBookUrl = bookBeUrl(book.id)
 
         return function(event) {
-
             execDelete(deleteBookUrl)
                 .then(function(response){
                     var filtered = self.state.page.books.filter((bk, index, arr) => bk.id !== book.id);
@@ -57,26 +55,21 @@ class ListBooks extends Base {
     }
 
     renderAuthors(authors) {
-        
         var links = (authors ? authors : []).map(a => <span><Link to={showAuthorUrl(a.id)} >{a.name}</Link>&nbsp;&nbsp;&nbsp;</span>);
-    return (<span>{links}</span>)
+        return (<span>{links}</span>)
     }
 
     renderTableRow(book) {
         const bookId = book.id;
-        const title = book.title;
-        const description = book.description;
         const authors = this.renderAuthors(book.authors);
-
-
         const showUrl = showBookUrl(bookId);
         const editUrl = editBookUrl(bookId);
 
         return (
             <tr key={bookId}>
-                <td><Link to={showUrl}>{title}</Link></td>
+                <td><Link to={showUrl}>{book.title}</Link></td>
                 <td>{authors}</td>
-                <td>{description}</td>
+                <td>{book.description}</td>
                 <td>
                     <Link to={editUrl} >edit</Link>&nbsp;&nbsp;&nbsp;
                     <Link to="" onClick={this.delete(book)}>delete</Link>
@@ -91,7 +84,6 @@ class ListBooks extends Base {
 
         const self = this;
         const createUrl = createBookUrl();
-
 
         const books = (this.state && this.state.page && this.state.page.books) ? this.state.page.books : [];
         var rows = books.map(book => self.renderTableRow(book));

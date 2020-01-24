@@ -48,7 +48,7 @@ class UpdateBook extends Base {
         execPut(bookBeUrl(bookId), book)
             .then(response => response.json())
             .then(data => self.setState({book: data}))
-            .then(data => self.registerInfo("Book updated"))
+            .then(_ => self.registerInfo("Book updated"))
             .catch(error => self.registerError(error));
 
         event.preventDefault();
@@ -68,8 +68,7 @@ class UpdateBook extends Base {
     }
 
     addAuthor(author) {
-        var authors = ((this.state && this.state.authors) ? this.state.authors : [])
-            .filter((a, index, arr) => a.id !== author.id);
+        var authors = this.authorsList().filter((a, index, arr) => a.id !== author.id);
         authors.push(author);
         this.setState({authors: authors});
     }
@@ -114,9 +113,7 @@ class UpdateBook extends Base {
                 <form onSubmit={this.handleSubmit}>
 
                     <div className="form-group">
-
                         <label htmlFor="titleInput">Title</label>
-
                         <input type="title" 
                                 className="form-control" 
                                 id="titleInput" 
@@ -126,9 +123,7 @@ class UpdateBook extends Base {
                     </div>
 
                     <div className="form-group">
-
                         <label htmlFor="descriptionInput">Description</label>
-
                         <input type="description" 
                                 className="form-control" 
                                 id="descriptionInput" 
@@ -138,12 +133,8 @@ class UpdateBook extends Base {
                     </div>
 
                     <div className="form-group">
-
                         <label>Authors</label>
-
-                        <ul>
-                            {this.authorsList()}    
-                        </ul>
+                        <ul>{this.authorsList()}</ul>
                     </div>
 
                     <div className="form-group">
@@ -153,7 +144,7 @@ class UpdateBook extends Base {
                     </div>
 
                     <button type="submit" 
-                            className="btn btn-primary">Submit</button>
+                            className="btn btn-primary">Update</button>
 
                 </form>
             </div>);

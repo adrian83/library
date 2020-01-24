@@ -74,9 +74,7 @@ class UpdateAuthor extends Base {
                 <form onSubmit={this.handleSubmit}>
 
                     <div className="form-group">
-
                         <label htmlFor="nameInput">Name</label>
-
                         <input type="name" 
                                 className="form-control" 
                                 id="nameInput" 
@@ -86,9 +84,7 @@ class UpdateAuthor extends Base {
                     </div>
 
                     <div className="form-group">
-
                         <label htmlFor="descriptionInput">Description</label>
-
                         <input type="description" 
                                 className="form-control" 
                                 id="descriptionInput" 
@@ -98,7 +94,7 @@ class UpdateAuthor extends Base {
                     </div>
 
                     <button type="submit" 
-                            className="btn btn-primary">Submit</button>
+                            className="btn btn-primary">Update</button>
 
                 </form>
             </div>);

@@ -31,7 +31,6 @@ class ListAuthors extends Base {
         const deleteAuthorUrl = authorBeUrl(author.id)
 
         return function(event) {
-
             execDelete(deleteAuthorUrl)
                 .then(function(response){
                     var filtered = self.state.page.authors.filter((at, index, arr) => at.id !== author.id);
@@ -39,26 +38,22 @@ class ListAuthors extends Base {
                     page.authors = filtered;
                     self.setState({page: page})
                 })
-                .then(data => self.registerInfo(`Author '${author.name}' removed`))
+                .then(_ => self.registerInfo(`Author '${author.name}' removed`))
                 .catch(error => self.registerError(error));
 
             event.preventDefault();
         }
     }
 
-    renderTableRow(no, author) {
+    renderTableRow(author) {
         const authorId = author.id;
-        const name = author.name;
-        const description = author.description;
-
         const showUrl = showAuthorUrl(authorId);
         const editUrl = editAuthorUrl(authorId);
 
         return (
             <tr key={authorId}>
-                <th scope="row">{no++}</th>
-                <td><Link to={showUrl}>{name}</Link></td>
-                <td>{description}</td>
+                <td><Link to={showUrl}>{author.name}</Link></td>
+                <td>{author.description}</td>
                 <td>
                     <Link to={editUrl} >edit</Link>&nbsp;&nbsp;&nbsp;
                     <Link to="" onClick={this.delete(author)}>delete</Link>
@@ -66,10 +61,9 @@ class ListAuthors extends Base {
             </tr>);
     }
 
-    changePage(no, size) {
-        //console.log("page number ", no, " size ", size);
+    changePage(pageNo, size) {
         const self = this;
-        execGet(authorsBeUrl() + "?limit=" + size + "&offset=" + (no * size) + "&sort=_id")
+        execGet(authorsBeUrl() + "?limit=" + size + "&offset=" + (pageNo * size) + "&sort=_id")
             .then(response => response.json())
             .then(data => self.setState({page: data}))
             .then(_ => self.forceUpdate())
@@ -85,9 +79,8 @@ class ListAuthors extends Base {
         const self = this;
         const createUrl = createAuthorUrl();
 
-        var no = 1
         const authors = (this.state && this.state.page && this.state.page.authors) ? this.state.page.authors : [];
-        var rows = authors.map(author => self.renderTableRow(no++, author));
+        var rows = authors.map(author => self.renderTableRow(author));
 
         return (
             <div>
@@ -99,12 +92,13 @@ class ListAuthors extends Base {
                 <div>
                     <Link to={createUrl}>Create author</Link>
                 </div>
+
                 <br/><br/>
+                
                 <div>
                     <table className="table table-striped">
                         <thead>
                             <tr>
-                                <th scope="col">#</th>
                                 <th scope="col">Name</th>
                                 <th scope="col">Description</th>
                                 <th scope="col">Operations</th>

@@ -35,7 +35,6 @@ class CreateAuthor extends Base {
     }
 
     handleSubmit(event) {
-
         const self = this;
 
         const form = {
@@ -54,9 +53,7 @@ class CreateAuthor extends Base {
     render() {
 
         if(this.state && this.state.author) {
-            var editUrl = editAuthorUrl(
-                this.state.author.id);
-
+            var editUrl = editAuthorUrl(this.state.author.id);
             return (<Redirect to={editUrl} />);
         }
 
