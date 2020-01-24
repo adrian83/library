@@ -47,4 +47,4 @@ be-run:
 	echo "running backend"
 	cd library-be/cmd/library && go run main.go
 
-be-all: be-fmt be-lint be-test be-run
+be-all: be-fmt be-test be-run

@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -24,6 +23,7 @@ import (
 	bookapi "github.com/adrian83/library/pkg/api/book"
 	"github.com/adrian83/library/pkg/author"
 	"github.com/adrian83/library/pkg/book"
+	"github.com/adrian83/library/pkg/common"
 	"github.com/adrian83/library/pkg/config"
 	"github.com/adrian83/library/pkg/storage"
 )
@@ -45,10 +45,13 @@ func readConfiguration() *config.Config {
 	return &cfg
 }
 
-func syncLogger(logger *zap.Logger) {
-	if err := logger.Sync(); err != nil {
-		fmt.Println("cannot sync logger")
+func NewLogger() *zap.SugaredLogger {
+	logger, err := common.NewLogger()
+	if err != nil {
+		panic(err)
 	}
+
+	return logger
 }
 
 func main() {
@@ -73,11 +76,8 @@ func main() {
 	booksCollection := database.Collection("books")
 	authorCollection := database.Collection("author")
 
-	bookAdapterLogger, _ := zap.NewProduction()
-	defer syncLogger(bookAdapterLogger)
-
-	authorAdapterLogger, _ := zap.NewProduction()
-	defer syncLogger(authorAdapterLogger)
+	bookAdapterLogger := NewLogger()
+	authorAdapterLogger := NewLogger()
 
 	mongoBookAdapter := storage.NewAdapter(booksCollection, bookAdapterLogger)
 	mongoAuthorAdapter := storage.NewAdapter(authorCollection, authorAdapterLogger)

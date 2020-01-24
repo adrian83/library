@@ -10,13 +10,16 @@ import (
 )
 
 type logger interface {
+	Infof(template string, args ...interface{})
 }
 
+// Adapter is a wrapper on MongoDB collection.
 type Adapter struct {
 	collection *mongo.Collection
 	logger     logger
 }
 
+// NewAdapter is a constructor for Adapter.
 func NewAdapter(coll *mongo.Collection, logger logger) *Adapter {
 	return &Adapter{
 		collection: coll,
@@ -24,8 +27,17 @@ func NewAdapter(coll *mongo.Collection, logger logger) *Adapter {
 	}
 }
 
+// InsertOne inserts one document into MongoDB collection.
 func (a *Adapter) InsertOne(ctx context.Context, doc interface{}) error {
-	_, err := a.collection.InsertOne(ctx, doc)
+	a.logger.Infof("inserting document: %v", doc)
+
+	output, err := a.collection.InsertOne(ctx, doc)
+	if err != nil {
+		return fmt.Errorf("cannot insert document, error: %v", err)
+	}
+
+	a.logger.Infof("inserting document response: %v", output)
+
 	return err
 }
 
