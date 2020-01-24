@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 
 class Pagination extends Component {
 
@@ -16,8 +17,6 @@ class Pagination extends Component {
         var pagesNo = Math.ceil(this.props.total / this.props.limit);
         var current = Math.floor(this.props.offset / this.props.limit);
 
-        //console.log("pages", pagesNo, "current", current);
-
         const limit = this.props.limit;
 
         const isFirst = current === 0;
@@ -28,7 +27,7 @@ class Pagination extends Component {
         if(isFirst) {
             list.push((<li key={-2} className="page-item disabled"><span className="page-link">Previous</span></li>));
         } else {
-            list.push((<li key={-1} className="page-item"><a className="page-link" href="#" onClick={this.changePage(current-1, limit)}>Previous</a></li>));
+            list.push((<li key={-1} className="page-item"><Link className="page-link" onClick={this.changePage(current-1, limit)}>Previous</Link></li>));
         }
 
         for (var i = 0; i < pagesNo; i++) {
@@ -37,14 +36,14 @@ class Pagination extends Component {
                                 <span className="page-link">{i+1}<span className="sr-only">(current)</span></span>
                             </li>));
             } else {
-                list.push((<li key={i} className="page-item"><a className="page-link" href="#" onClick={this.changePage(i, limit)}>{i+1}</a></li>));
+                list.push((<li key={i} className="page-item"><Link className="page-link" onClick={this.changePage(i, limit)}>{i+1}</Link></li>));
             }
         }
 
         if(isLast) {
             list.push((<li key={-3} className="page-item disabled"><span className="page-link">Next</span></li>));
         } else {
-            list.push((<li key={-4} className="page-item"><a className="page-link" href="#" onClick={this.changePage(current+1, limit)}>Next</a></li>));
+            list.push((<li key={-4} className="page-item"><Link className="page-link" onClick={this.changePage(current+1, limit)}>Next</Link></li>));
         }
 
         return list;
