@@ -132,19 +132,22 @@ func startServer(cfg *config.Config, router http.Handler) {
 }
 
 func createRouter(cfg *config.Config, authorService *author.Service, bookService *book.Service) *mux.Router {
+	bookAPILogger := NewLogger()
+	authorAPILogger := NewLogger()
+
 	r := mux.NewRouter()
 
-	r.HandleFunc(v1Api+"/books", bookapi.HandleListing(bookService)).Methods(http.MethodGet)
-	r.HandleFunc(v1Api+"/books", bookapi.HandlePersisting(bookService)).Methods(http.MethodPost)
-	r.HandleFunc(v1Api+"/books/{bookId}", bookapi.HandleUpdating(bookService)).Methods(http.MethodPut)
-	r.HandleFunc(v1Api+"/books/{bookId}", bookapi.HandleDeleting(bookService)).Methods(http.MethodDelete)
-	r.HandleFunc(v1Api+"/books/{bookId}", bookapi.HandleGetting(bookService)).Methods(http.MethodGet)
+	r.HandleFunc(v1Api+"/books", bookapi.HandleListing(bookService, bookAPILogger)).Methods(http.MethodGet)
+	r.HandleFunc(v1Api+"/books", bookapi.HandlePersisting(bookService, bookAPILogger)).Methods(http.MethodPost)
+	r.HandleFunc(v1Api+"/books/{bookId}", bookapi.HandleUpdating(bookService, bookAPILogger)).Methods(http.MethodPut)
+	r.HandleFunc(v1Api+"/books/{bookId}", bookapi.HandleDeleting(bookService, bookAPILogger)).Methods(http.MethodDelete)
+	r.HandleFunc(v1Api+"/books/{bookId}", bookapi.HandleGetting(bookService, bookAPILogger)).Methods(http.MethodGet)
 
-	r.HandleFunc(v1Api+"/authors", authorapi.HandleListing(authorService)).Methods(http.MethodGet)
-	r.HandleFunc(v1Api+"/authors", authorapi.HandlePersisting(authorService)).Methods(http.MethodPost)
-	r.HandleFunc(v1Api+"/authors/{authorId}", authorapi.HandleUpdating(authorService)).Methods(http.MethodPut)
-	r.HandleFunc(v1Api+"/authors/{authorId}", authorapi.HandleDeleting(authorService)).Methods(http.MethodDelete)
-	r.HandleFunc(v1Api+"/authors/{authorId}", authorapi.HandleGetting(authorService)).Methods(http.MethodGet)
+	r.HandleFunc(v1Api+"/authors", authorapi.HandleListing(authorService, authorAPILogger)).Methods(http.MethodGet)
+	r.HandleFunc(v1Api+"/authors", authorapi.HandlePersisting(authorService, authorAPILogger)).Methods(http.MethodPost)
+	r.HandleFunc(v1Api+"/authors/{authorId}", authorapi.HandleUpdating(authorService, authorAPILogger)).Methods(http.MethodPut)
+	r.HandleFunc(v1Api+"/authors/{authorId}", authorapi.HandleDeleting(authorService, authorAPILogger)).Methods(http.MethodDelete)
+	r.HandleFunc(v1Api+"/authors/{authorId}", authorapi.HandleGetting(authorService, authorAPILogger)).Methods(http.MethodGet)
 
 	r.PathPrefix("").Handler(http.StripPrefix("", http.FileServer(http.Dir(cfg.StaticsPath))))
 

@@ -34,7 +34,7 @@ type bookGetter interface {
 	Find(ctx context.Context, id string) (*book.Book, error)
 }
 
-func HandleGetting(bookGetter bookGetter) func(http.ResponseWriter, *http.Request) {
+func HandleGetting(bookGetter bookGetter, logger api.Logger) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx, cancel := context.WithTimeout(context.Background(), api.RequestTimeout)
 		defer cancel()
@@ -43,16 +43,16 @@ func HandleGetting(bookGetter bookGetter) func(http.ResponseWriter, *http.Reques
 
 		bkg, err := bookGetter.Find(ctx, bookID)
 		if err != nil {
-			api.HandleError(err, w)
+			api.HandleError(err, w, logger)
 			return
 		}
 
-		api.ResponseJSON(http.StatusOK, bkg, w)
+		api.ResponseJSON(http.StatusOK, bkg, w, logger)
 	}
 }
 
 // HandleDeleting is a handler / controller for deleting books.
-func HandleDeleting(bookDeleter bookDeleter) func(http.ResponseWriter, *http.Request) {
+func HandleDeleting(bookDeleter bookDeleter, logger api.Logger) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx, cancel := context.WithTimeout(context.Background(), api.RequestTimeout)
 		defer cancel()
@@ -60,23 +60,23 @@ func HandleDeleting(bookDeleter bookDeleter) func(http.ResponseWriter, *http.Req
 		bookID := mux.Vars(r)[bookIDParam]
 
 		if err := bookDeleter.Delete(ctx, bookID); err != nil {
-			api.HandleError(err, w)
+			api.HandleError(err, w, logger)
 			return
 		}
 
-		api.ResponseJSON(http.StatusOK, nil, w)
+		api.ResponseJSON(http.StatusOK, nil, w, logger)
 	}
 }
 
 // HandlePersisting is a handler / controller for persisting book.
-func HandlePersisting(bookPersister bookPersister) func(http.ResponseWriter, *http.Request) {
+func HandlePersisting(bookPersister bookPersister, logger api.Logger) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx, cancel := context.WithTimeout(context.Background(), api.RequestTimeout)
 		defer cancel()
 
 		var createBook CreateBook
 		if err := api.UnmarshalAndValidate(r.Body, &createBook); err != nil {
-			api.HandleError(err, w)
+			api.HandleError(err, w, logger)
 			return
 		}
 
@@ -84,16 +84,16 @@ func HandlePersisting(bookPersister bookPersister) func(http.ResponseWriter, *ht
 
 		bkg, err := bookPersister.Persist(ctx, req)
 		if err != nil {
-			api.HandleError(err, w)
+			api.HandleError(err, w, logger)
 			return
 		}
 
-		api.ResponseJSON(http.StatusCreated, bkg, w)
+		api.ResponseJSON(http.StatusCreated, bkg, w, logger)
 	}
 }
 
 // HandleUpdating is a handler / controller for updating book.
-func HandleUpdating(bookUpdater bookUpdater) func(http.ResponseWriter, *http.Request) {
+func HandleUpdating(bookUpdater bookUpdater, logger api.Logger) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx, cancel := context.WithTimeout(context.Background(), api.RequestTimeout)
 		defer cancel()
@@ -102,22 +102,22 @@ func HandleUpdating(bookUpdater bookUpdater) func(http.ResponseWriter, *http.Req
 
 		var updateBook UpdateBook
 		if err := api.UnmarshalAndValidate(r.Body, &updateBook); err != nil {
-			api.HandleError(err, w)
+			api.HandleError(err, w, logger)
 			return
 		}
 
 		req := book.NewUpdateBookReq(bookID, updateBook.Title, updateBook.Authors)
 		if err := bookUpdater.Update(ctx, req); err != nil {
-			api.HandleError(err, w)
+			api.HandleError(err, w, logger)
 			return
 		}
 
-		api.ResponseJSON(http.StatusOK, updateBook, w)
+		api.ResponseJSON(http.StatusOK, updateBook, w, logger)
 	}
 }
 
 // HandleListing is a handler / controller for listing books.
-func HandleListing(booksLister booksLister) func(http.ResponseWriter, *http.Request) {
+func HandleListing(booksLister booksLister, logger api.Logger) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx, cancel := context.WithTimeout(context.Background(), api.RequestTimeout)
 		defer cancel()
@@ -126,10 +126,10 @@ func HandleListing(booksLister booksLister) func(http.ResponseWriter, *http.Requ
 
 		page, err := booksLister.List(ctx, listBooks)
 		if err != nil {
-			api.HandleError(err, w)
+			api.HandleError(err, w, logger)
 			return
 		}
 
-		api.ResponseJSON(http.StatusOK, page, w)
+		api.ResponseJSON(http.StatusOK, page, w, logger)
 	}
 }

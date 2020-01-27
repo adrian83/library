@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -14,6 +15,15 @@ import (
 
 type user struct {
 	Name string `json:"name"`
+}
+
+type mockLogger struct{}
+
+func (m *mockLogger) Infof(s string, args ...interface{}) {
+	fmt.Printf(s, args...)
+}
+func (m *mockLogger) Errorf(s string, args ...interface{}) {
+	fmt.Printf(s, args...)
 }
 
 func TestUnmarshalingBody(t *testing.T) {
@@ -67,7 +77,7 @@ func TestJSONResponses(t *testing.T) {
 			w := httptest.NewRecorder()
 
 			// when
-			ResponseJSON(data.status, data.body, w)
+			ResponseJSON(data.status, data.body, w, &mockLogger{})
 
 			// then
 			resp := w.Result()
@@ -99,7 +109,7 @@ func TestTextResponses(t *testing.T) {
 			w := httptest.NewRecorder()
 
 			// when
-			ResponseText(data.status, data.body, w)
+			ResponseText(data.status, data.body, w, &mockLogger{})
 
 			// then
 			resp := w.Result()

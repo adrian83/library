@@ -22,11 +22,16 @@ const (
 	RequestTimeout = 10 * time.Second
 )
 
+type Logger interface {
+	Infof(string, ...interface{})
+	Errorf(string, ...interface{})
+}
+
 // UnmarshalReqBody transforms UnmarshalAndValidate into given interface{}.
 func UnmarshalReqBody(rc io.Reader, str interface{}) error {
 	bodyBts, err := ioutil.ReadAll(rc)
 	if err != nil {
-		return err
+		return fmt.Errorf("cannot read from Reader, error: %w", err)
 	}
 
 	return json.Unmarshal(bodyBts, str)
@@ -36,30 +41,30 @@ func UnmarshalReqBody(rc io.Reader, str interface{}) error {
 // Validable, taen validates if the struct is correct.
 func UnmarshalAndValidate(rc io.Reader, val Validable) error {
 	if err := UnmarshalReqBody(rc, val); err != nil {
-		return err
+		return fmt.Errorf("cannot unmarshal from Reader to Validable, error: %w", err)
 	}
 
 	return val.Validate()
 }
 
 // ResponseText writes given text and status into ResponseWriter in form of text.
-func ResponseText(status int, msg string, w http.ResponseWriter) {
+func ResponseText(status int, msg string, w http.ResponseWriter, logger Logger) {
 	w.Header().Add(contentType, typeText)
 	w.WriteHeader(status)
 
 	if _, err := w.Write([]byte(msg)); err != nil {
-		fmt.Println("TODO")
+		logger.Errorf("cannot write to http.ResponseWriter, error: %v", err)
 	}
 }
 
 // ResponseJSON writes given interface{} and status into ResponseWritercin form of json.
-func ResponseJSON(status int, resp interface{}, w http.ResponseWriter) {
+func ResponseJSON(status int, resp interface{}, w http.ResponseWriter, logger Logger) {
 	var respBts []byte
 
 	if resp != nil {
 		bts, err := json.Marshal(resp)
 		if err != nil {
-			HandleError(err, w)
+			HandleError(err, w, logger)
 			return
 		}
 
@@ -70,7 +75,7 @@ func ResponseJSON(status int, resp interface{}, w http.ResponseWriter) {
 	w.WriteHeader(status)
 
 	if _, err := w.Write(respBts); err != nil {
-		fmt.Println("TODO")
+		logger.Errorf("cannot write to http.ResponseWriter, error: %v", err)
 	}
 }
 
@@ -90,25 +95,20 @@ func ParseListRequest(params map[string][]string) *common.ListRequest {
 
 	limits := params["limit"]
 	if len(limits) > 0 {
-		fmt.Printf("\nLimits: %v\n", limits)
 		limitStr := limits[0]
 		limit, _ = strconv.ParseInt(limitStr, 10, 64)
 	}
 
 	offsets := params["offset"]
 	if len(offsets) > 0 {
-		fmt.Printf("\nOffsets: %v\n", offsets)
 		offsetStr := offsets[0]
 		offset, _ = strconv.ParseInt(offsetStr, 10, 64)
 	}
 
 	sorts := params["sort"]
 	if len(sorts) > 0 {
-		fmt.Printf("\nSorts: %v\n", sorts)
 		sort = sorts[0]
 	}
-
-	fmt.Printf("limit: %v, offer: %v, sort: %v\n", limit, offset, sort)
 
 	return common.NewListRequest(offset, limit, sort)
 }

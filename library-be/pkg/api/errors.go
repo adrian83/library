@@ -39,14 +39,14 @@ func NewValidationError(violations ...*Violation) *ValidationError {
 	}
 }
 
-func HandleError(err error, w http.ResponseWriter) {
+func HandleError(err error, w http.ResponseWriter, logger Logger) {
 	fmt.Printf("Error in API: %v", err)
 
 	switch t := err.(type) {
 	case *ValidationError:
 		fmt.Printf("Violations: %v", t.Violations)
-		ResponseJSON(http.StatusBadRequest, t.Violations, w)
+		ResponseJSON(http.StatusBadRequest, t.Violations, w, logger)
 	default:
-		ResponseText(http.StatusInternalServerError, msgInternalError, w)
+		ResponseText(http.StatusInternalServerError, msgInternalError, w, logger)
 	}
 }
