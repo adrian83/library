@@ -35,7 +35,6 @@ class CreateBook extends Base {
     }
 
     handleSubmit(event) {
-
         const self = this;
 
         const form = {
@@ -54,9 +53,7 @@ class CreateBook extends Base {
     render() {
 
         if(this.state && this.state.book) {
-            var editUrl = editBookUrl(
-                this.state.book.id);
-
+            var editUrl = editBookUrl(this.state.book.id);
             return (<Redirect to={editUrl} />);
         }
 

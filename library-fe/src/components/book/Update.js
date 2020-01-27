@@ -68,8 +68,11 @@ class UpdateBook extends Base {
     }
 
     addAuthor(author) {
-        var authors = this.authorsList().filter((a, index, arr) => a.id !== author.id);
+        console.log("add author", author);
+        var authors = ((this.state && this.state.authors) ? this.state.authors : [])
+            .filter((a, index, arr) => a.id !== author.id);
         authors.push(author);
+        console.log("authors", authors);
         this.setState({authors: authors});
     }
 
@@ -89,12 +92,11 @@ class UpdateBook extends Base {
 
     renderSelectedAuthor(author) {
         return (
-            <li key={author.id}>
-                <div>
-                    <span>{author.name}</span>
-                    <Link onClick={this.removeAuthor(author.id)}>[remove]</Link>
-                </div>
-            </li>)
+            <div key={author.id}>
+                <span>{author.name}</span>
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <Link to="" onClick={this.removeAuthor(author.id)}>[remove]</Link>
+            </div>)
     }
 
     render() {
@@ -134,7 +136,7 @@ class UpdateBook extends Base {
 
                     <div className="form-group">
                         <label>Authors</label>
-                        <ul>{this.authorsList()}</ul>
+                        {this.authorsList()}
                     </div>
 
                     <div className="form-group">

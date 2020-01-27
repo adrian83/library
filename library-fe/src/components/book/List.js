@@ -41,13 +41,13 @@ class ListBooks extends Base {
 
         return function(event) {
             execDelete(deleteBookUrl)
-                .then(function(response){
+                .then(function(_){
                     var filtered = self.state.page.books.filter((bk, index, arr) => bk.id !== book.id);
                     var page = self.state.page;
                     page.books = filtered;
                     self.setState({page: page})
                 })
-                .then(data => self.registerInfo(`Book '${book.title}' removed`))
+                .then(_ => self.registerInfo(`Book '${book.title}' removed`))
                 .catch(error => self.registerError(error));
 
             event.preventDefault();

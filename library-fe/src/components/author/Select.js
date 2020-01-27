@@ -38,6 +38,7 @@ class SelectAuthors extends Base {
     onSelect(author) {
         return (e) => {
             var selectFn = this.props.select;
+            console.log("author", author);
             selectFn(author);
             e.preventDefault();
         }
@@ -50,7 +51,7 @@ class SelectAuthors extends Base {
     showSelectLink(author) {
         var selected = (this.props.selected ? this.props.selected : [])
             .find(a => a.id === author.id);
-        return selected ? (<span></span>) : (<Link onClick={this.onSelect(author)}>[select]</Link>);
+        return selected ? (<span></span>) : (<Link to="" onClick={this.onSelect(author)}>[select]</Link>);
     }
 
     renderTableRow(author) {
