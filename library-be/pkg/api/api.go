@@ -23,6 +23,7 @@ const (
 )
 
 type Logger interface {
+	Info(...interface{})
 	Infof(string, ...interface{})
 	Errorf(string, ...interface{})
 }

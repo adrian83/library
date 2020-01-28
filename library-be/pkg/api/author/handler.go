@@ -121,6 +121,8 @@ func HandleDeleting(authorDeleter authorDeleter, logger api.Logger) func(http.Re
 			return
 		}
 
+		logger.Info("author deleting done")
+
 		api.ResponseJSON(http.StatusOK, nil, w, logger)
 	}
 }

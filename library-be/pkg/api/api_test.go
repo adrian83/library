@@ -19,9 +19,14 @@ type user struct {
 
 type mockLogger struct{}
 
+func (m *mockLogger) Info(args ...interface{}) {
+	fmt.Printf("%v", args)
+}
+
 func (m *mockLogger) Infof(s string, args ...interface{}) {
 	fmt.Printf(s, args...)
 }
+
 func (m *mockLogger) Errorf(s string, args ...interface{}) {
 	fmt.Printf(s, args...)
 }
