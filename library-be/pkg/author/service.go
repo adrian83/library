@@ -9,6 +9,17 @@ import (
 	"github.com/adrian83/library/pkg/common"
 )
 
+const (
+	zeroOffset         int64 = 0
+	maxAuthorsPageSize int64 = 10000
+)
+
+
+type logger interface {
+	Infof(string, ...interface{})
+	Info(...interface{})
+}
+
 type authorStore interface {
 	InsertOne(context.Context, interface{}) error
 	List(context.Context, bson.D, int64, int64) ([]map[string]interface{}, error)
@@ -20,43 +31,75 @@ type authorStore interface {
 
 type Service struct {
 	store authorStore
+	logger logger
 }
 
-func NewService(authorStore authorStore) *Service {
+func NewService(authorStore authorStore, logger logger) *Service {
 	return &Service{
 		store: authorStore,
+		logger: logger,
 	}
 }
 
-func (s *Service) Persist(ctx context.Context, author *Author) error {
-	entity := NewEntity(author)
-	return s.store.InsertOne(ctx, &entity)
+func (s *Service) Persist(ctx context.Context, createAuthorReq *CreateAuthorReq) (*Author, error) {
+	s.logger.Infof("new persisting author request: %v", createAuthorReq)
+
+	entity := NewEntityFromCreateAuthorReq(createAuthorReq)
+	if err := s.store.InsertOne(ctx, &entity); err != nil {
+		return nil, fmt.Errorf("cannot insert author, error: %w", err)
+	}
+
+	author := NewAuthorFromEntity(entity)
+
+	s.logger.Infof("persisted author: %v", author)
+
+	return author, nil
 }
 
-func (s *Service) Update(ctx context.Context, author *Author) error {
-	entity := NewEntity(author)
-	return s.store.UpdateOne(ctx, entity.ID, entity)
+func (s *Service) Update(ctx context.Context, updateAuthorReq *UpdateAuthorReq) error {
+	s.logger.Infof("new updating author request: %v", updateAuthorReq)
+
+	entity := NewEntityFromUpdateAuthorReq(updateAuthorReq)
+	if err := s.store.UpdateOne(ctx, entity.ID, entity); err != nil {
+		return fmt.Errorf("cannot update author, error: %w", err)
+	}
+
+	s.logger.Info("author updated successfully")
+
+	return nil
 }
 
 func (s *Service) Delete(ctx context.Context, authorID string) error {
-	return s.store.DeleteOne(ctx, authorID)
+	s.logger.Infof("deleting author with id: %v", authorID)
+
+	if err := s.store.DeleteOne(ctx, authorID); err != nil {
+		return fmt.Errorf("cannot delete author, error: %w", err)
+	}
+
+	s.logger.Info("author deleted successfully")
+
+	return nil
 }
 
 func (s *Service) Find(ctx context.Context, id string) (*Author, error) {
+	s.logger.Infof("getting author with id: %v", id)
+
 	var entity Entity
 	if err := s.store.FindOne(ctx, id, &entity); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cannot find author, error: %w", err)
 	}
 
-	return NewAuthorFromEntity(&entity), nil
+	author := NewAuthorFromEntity(&entity)
+
+	s.logger.Infof("found author: %v", author)
+
+	return author, nil
 }
 
-const (
-	zeroOffset         int64 = 0
-	maxAuthorsPageSize int64 = 10000
-)
 
 func (s *Service) FindAuthorsByIDs(ctx context.Context, ids []string) (map[string]*Author, error) {
+	s.logger.Infof("getting authors with ids: %v", ids)
+	
 	criteria := bson.D{{
 		"_id",
 		bson.D{{
@@ -67,7 +110,7 @@ func (s *Service) FindAuthorsByIDs(ctx context.Context, ids []string) (map[strin
 
 	maps, err := s.store.List(ctx, criteria, zeroOffset, maxAuthorsPageSize)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cannot list authors, error: %w", err)
 	}
 
 	authorsMap := make(map[string]*Author)
@@ -75,12 +118,14 @@ func (s *Service) FindAuthorsByIDs(ctx context.Context, ids []string) (map[strin
 	for _, m := range maps {
 		entity, err := NewEntityFromDoc(m)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("cannot transform document to entity, error: %w", err)
 		}
 
 		author := NewAuthorFromEntity(entity)
 		authorsMap[author.ID] = author
 	}
+
+	s.logger.Infof("found authors: %v", authorsMap)
 
 	return authorsMap, nil
 }

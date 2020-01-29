@@ -15,7 +15,7 @@ const (
 )
 
 type authorPersister interface {
-	Persist(context.Context, *author.Author) error
+	Persist(context.Context, *author.CreateAuthorReq) (*author.Author, error)
 }
 
 type authorDeleter interface {
@@ -23,7 +23,7 @@ type authorDeleter interface {
 }
 
 type authorUpdater interface {
-	Update(context.Context, *author.Author) error
+	Update(context.Context, *author.UpdateAuthorReq) error
 }
 
 type authorGetter interface {
@@ -94,15 +94,15 @@ func HandleUpdating(authorUpdater authorUpdater, logger api.Logger) func(http.Re
 			return
 		}
 
-		athr := author.NewAuthorWithID(authorID, updateAuthor.Name)
-		if err := authorUpdater.Update(ctx, athr); err != nil {
+		req := author.NewUpdateAuthorReq(authorID, updateAuthor.Name)
+		if err := authorUpdater.Update(ctx, req); err != nil {
 			api.HandleError(err, w, logger)
 			return
 		}
 
-		logger.Infof("author updating result: %v", athr)
+		logger.Infof("author updating result: %v", req)
 
-		api.ResponseJSON(http.StatusOK, athr, w, logger)
+		api.ResponseJSON(http.StatusOK, req, w, logger)
 	}
 }
 
@@ -141,8 +141,10 @@ func HandlePersisting(authorPersister authorPersister, logger api.Logger) func(h
 			return
 		}
 
-		athr := author.NewAuthor(createAuthor.Name)
-		if err := authorPersister.Persist(ctx, athr); err != nil {
+		req := author.NewCreateAuthorReq(createAuthor.Name)
+
+		athr, err := authorPersister.Persist(ctx, req)
+		if err != nil {
 			api.HandleError(err, w, logger)
 			return
 		}

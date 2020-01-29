@@ -10,6 +10,11 @@ import (
 	"github.com/adrian83/library/pkg/common"
 )
 
+type logger interface {
+	Infof(string, ...interface{})
+	Info(...interface{})
+}
+
 type authorService interface {
 	FindAuthorsByIDs(context.Context, []string) (map[string]*author.Author, error)
 }
@@ -23,23 +28,30 @@ type bookStore interface {
 	DeleteOne(ctx context.Context, bookID string) error
 }
 
-func NewService(bookStore bookStore, authorService authorService) *Service {
+// NewService is a constructor for the Service.
+func NewService(bookStore bookStore, authorService authorService, logger logger) *Service {
 	return &Service{
 		store:         bookStore,
 		authorService: authorService,
+		logger:        logger,
 	}
 }
 
+// Service exposes author related functionality.
 type Service struct {
 	store         bookStore
 	authorService authorService
+	logger        logger
 }
 
+// Persist stores book and authors into database.
 func (s *Service) Persist(ctx context.Context, createBookReq *CreateBookReq) (*Book, error) {
+	s.logger.Infof("new persisting book request: %v", createBookReq)
+
 	entity := NewEntityFromCreateBookReq(createBookReq)
 
 	if err := s.store.InsertOne(ctx, &entity); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cannot inser book, error: %w", err)
 	}
 
 	if len(entity.Authors) == 0 {
@@ -48,7 +60,7 @@ func (s *Service) Persist(ctx context.Context, createBookReq *CreateBookReq) (*B
 
 	authorsMap, err := s.authorService.FindAuthorsByIDs(ctx, entity.Authors)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cannot find authors by ids, error: %w", err)
 	}
 
 	authors := make([]*author.Author, 0)
@@ -59,27 +71,48 @@ func (s *Service) Persist(ctx context.Context, createBookReq *CreateBookReq) (*B
 	book := NewBookFromEntity(entity)
 	book.Authors = authors
 
+	s.logger.Infof("persisted book: %v", book)
+
 	return book, nil
 }
 
-func (s *Service) Update(ctx context.Context, req *UpdateBookReq) error {
-	entity := NewEntityFromUpdateBookReq(req)
-	return s.store.UpdateOne(ctx, entity.ID, entity)
+// Update updates book in database.
+func (s *Service) Update(ctx context.Context, updateBookReq *UpdateBookReq) error {
+	s.logger.Infof("new updating book request: %v", updateBookReq)
+
+	entity := NewEntityFromUpdateBookReq(updateBookReq)
+	if err := s.store.UpdateOne(ctx, entity.ID, entity); err != nil {
+		return fmt.Errorf("cannot update book, error: %w", err)
+	}
+
+	s.logger.Info("book updated successfully")
+
+	return nil
 }
 
 func (s *Service) Delete(ctx context.Context, bookID string) error {
-	return s.store.DeleteOne(ctx, bookID)
+	s.logger.Infof("deleting book with id: %v", bookID)
+
+	if err := s.store.DeleteOne(ctx, bookID); err != nil {
+		return fmt.Errorf("cannot delete book, error: %w", err)
+	}
+
+	s.logger.Info("book deleted successfully")
+
+	return nil
 }
 
 func (s *Service) Find(ctx context.Context, id string) (*Book, error) {
+	s.logger.Infof("getting book with id: %v", id)
+
 	var entity Entity
 	if err := s.store.FindOne(ctx, id, &entity); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cannot find book, error: %w", err)
 	}
 
-	fmt.Printf("\n\nBook: %v\n\n", entity)
-
 	book := NewBookFromEntity(&entity)
+
+	s.logger.Infof("found book: %v", book)
 
 	if len(entity.Authors) == 0 {
 		return book, nil
@@ -87,7 +120,7 @@ func (s *Service) Find(ctx context.Context, id string) (*Book, error) {
 
 	authorsMap, err := s.authorService.FindAuthorsByIDs(ctx, entity.Authors)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cannod find authors by ids, error: %w", err)
 	}
 
 	authors := make([]*author.Author, 0)
@@ -97,25 +130,27 @@ func (s *Service) Find(ctx context.Context, id string) (*Book, error) {
 
 	book.Authors = authors
 
+	s.logger.Infof("found book with authors: %v", book)
+
 	return book, nil
 }
 
-func (s *Service) List(ctx context.Context, listBooks *common.ListRequest) (*BooksPage, error) {
+func (s *Service) List(ctx context.Context, listReq *common.ListRequest) (*BooksPage, error) {
+	s.logger.Infof("listing books with parameters: %v", listReq)
+
 	filter := bson.D{}
 
-	maps, err := s.store.List(ctx, filter, listBooks.Offset, listBooks.Limit)
+	maps, err := s.store.List(ctx, filter, listReq.Offset, listReq.Limit)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cannot list books, error: %w", err)
 	}
-
-	fmt.Printf("Maps: %v", maps)
 
 	entities := make([]*Entity, 0)
 
 	for _, m := range maps {
 		entity, eErr := NewEntityFromDoc(m)
 		if eErr != nil {
-			return nil, eErr
+			return nil, fmt.Errorf("cannot transform document to entity, error: %w", eErr)
 		}
 
 		entities = append(entities, entity)
@@ -123,11 +158,10 @@ func (s *Service) List(ctx context.Context, listBooks *common.ListRequest) (*Boo
 
 	authorsMap, err := s.findAuthors(ctx, entities)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cannot find authors, error: %w", err)
 	}
 
 	books := make([]*Book, 0)
-
 	for _, e := range entities {
 		authors := s.selectAuthors(authorsMap, e.Authors)
 
@@ -139,10 +173,12 @@ func (s *Service) List(ctx context.Context, listBooks *common.ListRequest) (*Boo
 
 	count, err := s.store.Count(ctx, filter)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cannot get authors count, error: %w", err)
 	}
 
-	page := NewBooksPage(books, listBooks.Limit, listBooks.Offset, count)
+	page := NewBooksPage(books, listReq.Limit, listReq.Offset, count)
+
+	s.logger.Infof("found books list: %v", page)
 
 	return page, nil
 }

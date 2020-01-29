@@ -82,8 +82,11 @@ func main() {
 	mongoBookAdapter := storage.NewAdapter(booksCollection, bookAdapterLogger)
 	mongoAuthorAdapter := storage.NewAdapter(authorCollection, authorAdapterLogger)
 
-	authorService := author.NewService(mongoAuthorAdapter)
-	bookService := book.NewService(mongoBookAdapter, authorService)
+	bookServiceLogger := NewLogger()
+	authorServiceLogger := NewLogger()
+
+	authorService := author.NewService(mongoAuthorAdapter, authorServiceLogger)
+	bookService := book.NewService(mongoBookAdapter, authorService, bookServiceLogger)
 
 	allowedHeaders := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
 	allowedMethods := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS"})

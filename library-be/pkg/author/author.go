@@ -23,6 +23,22 @@ func NewEntity(athr *Author) *Entity {
 	}
 }
 
+func NewEntityFromCreateAuthorReq(req *CreateAuthorReq) *Entity {
+	return &Entity{
+		ID:           uuid.New().String(),
+		Name:        req.Name,
+		CreationDate: time.Now().UTC(),
+	}
+}
+
+func NewEntityFromUpdateAuthorReq(req *UpdateAuthorReq) *Entity {
+	return &Entity{
+		ID:           req.ID,
+		Name:        req.Name,
+		CreationDate: time.Now().UTC(),
+	}
+}
+
 func NewEntityFromDoc(doc map[string]interface{}) (*Entity, error) {
 	docBytes, err := bson.Marshal(doc)
 	if err != nil {
@@ -74,5 +90,27 @@ func NewAuthorsPage(authors Authors, limit, offset, total int64) *AuthorsPage {
 	return &AuthorsPage{
 		Page:    common.NewPage(limit, offset, total),
 		Authors: authors,
+	}
+}
+
+type CreateAuthorReq struct {
+	Name   string
+}
+
+func NewCreateAuthorReq(name string) *CreateAuthorReq {
+	return &CreateAuthorReq{
+		Name:   name,
+	}
+}
+
+type UpdateAuthorReq struct {
+	*CreateAuthorReq
+	ID string
+}
+
+func NewUpdateAuthorReq(id, name string) *UpdateAuthorReq {
+	return &UpdateAuthorReq{
+		CreateAuthorReq: NewCreateAuthorReq(name),
+		ID:            id,
 	}
 }
