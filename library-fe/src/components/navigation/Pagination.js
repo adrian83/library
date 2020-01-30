@@ -36,14 +36,14 @@ class Pagination extends Component {
                                 <span className="page-link">{i+1}<span className="sr-only">(current)</span></span>
                             </li>));
             } else {
-                list.push((<li key={i} className="page-item"><Link className="page-link" onClick={this.changePage(i, limit)}>{i+1}</Link></li>));
+                list.push((<li key={i} className="page-item"><Link to="" className="page-link" onClick={this.changePage(i, limit)}>{i+1}</Link></li>));
             }
         }
 
         if(isLast) {
             list.push((<li key={-3} className="page-item disabled"><span className="page-link">Next</span></li>));
         } else {
-            list.push((<li key={-4} className="page-item"><Link className="page-link" onClick={this.changePage(current+1, limit)}>Next</Link></li>));
+            list.push((<li key={-4} className="page-item"><Link to="" className="page-link" onClick={this.changePage(current+1, limit)}>Next</Link></li>));
         }
 
         return list;

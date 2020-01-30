@@ -52,6 +52,10 @@ class Error extends Component {
                     
                     }  else if(error.status === 401) {
                         return self.renderError(error.id, error.body);
+
+                    }  else if(error.status === 404) {
+                        //console.log("404 ", error.body);
+                        return self.renderError(error.id, error.body.message);
                     }
 
                     return self.renderError(error.id, error.body);

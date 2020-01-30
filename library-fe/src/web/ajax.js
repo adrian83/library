@@ -56,6 +56,8 @@ function handleServerSideError(response) {
         return response.json().then(data => new ResponseWithBody(response, data));
     } else if(response.status === 401){
         throw new ResponseError(response.status, "unauthorized");
+    } else if(response.status === 404){
+        return response.json().then(data => new ResponseWithBody(response, data));
     } else {
         throw new ResponseError(response.status, "unknown response");
     }

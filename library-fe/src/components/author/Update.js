@@ -42,7 +42,7 @@ class UpdateAuthor extends Base {
         execPut(authorBeUrl(authorId), author)
             .then(response => response.json())
             .then(data => self.setState({author: data}))
-            .then(data => self.registerInfo("Author updated"))
+            .then(_ => self.registerInfo("Author updated"))
             .catch(error => self.registerError(error));
 
         event.preventDefault();
