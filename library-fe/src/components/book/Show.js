@@ -51,7 +51,7 @@ class ShowBook extends Base {
                 <Info info={this.info()} hideInfo={this.hideInfo} ></Info>
                 
                 <div>
-                    <Link to={editUrl}>edit</Link>&nbsp;&nbsp;&nbsp;&nbsp;
+                    <Link to={editUrl}>edit</Link>
                 </div>
             </div>
             );

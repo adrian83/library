@@ -55,8 +55,13 @@ class ListAuthors extends Base {
                 <td><Link to={showUrl}>{author.name}</Link></td>
                 <td>{author.description}</td>
                 <td>
-                    <Link to={editUrl} >edit</Link>&nbsp;&nbsp;&nbsp;
-                    <Link to="" onClick={this.delete(author)}>delete</Link>
+                    <Link 
+                        style={{ marginLeft: '10px', marginRight:'10px' }} 
+                        to={editUrl} >edit</Link>
+                    <Link 
+                        style={{ marginLeft: '10px', marginRight:'10px' }} 
+                        to="" 
+                        onClick={this.delete(author)}>delete</Link>
                 </td>
             </tr>);
     }

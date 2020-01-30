@@ -93,9 +93,11 @@ class UpdateBook extends Base {
     renderSelectedAuthor(author) {
         return (
             <div key={author.id}>
-                <span>{author.name}</span>
-                &nbsp;&nbsp;&nbsp;&nbsp;
-                <Link to="" onClick={this.removeAuthor(author.id)}>[remove]</Link>
+                <span >{author.name}</span>
+                <Link 
+                    style={{ marginLeft: '10px', marginRight:'10px' }} 
+                    to="" 
+                    onClick={this.removeAuthor(author.id)}>[remove]</Link>
             </div>)
     }
 

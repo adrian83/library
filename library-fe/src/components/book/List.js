@@ -55,7 +55,7 @@ class ListBooks extends Base {
     }
 
     renderAuthors(authors) {
-        var links = (authors ? authors : []).map(a => <span><Link to={showAuthorUrl(a.id)} >{a.name}</Link>&nbsp;&nbsp;&nbsp;</span>);
+        var links = (authors ? authors : []).map(a => <span style={{ marginLeft: '10px', marginRight:'10px' }}><Link to={showAuthorUrl(a.id)} >{a.name}</Link></span>);
         return (<span>{links}</span>)
     }
 
@@ -71,8 +71,13 @@ class ListBooks extends Base {
                 <td>{authors}</td>
                 <td>{book.description}</td>
                 <td>
-                    <Link to={editUrl} >edit</Link>&nbsp;&nbsp;&nbsp;
-                    <Link to="" onClick={this.delete(book)}>delete</Link>
+                    <Link 
+                        style={{ marginLeft: '10px', marginRight:'10px' }} 
+                        to={editUrl} >edit</Link>
+                    <Link 
+                        style={{ marginLeft: '10px', marginRight:'10px' }} 
+                        to="" 
+                        onClick={this.delete(book)}>delete</Link>
                 </td>
             </tr>);
     }
