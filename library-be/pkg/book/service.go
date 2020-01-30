@@ -2,12 +2,15 @@ package book
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"go.mongodb.org/mongo-driver/bson"
 
 	"github.com/adrian83/library/pkg/author"
 	"github.com/adrian83/library/pkg/common"
+	"github.com/adrian83/library/pkg/errs"
+	"github.com/adrian83/library/pkg/storage"
 )
 
 type logger interface {
@@ -51,7 +54,7 @@ func (s *Service) Persist(ctx context.Context, createBookReq *CreateBookReq) (*B
 	entity := NewEntityFromCreateBookReq(createBookReq)
 
 	if err := s.store.InsertOne(ctx, &entity); err != nil {
-		return nil, fmt.Errorf("cannot inser book, error: %w", err)
+		return nil, s.handleError(fmt.Errorf("cannot inser book, error: %w", err))
 	}
 
 	if len(entity.Authors) == 0 {
@@ -60,7 +63,7 @@ func (s *Service) Persist(ctx context.Context, createBookReq *CreateBookReq) (*B
 
 	authorsMap, err := s.authorService.FindAuthorsByIDs(ctx, entity.Authors)
 	if err != nil {
-		return nil, fmt.Errorf("cannot find authors by ids, error: %w", err)
+		return nil, s.handleError(fmt.Errorf("cannot find authors by ids, error: %w", err))
 	}
 
 	authors := make([]*author.Author, 0)
@@ -82,7 +85,7 @@ func (s *Service) Update(ctx context.Context, updateBookReq *UpdateBookReq) erro
 
 	entity := NewEntityFromUpdateBookReq(updateBookReq)
 	if err := s.store.UpdateOne(ctx, entity.ID, entity); err != nil {
-		return fmt.Errorf("cannot update book, error: %w", err)
+		return s.handleError(fmt.Errorf("cannot update book, error: %w", err))
 	}
 
 	s.logger.Info("book updated successfully")
@@ -94,7 +97,7 @@ func (s *Service) Delete(ctx context.Context, bookID string) error {
 	s.logger.Infof("deleting book with id: %v", bookID)
 
 	if err := s.store.DeleteOne(ctx, bookID); err != nil {
-		return fmt.Errorf("cannot delete book, error: %w", err)
+		return s.handleError(fmt.Errorf("cannot delete book, error: %w", err))
 	}
 
 	s.logger.Info("book deleted successfully")
@@ -107,7 +110,7 @@ func (s *Service) Find(ctx context.Context, id string) (*Book, error) {
 
 	var entity Entity
 	if err := s.store.FindOne(ctx, id, &entity); err != nil {
-		return nil, fmt.Errorf("cannot find book, error: %w", err)
+		return nil, s.handleError(fmt.Errorf("cannot find book, error: %w", err))
 	}
 
 	book := NewBookFromEntity(&entity)
@@ -120,7 +123,7 @@ func (s *Service) Find(ctx context.Context, id string) (*Book, error) {
 
 	authorsMap, err := s.authorService.FindAuthorsByIDs(ctx, entity.Authors)
 	if err != nil {
-		return nil, fmt.Errorf("cannod find authors by ids, error: %w", err)
+		return nil, s.handleError(fmt.Errorf("cannod find authors by ids, error: %w", err))
 	}
 
 	authors := make([]*author.Author, 0)
@@ -142,15 +145,14 @@ func (s *Service) List(ctx context.Context, listReq *common.ListRequest) (*Books
 
 	maps, err := s.store.List(ctx, filter, listReq.Offset, listReq.Limit)
 	if err != nil {
-		return nil, fmt.Errorf("cannot list books, error: %w", err)
+		return nil, s.handleError(fmt.Errorf("cannot list books, error: %w", err))
 	}
 
 	entities := make([]*Entity, 0)
-
 	for _, m := range maps {
 		entity, eErr := NewEntityFromDoc(m)
 		if eErr != nil {
-			return nil, fmt.Errorf("cannot transform document to entity, error: %w", eErr)
+			return nil, s.handleError(fmt.Errorf("cannot transform document to entity, error: %w", eErr))
 		}
 
 		entities = append(entities, entity)
@@ -158,7 +160,7 @@ func (s *Service) List(ctx context.Context, listReq *common.ListRequest) (*Books
 
 	authorsMap, err := s.findAuthors(ctx, entities)
 	if err != nil {
-		return nil, fmt.Errorf("cannot find authors, error: %w", err)
+		return nil, s.handleError(fmt.Errorf("cannot find authors, error: %w", err))
 	}
 
 	books := make([]*Book, 0)
@@ -173,7 +175,7 @@ func (s *Service) List(ctx context.Context, listReq *common.ListRequest) (*Books
 
 	count, err := s.store.Count(ctx, filter)
 	if err != nil {
-		return nil, fmt.Errorf("cannot get authors count, error: %w", err)
+		return nil, s.handleError(fmt.Errorf("cannot get books count, error: %w", err))
 	}
 
 	page := NewBooksPage(books, listReq.Limit, listReq.Offset, count)
@@ -215,4 +217,12 @@ func (s *Service) findAuthors(ctx context.Context, entities []*Entity) (map[stri
 	}
 
 	return authors, nil
+}
+
+func (s *Service) handleError(err error) error {
+	if errors.Is(err, storage.ErrNotFound) {
+		return fmt.Errorf("cannot find book, error: %w", errs.NewAuthorNotFoundErr())
+	}
+
+	return err
 }

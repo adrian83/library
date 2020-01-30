@@ -2,12 +2,16 @@ package storage
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
+
+// ErrNotFound is an error that should be returned if requested document cannot be found.
+var ErrNotFound = errors.New("not found")
 
 type logger interface {
 	Infof(template string, args ...interface{})
@@ -61,6 +65,10 @@ func (a *Adapter) UpdateOne(ctx context.Context, id string, doc interface{}) err
 	output, err := a.collection.UpdateOne(ctx, filter, update)
 	if err != nil {
 		return fmt.Errorf("cannot update document, error: %w", err)
+	}
+
+	if output.MatchedCount == 0 {
+		return fmt.Errorf("cannot update document, error: %w", ErrNotFound)
 	}
 
 	a.logger.Infof("updating document response: %v", output)

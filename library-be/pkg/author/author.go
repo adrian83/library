@@ -26,7 +26,7 @@ func NewEntity(athr *Author) *Entity {
 func NewEntityFromCreateAuthorReq(req *CreateAuthorReq) *Entity {
 	return &Entity{
 		ID:           uuid.New().String(),
-		Name:        req.Name,
+		Name:         req.Name,
 		CreationDate: time.Now().UTC(),
 	}
 }
@@ -34,7 +34,7 @@ func NewEntityFromCreateAuthorReq(req *CreateAuthorReq) *Entity {
 func NewEntityFromUpdateAuthorReq(req *UpdateAuthorReq) *Entity {
 	return &Entity{
 		ID:           req.ID,
-		Name:        req.Name,
+		Name:         req.Name,
 		CreationDate: time.Now().UTC(),
 	}
 }
@@ -94,12 +94,12 @@ func NewAuthorsPage(authors Authors, limit, offset, total int64) *AuthorsPage {
 }
 
 type CreateAuthorReq struct {
-	Name   string
+	Name string
 }
 
 func NewCreateAuthorReq(name string) *CreateAuthorReq {
 	return &CreateAuthorReq{
-		Name:   name,
+		Name: name,
 	}
 }
 
@@ -111,6 +111,6 @@ type UpdateAuthorReq struct {
 func NewUpdateAuthorReq(id, name string) *UpdateAuthorReq {
 	return &UpdateAuthorReq{
 		CreateAuthorReq: NewCreateAuthorReq(name),
-		ID:            id,
+		ID:              id,
 	}
 }

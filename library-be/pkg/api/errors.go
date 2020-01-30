@@ -2,7 +2,10 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
+
+	"github.com/adrian83/library/pkg/errs"
 )
 
 const (
@@ -13,6 +16,11 @@ const (
 type Violation struct {
 	Field   string `json:"field"`
 	Message string `json:"message"`
+}
+
+func (v *Violation) String() string {
+	bts, _ := json.Marshal(v)
+	return string(bts)
 }
 
 // NewViolation is a constructor for Violation struct.
@@ -38,13 +46,36 @@ func NewValidationError(violations ...*Violation) *ValidationError {
 	}
 }
 
+type errorMsg struct {
+	Message string `json:"message"`
+}
+
 func HandleError(err error, w http.ResponseWriter, logger Logger) {
 	logger.Errorf("handling error: %v", err)
 
-	switch t := err.(type) {
-	case *ValidationError:
-		ResponseJSON(http.StatusBadRequest, t.Violations, w, logger)
-	default:
-		ResponseText(http.StatusInternalServerError, msgInternalError, w, logger)
+	var libErr *errs.LibError
+	if errors.As(err, &libErr) {
+		if libErr.AuthorNotFound() {
+			msg := errorMsg{Message: "Author not found"}
+			ResponseJSON(http.StatusNotFound, msg, w, logger)
+			return
+		} else if libErr.BookNotFound() {
+			msg := errorMsg{Message: "Book not found"}
+			ResponseJSON(http.StatusNotFound, msg, w, logger)
+			return
+		} else {
+
+			msg := errorMsg{Message: "Not found"}
+			ResponseJSON(http.StatusNotFound, msg, w, logger)
+			return
+		}
 	}
+
+	var vErr *ValidationError
+	if errors.As(err, &vErr) {
+		ResponseJSON(http.StatusBadRequest, vErr.Violations, w, logger)
+		return
+	}
+
+	ResponseText(http.StatusInternalServerError, msgInternalError, w, logger)
 }
