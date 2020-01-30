@@ -81,7 +81,15 @@ func (a *Adapter) FindOne(ctx context.Context, id string, doc interface{}) error
 	a.logger.Infof("getting document with id: %v", id)
 
 	filter := bson.M{"_id": id}
-	return a.collection.FindOne(ctx, filter).Decode(doc)
+	if err := a.collection.FindOne(ctx, filter).Decode(doc); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return fmt.Errorf("cannot find document with id: %v, error: %w", id, ErrNotFound)
+		}
+
+		return err
+	}
+
+	return nil
 }
 
 // DeleteOne removes single document with given id.
@@ -95,9 +103,13 @@ func (a *Adapter) DeleteOne(ctx context.Context, id string) error {
 		return fmt.Errorf("cannot delete document, error: %w", err)
 	}
 
+	if output.DeletedCount == 0 {
+		return fmt.Errorf("cannot delete document with id: %v, error: %w", id, ErrNotFound)
+	}
+
 	a.logger.Infof("deleting document response: %v", output)
 
-	return err
+	return nil
 }
 
 // List returns page of documents.
