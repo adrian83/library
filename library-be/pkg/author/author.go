@@ -12,6 +12,7 @@ import (
 type Entity struct {
 	ID           string    `bson:"_id,omitempty"`
 	Name         string    `bson:"name,omitempty"`
+	Description  string    `bson:"description,omitempty"`
 	CreationDate time.Time `bson:"creationDate,omitempty"`
 }
 
@@ -19,6 +20,7 @@ func NewEntity(athr *Author) *Entity {
 	return &Entity{
 		ID:           athr.ID,
 		Name:         athr.Name,
+		Description:  athr.Description,
 		CreationDate: athr.CreationDate,
 	}
 }
@@ -27,6 +29,7 @@ func NewEntityFromCreateAuthorReq(req *CreateAuthorReq) *Entity {
 	return &Entity{
 		ID:           uuid.New().String(),
 		Name:         req.Name,
+		Description:  req.Description,
 		CreationDate: time.Now().UTC(),
 	}
 }
@@ -35,6 +38,7 @@ func NewEntityFromUpdateAuthorReq(req *UpdateAuthorReq) *Entity {
 	return &Entity{
 		ID:           req.ID,
 		Name:         req.Name,
+		Description:  req.Description,
 		CreationDate: time.Now().UTC(),
 	}
 }
@@ -56,25 +60,28 @@ func NewEntityFromDoc(doc map[string]interface{}) (*Entity, error) {
 type Author struct {
 	ID           string    `json:"id"`
 	Name         string    `json:"name,omitempty"`
+	Description  string    `json:"description,omitempty"`
 	CreationDate time.Time `json:"creationDate,omitempty"`
 }
 
-func NewAuthor(name string) *Author {
-	return NewAuthorWithID(uuid.New().String(), name)
+func NewAuthor(name, desc string) *Author {
+	return NewAuthorWithID(uuid.New().String(), name, desc)
 }
 
 func NewAuthorFromEntity(entity *Entity) *Author {
 	return &Author{
 		ID:           entity.ID,
 		Name:         entity.Name,
+		Description:  entity.Description,
 		CreationDate: entity.CreationDate,
 	}
 }
 
-func NewAuthorWithID(id, name string) *Author {
+func NewAuthorWithID(id, name, desc string) *Author {
 	return &Author{
 		ID:           id,
 		Name:         name,
+		Description:  desc,
 		CreationDate: time.Now().UTC(),
 	}
 }
@@ -94,12 +101,14 @@ func NewAuthorsPage(authors Authors, limit, offset, total int64) *AuthorsPage {
 }
 
 type CreateAuthorReq struct {
-	Name string
+	Name        string
+	Description string
 }
 
-func NewCreateAuthorReq(name string) *CreateAuthorReq {
+func NewCreateAuthorReq(name, desc string) *CreateAuthorReq {
 	return &CreateAuthorReq{
-		Name: name,
+		Name:        name,
+		Description: desc,
 	}
 }
 
@@ -108,9 +117,9 @@ type UpdateAuthorReq struct {
 	ID string
 }
 
-func NewUpdateAuthorReq(id, name string) *UpdateAuthorReq {
+func NewUpdateAuthorReq(id, name, desc string) *UpdateAuthorReq {
 	return &UpdateAuthorReq{
-		CreateAuthorReq: NewCreateAuthorReq(name),
+		CreateAuthorReq: NewCreateAuthorReq(name, desc),
 		ID:              id,
 	}
 }

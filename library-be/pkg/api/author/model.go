@@ -4,7 +4,8 @@ import "github.com/adrian83/library/pkg/api"
 
 // CreateAuthor represents data in request body.
 type CreateAuthor struct {
-	Name string `json:"name"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
 
 func (ca *CreateAuthor) Validate() error {
@@ -22,7 +23,8 @@ func (ca *CreateAuthor) Validate() error {
 }
 
 type UpdateAuthor struct {
-	Name string `json:"name"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
 
 func (ua *UpdateAuthor) Validate() error {

@@ -94,7 +94,7 @@ func HandleUpdating(authorUpdater authorUpdater, logger api.Logger) func(http.Re
 			return
 		}
 
-		req := author.NewUpdateAuthorReq(authorID, updateAuthor.Name)
+		req := author.NewUpdateAuthorReq(authorID, updateAuthor.Name, updateAuthor.Description)
 		if err := authorUpdater.Update(ctx, req); err != nil {
 			api.HandleError(err, w, logger)
 			return
@@ -141,7 +141,7 @@ func HandlePersisting(authorPersister authorPersister, logger api.Logger) func(h
 			return
 		}
 
-		req := author.NewCreateAuthorReq(createAuthor.Name)
+		req := author.NewCreateAuthorReq(createAuthor.Name, createAuthor.Description)
 
 		athr, err := authorPersister.Persist(ctx, req)
 		if err != nil {
