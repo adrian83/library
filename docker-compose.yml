@@ -2,4 +2,21 @@ version: '3'
 services:
   mongo:
     image: "mongo"
+    ports:
+    - "27017:27017"
+    
+  backend:
+    build: ./library-be
+    ports:
+    - "7070:7070"
+    volumes:
+    - .:/library-backend
+    depends_on:
+    - 'mongo'
 
+  frontend:
+    build: ./library-fe
+    ports:
+    - "3000:3000"
+    volumes:
+    - .:/library-frontend
