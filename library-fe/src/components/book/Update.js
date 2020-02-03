@@ -19,6 +19,7 @@ class UpdateBook extends Base {
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleTitleChange = this.handleTitleChange.bind(this);
         this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
+        this.handleIsbnChange = this.handleIsbnChange.bind(this);
         this.addAuthor = this.addAuthor.bind(this);
     }
 
@@ -34,6 +35,12 @@ class UpdateBook extends Base {
         this.setState({book: book});
     }
 
+    handleIsbnChange(event) {
+        var book = this.state.book ? this.state.book : {};
+        book.isbn = event.target.value;
+        this.setState({book: book});
+    }
+
     handleSubmit(event) {
         const self = this;
         const bookId = this.props.match.params.bookId
@@ -42,6 +49,7 @@ class UpdateBook extends Base {
         const book = {
             title: self.state.book.title, 
             description: self.state.book.description,
+            isbn: self.state.book.isbn,
             authors: ids
         };
         
@@ -68,11 +76,9 @@ class UpdateBook extends Base {
     }
 
     addAuthor(author) {
-        console.log("add author", author);
         var authors = ((this.state && this.state.authors) ? this.state.authors : [])
             .filter((a, index, arr) => a.id !== author.id);
         authors.push(author);
-        console.log("authors", authors);
         this.setState({authors: authors});
     }
 
@@ -134,6 +140,16 @@ class UpdateBook extends Base {
                                 placeholder="Enter description" 
                                 value={this.state.book.description}
                                 onChange={this.handleDescriptionChange} />
+                    </div>
+
+                    <div className="form-group">
+                        <label htmlFor="isbnInput">ISBN</label>
+                        <input type="isbn" 
+                                className="form-control" 
+                                id="isbnInput" 
+                                placeholder="Enter ISBN" 
+                                value={this.state.book.isbn}
+                                onChange={this.handleIsbnChange} />
                     </div>
 
                     <div className="form-group">

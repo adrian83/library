@@ -17,13 +17,15 @@ class CreateBook extends Base {
 
         this.state =  {
             title: '', 
-            description: ''
+            description: '',
+            isbn: ''
         };
 
         this.hideError = this.hideError.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleTitleChange = this.handleTitleChange.bind(this);
         this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
+        this.handleIsbnChange = this.handleIsbnChange.bind(this);
     }
 
     handleTitleChange(event) {
@@ -34,12 +36,17 @@ class CreateBook extends Base {
         this.setState({description: event.target.value});
     }
 
+    handleIsbnChange(event) {
+        this.setState({isbn: event.target.value});
+    }
+
     handleSubmit(event) {
         const self = this;
 
         const form = {
             title: this.state.title,
-            description: this.state.description
+            description: this.state.description,
+            isbn: this.state.isbn
         }
 
         execPost(booksBeUrl(), form)
@@ -84,6 +91,16 @@ class CreateBook extends Base {
                                 placeholder="Enter description" 
                                 value={this.state.description}
                                 onChange={this.handleDescriptionChange} />
+                    </div>
+
+                    <div className="form-group">
+                        <label htmlFor="isbnInput">ISBN</label>
+                        <input type="isbn" 
+                                className="form-control" 
+                                id="isbnInput" 
+                                placeholder="Enter ISBN" 
+                                value={this.state.isbn}
+                                onChange={this.handleIsbnChange} />
                     </div>
 
                     <button type="submit" 

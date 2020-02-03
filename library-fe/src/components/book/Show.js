@@ -7,7 +7,7 @@ import Title from '../tiles/Title';
 import Base from '../Base';
 
 import { execGet } from '../../web/ajax';
-import {  editBookUrl, bookBeUrl } from '../../web/url';
+import { editBookUrl, bookBeUrl, showAuthorUrl } from '../../web/url';
 
 class ShowBook extends Base {
 
@@ -40,19 +40,41 @@ class ShowBook extends Base {
         );
     }
 
+    
+
     renderBook(book) {
         var editUrl = editBookUrl(book.id);
 
+        var authors = this.state.book.authors ? this.state.book.authors.map(function(author){ 
+            var showUrl = showAuthorUrl(author.id);
+            return (<div key={author.id}><Link to={showUrl}>{author.name}</Link></div>);
+        }) : [];
+
         return (
             <div>
-                <Title title={this.state.book.title} description={this.state.book.description} ></Title>
+                <Title title={this.state.book.title} description=""></Title>
                 
                 <Error errors={this.errors()} hideError={this.hideError} ></Error>
                 <Info info={this.info()} hideInfo={this.hideInfo} ></Info>
+
                 
                 <div>
                     <Link to={editUrl}>edit</Link>
                 </div>
+            
+                <br/>
+
+                <div>{this.state.book.description}</div>
+
+                <br/>
+
+                <div>ISBN: {this.state.book.isbn}</div>
+
+                <br/>
+                
+                <div>Authors:</div>
+                <div>{authors}</div>
+
             </div>
             );
     }
