@@ -128,7 +128,7 @@ func HandleUpdating(bookUpdater bookUpdater, logger api.Logger) func(http.Respon
 
 		logger.Infof("book updating response: %v", updateBook)
 
-		api.ResponseJSON(http.StatusOK, updateBook, w, logger)
+		api.ResponseJSON(http.StatusOK, nil, w, logger)
 	}
 }
 

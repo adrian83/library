@@ -102,7 +102,7 @@ func HandleUpdating(authorUpdater authorUpdater, logger api.Logger) func(http.Re
 
 		logger.Infof("author updating result: %v", req)
 
-		api.ResponseJSON(http.StatusOK, req, w, logger)
+		api.ResponseJSON(http.StatusOK, nil, w, logger)
 	}
 }
 
