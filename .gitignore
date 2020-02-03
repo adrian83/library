@@ -1,12 +1,1 @@
 
-
-infrastructure/
-
-
-library-fe/dart/angular/.packages
-library-fe/dart/angular/build
-library-fe/dart/angular/.pub
-library-fe/dart/angular/pubspec.lock
-
-library-fe/.dart_tool
-library-fe/build

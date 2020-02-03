@@ -1,7 +1,4 @@
 
-hello:
-	echo "HELLO"
-
 docker:
 	sudo systemctl start docker
 
