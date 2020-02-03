@@ -90,7 +90,7 @@ func HandlePersisting(bookPersister bookPersister, logger api.Logger) func(http.
 			return
 		}
 
-		req := book.NewCreateBookReq(createBook.Title, createBook.Authors)
+		req := book.NewCreateBookReq(createBook.Title, createBook.Description, createBook.ISBN)
 
 		bkg, err := bookPersister.Persist(ctx, req)
 		if err != nil {
@@ -120,7 +120,7 @@ func HandleUpdating(bookUpdater bookUpdater, logger api.Logger) func(http.Respon
 			return
 		}
 
-		req := book.NewUpdateBookReq(bookID, updateBook.Title, updateBook.Authors)
+		req := book.NewUpdateBookReq(bookID, updateBook.Title, updateBook.Description, updateBook.ISBN, updateBook.Authors)
 		if err := bookUpdater.Update(ctx, req); err != nil {
 			api.HandleError(err, w, logger)
 			return

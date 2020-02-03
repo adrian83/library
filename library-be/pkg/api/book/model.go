@@ -4,8 +4,9 @@ import "github.com/adrian83/library/pkg/api"
 
 // CreateBook represents data in request body.
 type CreateBook struct {
-	Title   string   `json:"title"`
-	Authors []string `json:"authors"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	ISBN        string `json:"isbn"`
 }
 
 func (cb *CreateBook) Validate() error {
@@ -23,14 +24,14 @@ func (cb *CreateBook) Validate() error {
 }
 
 type UpdateBook struct {
-	Title   string   `json:"title"`
+	CreateBook
 	Authors []string `json:"authors"`
 }
 
-func (cb *UpdateBook) Validate() error {
+func (ub *UpdateBook) Validate() error {
 	violations := make([]*api.Violation, 0)
 
-	if cb.Title == "" {
+	if ub.Title == "" {
 		violations = append(violations, api.NewViolation("title", "title cannot be empty"))
 	}
 
