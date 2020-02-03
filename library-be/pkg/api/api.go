@@ -86,7 +86,7 @@ type Validable interface {
 }
 
 const (
-	defaultLimit  int64 = 2
+	defaultLimit  int64 = 5
 	defaultOffset int64 = 0
 	defaultSort         = "_id"
 )
