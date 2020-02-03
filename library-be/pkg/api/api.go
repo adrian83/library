@@ -20,6 +20,10 @@ const (
 
 	// RequestTimeout is the default timeout for all requests.
 	RequestTimeout = 10 * time.Second
+
+	defaultLimit  int64 = 5
+	defaultOffset int64 = 0
+	defaultSort         = "_id"
 )
 
 type Logger interface {
@@ -84,12 +88,6 @@ func ResponseJSON(status int, resp interface{}, w http.ResponseWriter, logger Lo
 type Validable interface {
 	Validate() error
 }
-
-const (
-	defaultLimit  int64 = 5
-	defaultOffset int64 = 0
-	defaultSort         = "_id"
-)
 
 func ParseListRequest(params map[string][]string) *common.ListRequest {
 	limit, offset, sort := defaultLimit, defaultOffset, defaultSort

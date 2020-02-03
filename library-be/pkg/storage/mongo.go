@@ -123,7 +123,7 @@ func (a *Adapter) List(ctx context.Context, criteria bson.D, offset, size int64)
 	defer cur.Close(ctx)
 
 	if err := cur.Err(); err != nil {
-		return nil, fmt.Errorf("cursor conatins error, error: %w", err)
+		return nil, fmt.Errorf("cursor contains error, error: %w", err)
 	}
 
 	result := make([]map[string]interface{}, 0)

@@ -58,17 +58,19 @@ func HandleError(err error, w http.ResponseWriter, logger Logger) {
 		if libErr.AuthorNotFound() {
 			msg := errorMsg{Message: "Author not found"}
 			ResponseJSON(http.StatusNotFound, msg, w, logger)
+
 			return
 		} else if libErr.BookNotFound() {
 			msg := errorMsg{Message: "Book not found"}
 			ResponseJSON(http.StatusNotFound, msg, w, logger)
-			return
-		} else {
 
-			msg := errorMsg{Message: "Not found"}
-			ResponseJSON(http.StatusNotFound, msg, w, logger)
 			return
 		}
+
+		msg := errorMsg{Message: "Internal server error"}
+		ResponseJSON(http.StatusInternalServerError, msg, w, logger)
+
+		return
 	}
 
 	var vErr *ValidationError

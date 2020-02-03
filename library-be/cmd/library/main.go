@@ -34,6 +34,8 @@ const (
 	v1Api = "/api/v1"
 )
 
+var mongoConnectionTimeout = 10 * time.Second
+
 func readConfiguration() *config.Config {
 	var cfg config.Config
 	if err := envconfig.Process(configPrefix, &cfg); err != nil {
@@ -64,7 +66,7 @@ func main() {
 		log.Printf("Cannot create mongodb client: %v", true)
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), mongoConnectionTimeout)
 	defer cancel()
 
 	if err = client.Connect(ctx); err != nil {
