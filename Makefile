@@ -31,8 +31,7 @@ be-test:
 	cd library-be && go test ./... -cover
 
 be-lint:
-	# cd library-be && golangci-lint run ./...
-	cd library-be && docker run --rm -v $(pwd):/app -w /app golangci/golangci-lint:v1.23.1 golangci-lint run -v
+	cd library-be && golangci-lint run ./...
 
 be-run: export SERVER_PORT=7070
 be-run: export SERVER_HOST=0.0.0.0

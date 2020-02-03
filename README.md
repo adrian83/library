@@ -8,8 +8,8 @@ Simple CRUD application written in [Go](https://golang.org/) and [JavaScrip (Rea
 ### Running with docker compose
 
 #### Prerequisites
-- [Docker](https://www.docker.com/)
-- [Docker Compose](https://docs.docker.com/compose/)
+- [docker](https://www.docker.com/)
+- [docker compose](https://docs.docker.com/compose/)
 
 #### Steps
 1. Run `make compose-up`
@@ -18,10 +18,11 @@ Simple CRUD application written in [Go](https://golang.org/) and [JavaScrip (Rea
 ### Running locally
 
 #### Prerequisites
-- [Docker](https://www.docker.com/)
-- [Go](https://golang.org/)
-- [Npm](https://www.npmjs.com/)
+- [docker](https://www.docker.com/)
+- [go](https://golang.org/)
+- [npm](https://www.npmjs.com/)
 - [GNU Make](https://www.gnu.org/software/make/)
+- [golangci-lint (optional)](https://github.com/golangci/golangci-lint)
 
 #### Steps
 1. Start infrastructure (MongoDB): `make deps`
