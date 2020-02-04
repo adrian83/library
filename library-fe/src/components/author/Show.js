@@ -40,12 +40,25 @@ class ShowAuthor extends Base {
         );
     }
 
+    renderAuthorDescription(description) {
+        if(description) {
+            return (
+                <dl className="row">
+                    <dt className="col-sm-3">Description:</dt>
+                    <dd className="col-sm-9">{description}</dd>
+                </dl>);
+        }
+        return "";
+    }
+
     renderAuthor(author) {
         var editUrl = editAuthorUrl(author.id);
 
+        var desc = this.renderAuthorDescription(this.state.author.description);
+
         return (
             <div>
-                <Title title={this.state.author.name} description={this.state.author.description} ></Title>
+                <Title title={this.state.author.name} description="" ></Title>
                 
                 <Error errors={this.errors()} hideError={this.hideError} ></Error>
                 <Info info={this.info()} hideInfo={this.hideInfo} ></Info>
@@ -53,6 +66,22 @@ class ShowAuthor extends Base {
                 <div>
                     <Link to={editUrl}>edit</Link>
                 </div>
+
+                <br/><br/>
+
+                <div className="text-left">
+
+                    <dl className="row">
+                        <dt className="col-sm-3">Name:</dt>
+                        <dd className="col-sm-9">{this.state.author.name}</dd>
+                    </dl>
+
+                    {desc}
+
+                </div>
+
+
+
             </div>
             );
     }

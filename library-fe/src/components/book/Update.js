@@ -54,8 +54,6 @@ class UpdateBook extends Base {
         };
         
         execPut(bookBeUrl(bookId), book)
-            .then(response => response.json())
-            .then(data => self.setState({book: data}))
             .then(_ => self.registerInfo("Book updated"))
             .catch(error => self.registerError(error));
 
@@ -115,7 +113,7 @@ class UpdateBook extends Base {
 
         return (
             <div>
-                <Title title={this.state.book.title} description={this.state.book.description}></Title>
+                <Title title={this.state.book.title} description=""></Title>
 
                 <Error errors={this.errors()} hideError={this.hideError} ></Error>
                 <Info info={this.info()} hideInfo={this.hideInfo} ></Info>

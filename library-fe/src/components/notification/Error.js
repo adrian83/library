@@ -39,7 +39,7 @@ class Error extends Component {
         if(this.props && this.props.errors) {
             //console.log("render errors", this.props.errors);
             var errors = this.props.errors.map(function(error){ 
-                //console.log("render error", error);
+                console.log("error:", error);
 
                 if(error.status) {
 
@@ -59,9 +59,8 @@ class Error extends Component {
 
                     return self.renderError(error.id, error.body);
                 }
-                return self.renderError("abc", "---");
+                return self.renderError(new Date().getTime(), "Unknown error");
             });
-            return(<div>{errors}</div>);
         }
         return(<div></div>);
     }

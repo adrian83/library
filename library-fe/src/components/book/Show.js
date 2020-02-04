@@ -40,15 +40,40 @@ class ShowBook extends Base {
         );
     }
 
-    
+    renderInfoRow(label, value) {
+        if(value) {
+            return (
+                <dl className="row">
+                    <dt className="col-sm-3">{label}:</dt>
+                    <dd className="col-sm-9">{value}</dd>
+                </dl>);
+        }
+        return "";
+    }
+
+    renderAuthors(authors) {
+        if(authors) {
+
+            var paragraphs = authors.map(function(author){ 
+                var showUrl = showAuthorUrl(author.id);
+                return (<p key={author.id}><Link to={showUrl}>{author.name}</Link></p>);
+            })
+
+            return (
+                <dl className="row">
+                    <dt className="col-sm-3">Authors:</dt>
+                    <dd className="col-sm-9">{paragraphs}</dd>
+                </dl>);
+        }
+        return "";
+    }
 
     renderBook(book) {
         var editUrl = editBookUrl(book.id);
 
-        var authors = this.state.book.authors ? this.state.book.authors.map(function(author){ 
-            var showUrl = showAuthorUrl(author.id);
-            return (<div key={author.id}><Link to={showUrl}>{author.name}</Link></div>);
-        }) : [];
+        var desc = this.renderInfoRow("Description", this.state.book.description);
+        var isbn = this.renderInfoRow("ISBN", this.state.book.isbn);
+        var authors = this.renderAuthors(this.state.book.authors);
 
         return (
             <div>
@@ -64,16 +89,20 @@ class ShowBook extends Base {
             
                 <br/>
 
-                <div>{this.state.book.description}</div>
+                <div className="text-left">
 
-                <br/>
+                    <dl className="row">
+                        <dt className="col-sm-3">Title:</dt>
+                        <dd className="col-sm-9">{this.state.book.title}</dd>
+                    </dl>
 
-                <div>ISBN: {this.state.book.isbn}</div>
+                    {desc}
 
-                <br/>
-                
-                <div>Authors:</div>
-                <div>{authors}</div>
+                    {isbn}
+
+                    {authors}
+
+                </div>
 
             </div>
             );
