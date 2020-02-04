@@ -1,6 +1,6 @@
 
 # LIBRARY
-Simple CRUD application written in [Go](https://golang.org/) and [JavaScrip (React)](https://reactjs.org/) programming languages with [MongoDB](https://www.mongodb.com/) as a main data storage.
+Simple CRUD application written in [Go](https://golang.org/) and [JavaScript (React)](https://reactjs.org/) programming languages with [MongoDB](https://www.mongodb.com/) as a main data storage.
 
 
 ## Running
