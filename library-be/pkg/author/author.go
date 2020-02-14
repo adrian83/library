@@ -88,6 +88,10 @@ func NewAuthorWithID(id, name, desc string) *Author {
 
 type Authors []*Author
 
+func NewAuthors(authors ...*Author) Authors {
+	return authors
+}
+
 type AuthorsPage struct {
 	*common.Page
 	Authors Authors `json:"authors"`

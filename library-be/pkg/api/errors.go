@@ -9,7 +9,9 @@ import (
 )
 
 const (
-	msgInternalError = "internal server error"
+	msgInternalError  = "internal server error"
+	msgAuthorNotFound = "Author not found"
+	msgBookNotFound   = "Book not found"
 )
 
 // Violation contains information about which structure's field is invalida and why.
@@ -56,18 +58,18 @@ func HandleError(err error, w http.ResponseWriter, logger Logger) {
 	var libErr *errs.LibError
 	if errors.As(err, &libErr) {
 		if libErr.AuthorNotFound() {
-			msg := errorMsg{Message: "Author not found"}
+			msg := errorMsg{Message: msgAuthorNotFound}
 			ResponseJSON(http.StatusNotFound, msg, w, logger)
 
 			return
 		} else if libErr.BookNotFound() {
-			msg := errorMsg{Message: "Book not found"}
+			msg := errorMsg{Message: msgBookNotFound}
 			ResponseJSON(http.StatusNotFound, msg, w, logger)
 
 			return
 		}
 
-		msg := errorMsg{Message: "Internal server error"}
+		msg := errorMsg{Message: msgInternalError}
 		ResponseJSON(http.StatusInternalServerError, msg, w, logger)
 
 		return
@@ -79,5 +81,6 @@ func HandleError(err error, w http.ResponseWriter, logger Logger) {
 		return
 	}
 
-	ResponseText(http.StatusInternalServerError, msgInternalError, w, logger)
+	msg := errorMsg{Message: msgInternalError}
+	ResponseJSON(http.StatusInternalServerError, msg, w, logger)
 }

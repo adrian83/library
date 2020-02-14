@@ -23,20 +23,5 @@ func (ca *CreateAuthor) Validate() error {
 }
 
 type UpdateAuthor struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-}
-
-func (ua *UpdateAuthor) Validate() error {
-	violations := make([]*api.Violation, 0)
-
-	if ua.Name == "" {
-		violations = append(violations, api.NewViolation("name", "name cannot be empty"))
-	}
-
-	if len(violations) > 0 {
-		return api.NewValidationError(violations...)
-	}
-
-	return nil
+	CreateAuthor
 }

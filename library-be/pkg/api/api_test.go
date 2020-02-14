@@ -2,7 +2,7 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -17,18 +17,20 @@ type user struct {
 	Name string `json:"name"`
 }
 
-type mockLogger struct{}
+type mockLogger struct {
+	t *testing.T
+}
 
 func (m *mockLogger) Info(args ...interface{}) {
-	fmt.Printf("%v", args)
+	m.t.Logf("%v", args)
 }
 
 func (m *mockLogger) Infof(s string, args ...interface{}) {
-	fmt.Printf(s, args...)
+	m.t.Logf(s, args...)
 }
 
 func (m *mockLogger) Errorf(s string, args ...interface{}) {
-	fmt.Printf(s, args...)
+	m.t.Logf(s, args...)
 }
 
 func TestUnmarshalingBody(t *testing.T) {
@@ -82,7 +84,7 @@ func TestJSONResponses(t *testing.T) {
 			w := httptest.NewRecorder()
 
 			// when
-			ResponseJSON(data.status, data.body, w, &mockLogger{})
+			ResponseJSON(data.status, data.body, w, &mockLogger{t})
 
 			// then
 			resp := w.Result()
@@ -114,7 +116,7 @@ func TestTextResponses(t *testing.T) {
 			w := httptest.NewRecorder()
 
 			// when
-			ResponseText(data.status, data.body, w, &mockLogger{})
+			ResponseText(data.status, data.body, w, &mockLogger{t})
 
 			// then
 			resp := w.Result()
@@ -126,6 +128,89 @@ func TestTextResponses(t *testing.T) {
 			assert.Equal(t, typeText, resp.Header.Get(contentType))
 		})
 	}
+}
+
+func TestParseListRequest(t *testing.T) {
+	// given
+	testData := map[string]struct {
+		input  map[string][]string
+		limit  int64
+		offset int64
+		sort   string
+	}{
+		"all valid params set": {
+			map[string][]string{
+				"offset": []string{"44"},
+				"limit":  []string{"11"},
+				"sort":   []string{"name"},
+			},
+			11,
+			44,
+			"name",
+		},
+		"default values": {
+			map[string][]string{},
+			defaultLimit,
+			defaultOffset,
+			defaultSort,
+		},
+	}
+
+	for name, tData := range testData {
+		data := tData
+
+		t.Run(name, func(t *testing.T) {
+
+			// when
+			listReq := ParseListRequest(data.input)
+
+			// then
+			assert.Equal(t, data.offset, listReq.Offset)
+			assert.Equal(t, data.limit, listReq.Limit)
+			assert.Equal(t, data.sort, listReq.Sort)
+		})
+	}
+
+}
+
+func TestUnmarshalAndValidate(t *testing.T) {
+	// given
+	testData := map[string]struct {
+		input string
+		valid bool
+	}{
+		"valid data":   {`{"name":"John"}`, true},
+		"invalid data": {`{"name":""}`, false},
+	}
+
+	for name, tData := range testData {
+		data := tData
+
+		t.Run(name, func(t *testing.T) {
+
+			resp := TestValidable{}
+
+			// when
+			err := UnmarshalAndValidate(strings.NewReader(data.input), &resp)
+
+			// then
+			if !data.valid {
+				assert.Error(t, err)
+			}
+		})
+	}
+}
+
+type TestValidable struct {
+	Name string `json:"name"`
+}
+
+func (v *TestValidable) Validate() error {
+	if v.Name == "" {
+		return errors.New("empty name")
+	}
+
+	return nil
 }
 
 func readJSON(t *testing.T, rc io.Reader) *TestBody {
