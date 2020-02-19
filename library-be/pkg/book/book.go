@@ -123,17 +123,21 @@ type Book struct {
 
 type Books []*Book
 
-func NewBook(title, desc, isbn string) *Book {
-	return NewBookWithID(uuid.New().String(), title, desc, isbn)
+func NewBooks(books ...*Book) Books {
+	return books
 }
 
-func NewBookWithID(id, title, desc, isbn string) *Book {
+func NewBook(title, desc, isbn string, authors []*author.Author) *Book {
+	return NewBookWithID(uuid.New().String(), title, desc, isbn, authors)
+}
+
+func NewBookWithID(id, title, desc, isbn string, authors []*author.Author) *Book {
 	return &Book{
 		ID:           id,
 		Title:        title,
 		Description:  desc,
 		ISBN:         isbn,
-		Authors:      nil,
+		Authors:      authors,
 		CreationDate: time.Now().UTC(),
 	}
 }
