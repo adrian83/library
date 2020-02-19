@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 	"testing"
+	"time"
 
+	"github.com/adrian83/library/pkg/common"
 	"github.com/adrian83/library/pkg/storage"
 	"github.com/stretchr/testify/assert"
 
@@ -164,4 +166,170 @@ func TestDeleteError(t *testing.T) {
 
 	// then
 	assert.Error(t, err)
+}
+
+func TestFind(t *testing.T) {
+	// given
+	authorStore := authorStoreMock{}
+	logger := loggerMock{t}
+
+	service := NewService(&authorStore, &logger)
+
+	// when
+	author, err := service.Find(context.TODO(), authorShakespeare.ID)
+
+	// then
+	assert.NoError(t, err)
+	assert.NotNil(t, author)
+}
+
+func TestFindError(t *testing.T) {
+	// given
+	authorStore := authorStoreMock{findOneErr: storage.ErrNotFound}
+	logger := loggerMock{t}
+
+	service := NewService(&authorStore, &logger)
+
+	// when
+	author, err := service.Find(context.TODO(), authorShakespeare.ID)
+
+	// then
+	assert.Error(t, err)
+	assert.Nil(t, author)
+}
+
+// ----- FIND BY IDS -----
+
+func TestFindAuthorsByIDs(t *testing.T) {
+	// given
+	authorShakespeareDoc := authorToDoc(t, authorShakespeare)
+	authorGoetheDoc := authorToDoc(t, authorGoethe)
+	documents := []map[string]interface{}{authorShakespeareDoc, authorGoetheDoc}
+
+	authorStore := authorStoreMock{listResult: documents}
+	logger := loggerMock{t}
+
+	service := NewService(&authorStore, &logger)
+
+	// when
+	authorsMap, err := service.FindAuthorsByIDs(context.TODO(), []string{authorShakespeare.ID, authorGoethe.ID})
+
+	// then
+	assert.NoError(t, err)
+	assert.NotNil(t, authorsMap)
+	assert.Len(t, authorsMap, 2)
+
+	resultShakespeare, ok := authorsMap[authorShakespeare.ID]
+	assert.True(t, ok)
+	assert.Equal(t, authorShakespeare.ID, resultShakespeare.ID)
+	assert.Equal(t, authorShakespeare.Name, resultShakespeare.Name)
+	assert.Equal(t, authorShakespeare.Description, resultShakespeare.Description)
+	assertTime(t, authorShakespeare.CreationDate, resultShakespeare.CreationDate)
+
+	resultGoethe, ok := authorsMap[authorGoethe.ID]
+	assert.True(t, ok)
+	assert.Equal(t, authorGoethe.ID, resultGoethe.ID)
+	assert.Equal(t, authorGoethe.Name, resultGoethe.Name)
+	assert.Equal(t, authorGoethe.Description, resultGoethe.Description)
+	assertTime(t, authorGoethe.CreationDate, resultGoethe.CreationDate)
+}
+
+func TestFindAuthorsByIDsError(t *testing.T) {
+	// given
+	authorStore := authorStoreMock{listErr: errors.New("test")}
+	logger := loggerMock{t}
+
+	service := NewService(&authorStore, &logger)
+
+	// when
+	authorsMap, err := service.FindAuthorsByIDs(context.TODO(), []string{authorShakespeare.ID, authorGoethe.ID})
+
+	// then
+	assert.Error(t, err)
+	assert.Nil(t, authorsMap)
+}
+
+func TestList(t *testing.T) {
+	// given
+	authorShakespeareDoc := authorToDoc(t, authorShakespeare)
+	authorGoetheDoc := authorToDoc(t, authorGoethe)
+	documents := []map[string]interface{}{authorShakespeareDoc, authorGoetheDoc}
+
+	authorStore := authorStoreMock{listResult: documents, countResult: int64(len(documents))}
+	logger := loggerMock{t}
+
+	service := NewService(&authorStore, &logger)
+
+	listReq := common.NewListRequest(0, 10, "_id")
+
+	// when
+	authorsPage, err := service.List(context.TODO(), listReq)
+
+	// then
+	assert.NoError(t, err)
+	assert.NotNil(t, authorsPage)
+}
+
+func TestListErrorWhileListing(t *testing.T) {
+	// given
+	authorStore := authorStoreMock{listErr: errors.New("test")}
+	logger := loggerMock{t}
+
+	service := NewService(&authorStore, &logger)
+
+	listReq := common.NewListRequest(0, 10, "_id")
+
+	// when
+	authorsPage, err := service.List(context.TODO(), listReq)
+
+	// then
+	assert.Error(t, err)
+	assert.Nil(t, authorsPage)
+}
+
+func TestListErrorWhileCounting(t *testing.T) {
+	// given
+	authorShakespeareDoc := authorToDoc(t, authorShakespeare)
+	authorGoetheDoc := authorToDoc(t, authorGoethe)
+	documents := []map[string]interface{}{authorShakespeareDoc, authorGoetheDoc}
+
+	authorStore := authorStoreMock{listResult: documents, countErr: errors.New("test")}
+	logger := loggerMock{t}
+
+	service := NewService(&authorStore, &logger)
+
+	listReq := common.NewListRequest(0, 10, "_id")
+
+	// when
+	authorsPage, err := service.List(context.TODO(), listReq)
+
+	// then
+	assert.Error(t, err)
+	assert.Nil(t, authorsPage)
+}
+
+// ----- HELPERS -----
+
+func assertTime(t *testing.T, expected, actual time.Time) {
+	assert.Equal(t, expected.Year(), actual.Year())
+	assert.Equal(t, expected.Month(), actual.Month())
+	assert.Equal(t, expected.Day(), actual.Day())
+	assert.Equal(t, expected.Hour(), actual.Hour())
+	assert.Equal(t, expected.Minute(), actual.Minute())
+	assert.Equal(t, expected.Second(), actual.Second())
+}
+
+func authorToDoc(t *testing.T, author *Author) map[string]interface{} {
+
+	bts, err := bson.Marshal(NewEntity(author))
+	if err != nil {
+		t.Errorf("cannot marshal Author to BSON, error: %v", err)
+	}
+
+	doc := make(map[string]interface{})
+	if err := bson.Unmarshal(bts, &doc); err != nil {
+		t.Errorf("cannot unmarshal BSON to document, error: %v", err)
+	}
+
+	return doc
 }

@@ -1,6 +1,7 @@
 package author
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/adrian83/library/pkg/common"
@@ -51,7 +52,7 @@ func NewEntityFromDoc(doc map[string]interface{}) (*Entity, error) {
 
 	var entity Entity
 	if err := bson.Unmarshal(docBytes, &entity); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cannot unmarshal author Entity from bytes, error: %w", err)
 	}
 
 	return &entity, nil
