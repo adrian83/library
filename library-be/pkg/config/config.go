@@ -2,6 +2,8 @@ package config
 
 import (
 	"encoding/json"
+
+	"github.com/kelseyhightower/envconfig"
 )
 
 // Config is a configuration.
@@ -17,4 +19,14 @@ type Config struct {
 func (c *Config) String() string {
 	bts, _ := json.Marshal(c)
 	return string(bts)
+}
+
+// ReadConfiguration reads configuration properties from Environment.
+func ReadConfiguration(prefix string) (*Config, error) {
+	var cfg Config
+	if err := envconfig.Process(prefix, &cfg); err != nil {
+		return nil, err
+	}
+
+	return &cfg, nil
 }

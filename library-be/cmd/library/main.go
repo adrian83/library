@@ -12,7 +12,6 @@ import (
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
-	"github.com/kelseyhightower/envconfig"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -37,14 +36,16 @@ const (
 var mongoConnectionTimeout = 10 * time.Second
 
 func readConfiguration() *config.Config {
-	var cfg config.Config
-	if err := envconfig.Process(configPrefix, &cfg); err != nil {
+
+	cfg, err := config.ReadConfiguration(configPrefix)
+	if err != nil {
 		log.Printf("cannot read Configuration, error: %v", err)
+		panic(err)
 	}
 
-	log.Printf("Configuration: %v", &cfg)
+	log.Printf("Configuration: %v", cfg)
 
-	return &cfg
+	return cfg
 }
 
 func NewLogger() *zap.SugaredLogger {

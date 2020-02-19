@@ -3,8 +3,10 @@ package errs
 type ErrCode string
 
 const (
+	// AuthorNotFound is a code of an error used when Autor cannot be found.
 	AuthorNotFound ErrCode = "AuthorNotFound"
-	BookNotFound   ErrCode = "BookNotFound"
+	// BookNotFound is a code of an error used when Book cannot be found.
+	BookNotFound ErrCode = "BookNotFound"
 )
 
 type LibError struct {
