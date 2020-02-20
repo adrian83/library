@@ -3,7 +3,7 @@ package errs
 type ErrCode string
 
 const (
-	// AuthorNotFound is a code of an error used when Autor cannot be found.
+	// AuthorNotFound is a code of an error used when Author cannot be found.
 	AuthorNotFound ErrCode = "AuthorNotFound"
 	// BookNotFound is a code of an error used when Book cannot be found.
 	BookNotFound ErrCode = "BookNotFound"

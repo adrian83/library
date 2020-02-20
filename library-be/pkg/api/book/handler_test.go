@@ -22,11 +22,17 @@ const (
 )
 
 var (
-	authorShakespeare = author.NewAuthor("William Shakespeare", "Shakespeare was born and raised in Stratford-upon-Avon, Warwickshire. At the age...")
-	authorGoethe      = author.NewAuthor("Johann Wolfgang von Goethe", "Johann Wolfgang von Goethe was a German writer and statesman. His works...")
+	authorShakespeare = author.NewAuthor("William Shakespeare", "Shakespeare was born and raised "+
+		"in Stratford-upon-Avon, Warwickshire. At the age...")
+	authorGoethe = author.NewAuthor("Johann Wolfgang von Goethe", "Johann Wolfgang von Goethe "+
+		"was a German writer and statesman. His works...")
 
-	bookHamlet = book.NewBook("Hamlet", "The Tragedy of Hamlet, Prince of Denmark, often shortened to Hamlet (/ˈhæmlɪt/), is a tragedy written by William Shakespeare sometime between 1599 and 1601. It is...", "isbn-abc-def-ghi", author.NewAuthors(authorShakespeare))
-	bookFaust  = book.NewBook("Faust", "Faust is a tragic play in two parts by Johann Wolfgang von Goethe, usually known in English as Faust, Part One and Faust, Part Two. Although rarely staged in its entirety, it is the play...", "isbn-mno-prs-tuv", author.NewAuthors(authorGoethe))
+	bookHamlet = book.NewBook("Hamlet", "The Tragedy of Hamlet, Prince of Denmark, often shortened "+
+		"to Hamlet, is a tragedy written by William Shakespeare sometime between 1599 and 1601. It is...",
+		"isbn-abc-def-ghi", author.NewAuthors(authorShakespeare))
+	bookFaust = book.NewBook("Faust", "Faust is a tragic play in two parts by Johann Wolfgang von Goethe,"+
+		" usually known in English as Faust, Part One and Faust, Part Two. Although rarely staged in its entirety, it is the play...",
+		"isbn-mno-prs-tuv", author.NewAuthors(authorGoethe))
 )
 
 type mockLogger struct {
@@ -221,6 +227,7 @@ func TestHandleUpdating(t *testing.T) {
 
 	// then
 	resp := w.Result()
+	defer resp.Body.Close()
 
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 
@@ -308,6 +315,7 @@ func TestHandleUpdatingValidationError(t *testing.T) {
 
 	// then
 	resp := w.Result()
+	defer resp.Body.Close()
 
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 
@@ -345,6 +353,7 @@ func TestHandleDeleting(t *testing.T) {
 
 	// then
 	resp := w.Result()
+	defer resp.Body.Close()
 
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 
@@ -498,6 +507,7 @@ func TestHandlePersistingValidationError(t *testing.T) {
 
 	// then
 	resp := w.Result()
+	defer resp.Body.Close()
 
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 

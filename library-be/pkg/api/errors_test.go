@@ -13,7 +13,6 @@ import (
 
 func TestHandleError(t *testing.T) {
 	// given
-
 	msgValidationErr := "invalid name"
 
 	testData := map[string]struct {
@@ -31,8 +30,8 @@ func TestHandleError(t *testing.T) {
 		data := tData
 
 		t.Run(name, func(t *testing.T) {
-
 			w := httptest.NewRecorder()
+
 			// when
 			HandleError(data.err, w, &mockLogger{t})
 

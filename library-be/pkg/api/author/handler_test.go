@@ -210,6 +210,7 @@ func TestHandleUpdating(t *testing.T) {
 
 	// then
 	resp := w.Result()
+	defer resp.Body.Close()
 
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 
@@ -283,6 +284,7 @@ func TestHandleUpdatingValidationError(t *testing.T) {
 
 	// then
 	resp := w.Result()
+	defer resp.Body.Close()
 
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 
@@ -320,6 +322,7 @@ func TestHandleDeleting(t *testing.T) {
 
 	// then
 	resp := w.Result()
+	defer resp.Body.Close()
 
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 
@@ -461,6 +464,7 @@ func TestHandlePersistingValidationError(t *testing.T) {
 
 	// then
 	resp := w.Result()
+	defer resp.Body.Close()
 
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 

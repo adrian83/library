@@ -134,6 +134,7 @@ func (s *Service) List(ctx context.Context, listReq *common.ListRequest) (*Books
 	}
 
 	entities := make([]*Entity, 0)
+
 	for _, m := range maps {
 		entity, eErr := NewEntityFromDoc(m)
 		if eErr != nil {
@@ -149,6 +150,7 @@ func (s *Service) List(ctx context.Context, listReq *common.ListRequest) (*Books
 	}
 
 	books := make([]*Book, 0)
+
 	for _, e := range entities {
 		authors := s.selectAuthors(authorsMap, e.Authors)
 

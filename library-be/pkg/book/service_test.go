@@ -15,11 +15,18 @@ import (
 )
 
 var (
-	authorShakespeare = author.NewAuthor("William Shakespeare", "Shakespeare was born and raised in Stratford-upon-Avon, Warwickshire. At the age...")
-	authorGoethe      = author.NewAuthor("Johann Wolfgang von Goethe", "Johann Wolfgang von Goethe was a German writer and statesman. His works...")
+	authorShakespeare = author.NewAuthor("William Shakespeare", "Shakespeare was born and "+
+		"raised in Stratford-upon-Avon, Warwickshire. At the age...")
+	authorGoethe = author.NewAuthor("Johann Wolfgang von Goethe", "Johann Wolfgang von Goethe "+
+		"was a German writer and statesman. His works...")
 
-	bookHamlet        = NewBook("Hamlet", "The Tragedy of Hamlet, Prince of Denmark, often shortened to Hamlet (/ˈhæmlɪt/), is a tragedy written by William Shakespeare sometime between 1599 and 1601. It is...", "isbn-abc-def-ghi", author.NewAuthors(authorShakespeare))
-	bookFaust         = NewBook("Faust", "Faust is a tragic play in two parts by Johann Wolfgang von Goethe, usually known in English as Faust, Part One and Faust, Part Two. Although rarely staged in its entirety, it is the play...", "isbn-mno-prs-tuv", author.NewAuthors(authorGoethe))
+	bookHamlet = NewBook("Hamlet", "The Tragedy of Hamlet, Prince of Denmark, often shortened to Hamlet, "+
+		"is a tragedy written by William Shakespeare sometime between 1599 and 1601. It is...",
+		"isbn-abc-def-ghi", author.NewAuthors(authorShakespeare))
+	bookFaust = NewBook("Faust", "Faust is a tragic play in two parts by Johann Wolfgang von Goethe, "+
+		"usually known in English as Faust, Part One and Faust, Part Two. Although rarely staged in its "+
+		"entirety, it is the play...",
+		"isbn-mno-prs-tuv", author.NewAuthors(authorGoethe))
 	bookWithoutAuthor = NewBook("Just a title", "Just a description", "isbn-def-ghi-jkl", nil)
 )
 
@@ -70,12 +77,14 @@ func (m *bookStoreMock) FindOne(ctx context.Context, id string, str interface{})
 	if m.findOneErr != nil {
 		return m.findOneErr
 	}
+
 	bookPtr := str.(*Entity)
 	bookPtr.ID = m.findOneResult.ID
 	bookPtr.Title = m.findOneResult.Title
 	bookPtr.Description = m.findOneResult.Description
 	bookPtr.ISBN = m.findOneResult.ISBN
 	bookPtr.Authors = m.findOneResult.Authors
+
 	return nil
 }
 
@@ -426,16 +435,16 @@ func assertBookInBooks(t *testing.T, book *Book, books []*Book) {
 	t.Errorf("cannot find book %v in books collection", book)
 }
 
-func assertAuthorInAuthors(t *testing.T, author *author.Author, authors []*author.Author) {
+func assertAuthorInAuthors(t *testing.T, athr *author.Author, authors []*author.Author) {
 	for _, a := range authors {
-		if a.ID == author.ID && a.Name == author.Name &&
-			a.Description == author.Description &&
-			equalTime(a.CreationDate, author.CreationDate) {
+		if a.ID == athr.ID && a.Name == athr.Name &&
+			a.Description == athr.Description &&
+			equalTime(a.CreationDate, athr.CreationDate) {
 			return
 		}
 	}
 
-	t.Errorf("cannot find author %v in authors collection", author)
+	t.Errorf("cannot find author %v in authors collection", athr)
 }
 
 func assertEqualAuthors(t *testing.T, expected, actual *author.Author) {
@@ -446,7 +455,6 @@ func assertEqualAuthors(t *testing.T, expected, actual *author.Author) {
 }
 
 func bookToDoc(t *testing.T, book *Book) map[string]interface{} {
-
 	bts, err := bson.Marshal(NewEntityFromBook(book))
 	if err != nil {
 		t.Errorf("cannot marshal Book to BSON, error: %v", err)

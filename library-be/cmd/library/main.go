@@ -36,7 +36,6 @@ const (
 var mongoConnectionTimeout = 10 * time.Second
 
 func readConfiguration() *config.Config {
-
 	cfg, err := config.ReadConfiguration(configPrefix)
 	if err != nil {
 		log.Printf("cannot read Configuration, error: %v", err)

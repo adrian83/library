@@ -7,7 +7,6 @@ import (
 )
 
 func TestErrors(t *testing.T) {
-
 	testData := map[string]struct {
 		err              *LibError
 		code             ErrCode

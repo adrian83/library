@@ -140,9 +140,9 @@ func TestParseListRequest(t *testing.T) {
 	}{
 		"all valid params set": {
 			map[string][]string{
-				"offset": []string{"44"},
-				"limit":  []string{"11"},
-				"sort":   []string{"name"},
+				"offset": {"44"},
+				"limit":  {"11"},
+				"sort":   {"name"},
 			},
 			11,
 			44,
@@ -160,7 +160,6 @@ func TestParseListRequest(t *testing.T) {
 		data := tData
 
 		t.Run(name, func(t *testing.T) {
-
 			// when
 			listReq := ParseListRequest(data.input)
 
@@ -170,7 +169,6 @@ func TestParseListRequest(t *testing.T) {
 			assert.Equal(t, data.sort, listReq.Sort)
 		})
 	}
-
 }
 
 func TestUnmarshalAndValidate(t *testing.T) {
@@ -187,7 +185,6 @@ func TestUnmarshalAndValidate(t *testing.T) {
 		data := tData
 
 		t.Run(name, func(t *testing.T) {
-
 			resp := TestValidable{}
 
 			// when

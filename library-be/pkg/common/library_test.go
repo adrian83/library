@@ -22,6 +22,7 @@ func TestNewPageCreation(t *testing.T) {
 func TestNewListRequestCreation(t *testing.T) {
 	// given
 	sort := "name"
+
 	var offset, limit int64 = 15, 10
 
 	// when
