@@ -168,6 +168,8 @@ func TestDeleteError(t *testing.T) {
 	assert.Error(t, err)
 }
 
+// ----- FINDING -----
+
 func TestFind(t *testing.T) {
 	// given
 	authorStore := authorStoreMock{}

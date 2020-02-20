@@ -57,22 +57,7 @@ func (s *Service) Persist(ctx context.Context, createBookReq *CreateBookReq) (*B
 		return nil, s.handleError(fmt.Errorf("cannot inser book, error: %w", err))
 	}
 
-	if len(entity.Authors) == 0 {
-		return NewBookFromEntity(entity), nil
-	}
-
-	authorsMap, err := s.authorService.FindAuthorsByIDs(ctx, entity.Authors)
-	if err != nil {
-		return nil, s.handleError(fmt.Errorf("cannot find authors by ids, error: %w", err))
-	}
-
-	authors := make([]*author.Author, 0)
-	for _, author := range authorsMap {
-		authors = append(authors, author)
-	}
-
 	book := NewBookFromEntity(entity)
-	book.Authors = authors
 
 	s.logger.Infof("persisted book: %v", book)
 

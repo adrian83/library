@@ -314,6 +314,196 @@ func TestHandleUpdatingValidationError(t *testing.T) {
 	updater.VerifyUpdateCalls(t, 0)
 }
 
+// ----- DELETING -----
+
+type bookDeleterMock struct {
+	err   error
+	calls int
+}
+
+func (m *bookDeleterMock) Delete(ctx context.Context, bookID string) error {
+	m.calls++
+	return m.err
+}
+
+func (m *bookDeleterMock) VerifyDeleteCalls(t *testing.T, count int) {
+	if m.calls != count {
+		t.Errorf("Delete should be called: %v times, but was: %v times", count, m.calls)
+	}
+}
+
+func TestHandleDeleting(t *testing.T) {
+	// given
+	deleter := bookDeleterMock{}
+	logger := mockLogger{t}
+
+	req := httptest.NewRequest(http.MethodDelete, url, nil)
+	w := httptest.NewRecorder()
+
+	// when
+	HandleDeleting(&deleter, &logger)(w, req)
+
+	// then
+	resp := w.Result()
+
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+	deleter.VerifyDeleteCalls(t, 1)
+}
+
+func TestHandleDeletingError(t *testing.T) {
+	// given
+	deleter := bookDeleterMock{err: errors.New("test")}
+	logger := mockLogger{t}
+
+	req := httptest.NewRequest(http.MethodDelete, url, nil)
+	w := httptest.NewRecorder()
+
+	// when
+	HandleDeleting(&deleter, &logger)(w, req)
+
+	// then
+	resp := w.Result()
+
+	respBodyBytes := responseBody(t, resp)
+
+	assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+	assert.Contains(t, string(respBodyBytes), `"message"`)
+
+	deleter.VerifyDeleteCalls(t, 1)
+}
+
+// ----- PERSISTING -----
+
+type bookPersisterMock struct {
+	book  *book.Book
+	err   error
+	calls int
+}
+
+func (m *bookPersisterMock) Persist(context.Context, *book.CreateBookReq) (*book.Book, error) {
+	m.calls++
+	return m.book, m.err
+}
+
+func (m *bookPersisterMock) VerifyPersistCalls(t *testing.T, count int) {
+	if m.calls != count {
+		t.Errorf("Persist should be called: %v times, but was: %v times", count, m.calls)
+	}
+}
+
+func TestHandlePersisting(t *testing.T) {
+	// given
+	persister := bookPersisterMock{book: bookFaust}
+	logger := mockLogger{t}
+
+	createBook := CreateBook{
+		Title:       bookFaust.Title,
+		Description: bookFaust.Description,
+		ISBN:        bookFaust.ISBN,
+	}
+	createBookBytes := marshal(t, createBook)
+	createBookReader := bytes.NewReader(createBookBytes)
+
+	req := httptest.NewRequest(http.MethodPut, url, createBookReader)
+	w := httptest.NewRecorder()
+
+	// when
+	HandlePersisting(&persister, &logger)(w, req)
+
+	// then
+	resp := w.Result()
+
+	respBodyBytes := responseBody(t, resp)
+	bookBytes := marshal(t, bookFaust)
+
+	assert.Equal(t, http.StatusCreated, resp.StatusCode)
+	assert.Equal(t, respBodyBytes, bookBytes)
+
+	persister.VerifyPersistCalls(t, 1)
+}
+
+func TestHandlePersistingError(t *testing.T) {
+	// given
+	persister := bookPersisterMock{err: errors.New("test")}
+	logger := mockLogger{t}
+
+	createBook := CreateBook{
+		Title:       bookFaust.Title,
+		Description: bookFaust.Description,
+		ISBN:        bookFaust.ISBN,
+	}
+	createBookBytes := marshal(t, createBook)
+	createBookReader := bytes.NewReader(createBookBytes)
+
+	req := httptest.NewRequest(http.MethodPut, url, createBookReader)
+	w := httptest.NewRecorder()
+
+	// when
+	HandlePersisting(&persister, &logger)(w, req)
+
+	// then
+	resp := w.Result()
+
+	respBodyBytes := responseBody(t, resp)
+
+	assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+	assert.Contains(t, string(respBodyBytes), `"message"`)
+
+	persister.VerifyPersistCalls(t, 1)
+}
+
+func TestHandlePersistingInvalidRequestBodyError(t *testing.T) {
+	// given
+	persister := bookPersisterMock{book: bookFaust}
+	logger := mockLogger{t}
+
+	bodyReader := bytes.NewReader([]byte("this is not JSON but it should be"))
+
+	req := httptest.NewRequest(http.MethodPut, url, bodyReader)
+	w := httptest.NewRecorder()
+
+	// when
+	HandlePersisting(&persister, &logger)(w, req)
+
+	// then
+	resp := w.Result()
+
+	respBodyBytes := responseBody(t, resp)
+
+	assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+	assert.Contains(t, string(respBodyBytes), `"message"`)
+
+	persister.VerifyPersistCalls(t, 0)
+}
+
+func TestHandlePersistingValidationError(t *testing.T) {
+	// given
+	persister := bookPersisterMock{book: bookHamlet}
+	logger := mockLogger{t}
+
+	createBook := CreateBook{
+		Title:       "",
+		Description: bookHamlet.Description,
+		ISBN:        bookHamlet.ISBN,
+	}
+	createBookBytes := marshal(t, createBook)
+	createBookReader := bytes.NewReader(createBookBytes)
+
+	req := httptest.NewRequest(http.MethodPut, url, createBookReader)
+	w := httptest.NewRecorder()
+
+	// when
+	HandlePersisting(&persister, &logger)(w, req)
+
+	// then
+	resp := w.Result()
+
+	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+
+	persister.VerifyPersistCalls(t, 0)
+}
+
 // ----- HELPERS -----
 
 func responseBody(t *testing.T, resp *http.Response) []byte {
