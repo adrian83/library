@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/adrian83/library/pkg/errs"
+
 	"github.com/stretchr/testify/assert"
 )
 
