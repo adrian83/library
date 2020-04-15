@@ -12,7 +12,7 @@ Simple CRUD application written in [Go](https://golang.org/) and [JavaScript (Re
 - [docker compose](https://docs.docker.com/compose/)
 
 #### Steps
-1. Run `make compose-up`
+1. Run `docker-compose up`
 2. Navigate in browser to `localhost:3000`
 
 ### Running locally
@@ -29,3 +29,4 @@ Simple CRUD application written in [Go](https://golang.org/) and [JavaScript (Re
 2. Start backend: `make be-all`
 3. Start frontend: `make fe-all`
 4. Navigate in browser to `localhost:3000`
+
