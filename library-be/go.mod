@@ -1,6 +1,6 @@
 module github.com/adrian83/library
 
-go 1.12
+go 1.13
 
 require (
 	github.com/go-stack/stack v1.8.0 // indirect
