@@ -46,7 +46,13 @@ func NewService(authorStore authorStore, logger logger) *Service {
 func (s *Service) Persist(ctx context.Context, createAuthorReq *CreateAuthorReq) (*Author, error) {
 	s.logger.Infof("new persisting author request: %v", createAuthorReq)
 
-	entity := NewEntityFromCreateAuthorReq(createAuthorReq)
+	entity := NewEntity(
+		common.NewID(),
+		createAuthorReq.Name,
+		createAuthorReq.Description,
+		common.NowUTC(),
+	)
+
 	if err := s.store.InsertOne(ctx, &entity); err != nil {
 		return nil, s.handleError(fmt.Errorf("cannot insert author, error: %w", err))
 	}
@@ -61,7 +67,13 @@ func (s *Service) Persist(ctx context.Context, createAuthorReq *CreateAuthorReq)
 func (s *Service) Update(ctx context.Context, updateAuthorReq *UpdateAuthorReq) error {
 	s.logger.Infof("new updating author request: %v", updateAuthorReq)
 
-	entity := NewEntityFromUpdateAuthorReq(updateAuthorReq)
+	entity := NewEntity(
+		updateAuthorReq.ID,
+		updateAuthorReq.Name,
+		updateAuthorReq.Description,
+		common.NowUTC(),
+	)
+
 	if err := s.store.UpdateOne(ctx, entity.ID, entity); err != nil {
 		return s.handleError(fmt.Errorf("cannot update author, error: %w", err))
 	}

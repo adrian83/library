@@ -214,7 +214,7 @@ func TestDeleteError(t *testing.T) {
 
 func TestFind(t *testing.T) {
 	// given
-	entity := NewEntityFromBook(bookFaust)
+	entity := newEntityFromBook(bookFaust)
 
 	bookStore := bookStoreMock{findOneResult: entity}
 	authorService := authorServiceMock{authorsMap: map[string]*author.Author{authorGoethe.ID: authorGoethe}}
@@ -243,7 +243,7 @@ func TestFind(t *testing.T) {
 
 func TestFindBookWithoutAuthor(t *testing.T) {
 	// given
-	entity := NewEntityFromBook(bookWithoutAuthor)
+	entity := newEntityFromBook(bookWithoutAuthor)
 
 	bookStore := bookStoreMock{findOneResult: entity}
 	authorService := authorServiceMock{}
@@ -283,7 +283,7 @@ func TestFindErrorWhileGettingBook(t *testing.T) {
 
 func TestFindErrorWhileGettingAuthors(t *testing.T) {
 	// given
-	entity := NewEntityFromBook(bookFaust)
+	entity := newEntityFromBook(bookFaust)
 
 	bookStore := bookStoreMock{findOneResult: entity}
 	authorService := authorServiceMock{err: errors.New("test")}
@@ -454,8 +454,19 @@ func assertEqualAuthors(t *testing.T, expected, actual *author.Author) {
 	assertEqualTime(t, expected.CreationDate, actual.CreationDate)
 }
 
+func newEntityFromBook(book *Book) *Entity {
+	return NewEntity(
+		book.ID,
+		book.Title,
+		book.Description,
+		book.ISBN,
+		book.Authors.IDs(),
+		book.CreationDate,
+	)
+}
+
 func bookToDoc(t *testing.T, book *Book) map[string]interface{} {
-	bts, err := bson.Marshal(NewEntityFromBook(book))
+	bts, err := bson.Marshal(newEntityFromBook(book))
 	if err != nil {
 		t.Errorf("cannot marshal Book to BSON, error: %v", err)
 	}
