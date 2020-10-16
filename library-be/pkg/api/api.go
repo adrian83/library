@@ -21,6 +21,10 @@ const (
 	// RequestTimeout is the default timeout for all requests.
 	RequestTimeout = 10 * time.Second
 
+	paramLimit  = "limit"
+	paramOffset = "offset"
+	paramSort   = "sort"
+
 	defaultLimit  int64 = 5
 	defaultOffset int64 = 0
 	defaultSort         = "_id"
@@ -92,19 +96,19 @@ type Validable interface {
 func ParseListRequest(params map[string][]string) *common.ListRequest {
 	limit, offset, sort := defaultLimit, defaultOffset, defaultSort
 
-	limits := params["limit"]
+	limits := params[paramLimit]
 	if len(limits) > 0 {
 		limitStr := limits[0]
 		limit, _ = strconv.ParseInt(limitStr, 10, 64)
 	}
 
-	offsets := params["offset"]
+	offsets := params[paramOffset]
 	if len(offsets) > 0 {
 		offsetStr := offsets[0]
 		offset, _ = strconv.ParseInt(offsetStr, 10, 64)
 	}
 
-	sorts := params["sort"]
+	sorts := params[paramSort]
 	if len(sorts) > 0 {
 		sort = sorts[0]
 	}

@@ -1,5 +1,11 @@
 package common
 
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
+
 type Page struct {
 	Limit  int64 `json:"limit"`
 	Offset int64 `json:"offset"`
@@ -28,4 +34,12 @@ func NewListRequest(offset, limit int64, sort string) *ListRequest {
 		Limit:  limit,
 		Sort:   sort,
 	}
+}
+
+func NewID() string {
+	return uuid.New().String()
+}
+
+func NowUTC() time.Time {
+	return time.Now().UTC()
 }

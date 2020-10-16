@@ -19,40 +19,14 @@ type Entity struct {
 	CreationDate time.Time `bson:"creationDate,omitempty"`
 }
 
-func NewEntityFromBook(bkg *Book) *Entity {
-	ids := make([]string, len(bkg.Authors))
-	for i := 0; i < len(bkg.Authors); i++ {
-		ids[i] = bkg.Authors[i].ID
-	}
-
+func NewEntity(id, title, desc, isbn string, authors []string, date time.Time) *Entity {
 	return &Entity{
-		ID:           bkg.ID,
-		Title:        bkg.Title,
-		Authors:      ids,
-		Description:  bkg.Description,
-		ISBN:         bkg.ISBN,
-		CreationDate: bkg.CreationDate,
-	}
-}
-
-func NewEntityFromCreateBookReq(req *CreateBookReq) *Entity {
-	return &Entity{
-		ID:           uuid.New().String(),
-		Title:        req.Title,
-		Authors:      nil,
-		Description:  req.Description,
-		ISBN:         req.ISBN,
-		CreationDate: time.Now().UTC(),
-	}
-}
-
-func NewEntityFromUpdateBookReq(req *UpdateBookReq) *Entity {
-	return &Entity{
-		ID:          req.ID,
-		Title:       req.Title,
-		Authors:     req.Authors,
-		Description: req.Description,
-		ISBN:        req.ISBN,
+		ID:           id,
+		Title:        title,
+		Description:  desc,
+		ISBN:         isbn,
+		Authors:      authors,
+		CreationDate: date,
 	}
 }
 
@@ -113,12 +87,12 @@ func NewUpdateBookReq(id, title, desc, isbn string, authors []string) *UpdateBoo
 }
 
 type Book struct {
-	ID           string           `json:"id"`
-	Title        string           `json:"title,omitempty"`
-	Description  string           `json:"description,omitempty"`
-	ISBN         string           `json:"isbn,omitempty"`
-	Authors      []*author.Author `json:"authors,omitempty"`
-	CreationDate time.Time        `json:"creationDate,omitempty"`
+	ID           string         `json:"id"`
+	Title        string         `json:"title,omitempty"`
+	Description  string         `json:"description,omitempty"`
+	ISBN         string         `json:"isbn,omitempty"`
+	Authors      author.Authors `json:"authors,omitempty"`
+	CreationDate time.Time      `json:"creationDate,omitempty"`
 }
 
 type Books []*Book
@@ -127,11 +101,11 @@ func NewBooks(books ...*Book) Books {
 	return books
 }
 
-func NewBook(title, desc, isbn string, authors []*author.Author) *Book {
+func NewBook(title, desc, isbn string, authors author.Authors) *Book {
 	return NewBookWithID(uuid.New().String(), title, desc, isbn, authors)
 }
 
-func NewBookWithID(id, title, desc, isbn string, authors []*author.Author) *Book {
+func NewBookWithID(id, title, desc, isbn string, authors author.Authors) *Book {
 	return &Book{
 		ID:           id,
 		Title:        title,

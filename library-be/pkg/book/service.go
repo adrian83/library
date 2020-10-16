@@ -51,7 +51,14 @@ type Service struct {
 func (s *Service) Persist(ctx context.Context, createBookReq *CreateBookReq) (*Book, error) {
 	s.logger.Infof("new persisting book request: %v", createBookReq)
 
-	entity := NewEntityFromCreateBookReq(createBookReq)
+	entity := NewEntity(
+		common.NewID(),
+		createBookReq.Title,
+		createBookReq.Description,
+		createBookReq.ISBN,
+		nil,
+		common.NowUTC(),
+	)
 
 	if err := s.store.InsertOne(ctx, &entity); err != nil {
 		return nil, s.handleError(fmt.Errorf("cannot inser book, error: %w", err))
@@ -68,7 +75,15 @@ func (s *Service) Persist(ctx context.Context, createBookReq *CreateBookReq) (*B
 func (s *Service) Update(ctx context.Context, updateBookReq *UpdateBookReq) error {
 	s.logger.Infof("new updating book request: %v", updateBookReq)
 
-	entity := NewEntityFromUpdateBookReq(updateBookReq)
+	entity := NewEntity(
+		updateBookReq.ID,
+		updateBookReq.Title,
+		updateBookReq.Description,
+		updateBookReq.ISBN,
+		updateBookReq.Authors,
+		common.NowUTC(),
+	)
+
 	if err := s.store.UpdateOne(ctx, entity.ID, entity); err != nil {
 		return s.handleError(fmt.Errorf("cannot update book, error: %w", err))
 	}

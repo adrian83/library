@@ -17,30 +17,12 @@ type Entity struct {
 	CreationDate time.Time `bson:"creationDate,omitempty"`
 }
 
-func NewEntity(athr *Author) *Entity {
+func NewEntity(id, name, desc string, date time.Time) *Entity {
 	return &Entity{
-		ID:           athr.ID,
-		Name:         athr.Name,
-		Description:  athr.Description,
-		CreationDate: athr.CreationDate,
-	}
-}
-
-func NewEntityFromCreateAuthorReq(req *CreateAuthorReq) *Entity {
-	return &Entity{
-		ID:           uuid.New().String(),
-		Name:         req.Name,
-		Description:  req.Description,
-		CreationDate: time.Now().UTC(),
-	}
-}
-
-func NewEntityFromUpdateAuthorReq(req *UpdateAuthorReq) *Entity {
-	return &Entity{
-		ID:           req.ID,
-		Name:         req.Name,
-		Description:  req.Description,
-		CreationDate: time.Now().UTC(),
+		ID:           id,
+		Name:         name,
+		Description:  desc,
+		CreationDate: date,
 	}
 }
 
@@ -88,6 +70,19 @@ func NewAuthorWithID(id, name, desc string) *Author {
 }
 
 type Authors []*Author
+
+func (as Authors) IDs() []string {
+	if as == nil {
+		return nil
+	}
+
+	ids := make([]string, len(as))
+	for i, a := range as {
+		ids[i] = a.ID
+	}
+
+	return ids
+}
 
 func NewAuthors(authors ...*Author) Authors {
 	return authors

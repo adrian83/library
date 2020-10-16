@@ -322,7 +322,9 @@ func assertTime(t *testing.T, expected, actual time.Time) {
 }
 
 func authorToDoc(t *testing.T, author *Author) map[string]interface{} {
-	bts, err := bson.Marshal(NewEntity(author))
+	entity := NewEntity(author.ID, author.Name, author.Description, author.CreationDate)
+
+	bts, err := bson.Marshal(entity)
 	if err != nil {
 		t.Errorf("cannot marshal Author to BSON, error: %v", err)
 	}
