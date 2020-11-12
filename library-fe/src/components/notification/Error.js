@@ -37,8 +37,8 @@ class Error extends Component {
 
         var self = this;
         if(this.props && this.props.errors) {
-            //console.log("render errors", this.props.errors);
-            var errors = this.props.errors.map(function(error){ 
+            
+            this.props.errors.forEach(function(error){ 
                 console.log("error:", error);
 
                 if(error.status) {

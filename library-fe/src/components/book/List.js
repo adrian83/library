@@ -55,7 +55,7 @@ class ListBooks extends Base {
     }
 
     renderAuthors(authors) {
-        var links = (authors ? authors : []).map(a => <span style={{ marginLeft: '10px', marginRight:'10px' }}><Link to={showAuthorUrl(a.id)} >{a.name}</Link></span>);
+        var links = (authors ? authors : []).map(a => <span key={a.id} style={{ marginLeft: '10px', marginRight:'10px' }}><Link to={showAuthorUrl(a.id)} >{a.name}</Link></span>);
         return (<span>{links}</span>)
     }
 

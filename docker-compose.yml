@@ -16,6 +16,7 @@ services:
 
   frontend:
     build: ./library-fe
+    stdin_open: true
     ports:
     - "3000:3000"
     volumes:
