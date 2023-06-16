@@ -1,6 +1,7 @@
 package book
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/adrian83/library/pkg/author"
@@ -50,6 +51,10 @@ type BooksPage struct {
 	Books Books `json:"books"`
 }
 
+func (bp *BooksPage) String() string {
+	return fmt.Sprintf("BooksPage {page: %s, books: %s}", bp.Page, bp.Books)
+}
+
 // NewBooksPage is a constructor for BooksPage.
 func NewBooksPage(books Books, limit, offset, total int64) *BooksPage {
 	return &BooksPage{
@@ -64,6 +69,10 @@ type CreateBookReq struct {
 	ISBN        string
 }
 
+func (cbr *CreateBookReq) String() string {
+	return fmt.Sprintf("CreateBookReq {title: %s, desc: %s, isbn: %s}", cbr.Title, cbr.Description, cbr.ISBN)
+}
+
 func NewCreateBookReq(title, desc, isbn string) *CreateBookReq {
 	return &CreateBookReq{
 		Title:       title,
@@ -76,6 +85,11 @@ type UpdateBookReq struct {
 	*CreateBookReq
 	ID      string
 	Authors []string
+}
+
+func (ubr *UpdateBookReq) String() string {
+	return fmt.Sprintf("UpdateBookReq {id: %s, title: %s, desc: %s, isbn: %s, authors: %s}", ubr.ID,
+		ubr.CreateBookReq.Title, ubr.CreateBookReq.Description, ubr.CreateBookReq.ISBN, ubr.Authors)
 }
 
 func NewUpdateBookReq(id, title, desc, isbn string, authors []string) *UpdateBookReq {
@@ -93,6 +107,11 @@ type Book struct {
 	ISBN         string         `json:"isbn,omitempty"`
 	Authors      author.Authors `json:"authors,omitempty"`
 	CreationDate time.Time      `json:"creationDate,omitempty"`
+}
+
+func (b *Book) String() string {
+	return fmt.Sprintf("Book {id: %s, title: %s, desc: %s, isbn: %s, created: %s, authors: %s}", b.ID,
+		b.Title, b.Description, b.ISBN, b.CreationDate, b.Authors)
 }
 
 type Books []*Book

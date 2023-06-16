@@ -39,9 +39,9 @@ func HandleGetting(bookGetter bookGetter, logger api.Logger) func(http.ResponseW
 		ctx, cancel := context.WithTimeout(context.Background(), api.RequestTimeout)
 		defer cancel()
 
-		logger.Infof("book getting request: %v", r)
-
 		bookID := mux.Vars(r)[bookIDParam]
+
+		logger.Infof("get book by id request, id: %s", bookID)
 
 		bkg, err := bookGetter.Find(ctx, bookID)
 		if err != nil {
@@ -49,7 +49,7 @@ func HandleGetting(bookGetter bookGetter, logger api.Logger) func(http.ResponseW
 			return
 		}
 
-		logger.Infof("book getting result: %v", bkg)
+		logger.Infof("get book by id result, book: %s", bkg)
 
 		api.ResponseJSON(http.StatusOK, bkg, w, logger)
 	}
@@ -61,16 +61,16 @@ func HandleDeleting(bookDeleter bookDeleter, logger api.Logger) func(http.Respon
 		ctx, cancel := context.WithTimeout(context.Background(), api.RequestTimeout)
 		defer cancel()
 
-		logger.Infof("book deleting request: %v", r)
-
 		bookID := mux.Vars(r)[bookIDParam]
+
+		logger.Infof("delete book by id request, id: %s", bookID)
 
 		if err := bookDeleter.Delete(ctx, bookID); err != nil {
 			api.HandleError(err, w, logger)
 			return
 		}
 
-		logger.Info("book deleting done")
+		logger.Info("delete book by id result, ok")
 
 		api.ResponseJSON(http.StatusOK, nil, w, logger)
 	}
@@ -82,13 +82,13 @@ func HandlePersisting(bookPersister bookPersister, logger api.Logger) func(http.
 		ctx, cancel := context.WithTimeout(context.Background(), api.RequestTimeout)
 		defer cancel()
 
-		logger.Infof("book persisting request: %v", r)
-
 		var createBook CreateBook
 		if err := api.UnmarshalAndValidate(r.Body, &createBook); err != nil {
 			api.HandleError(err, w, logger)
 			return
 		}
+
+		logger.Infof("persist book request, data: %s", createBook)
 
 		req := book.NewCreateBookReq(createBook.Title, createBook.Description, createBook.ISBN)
 
@@ -98,7 +98,7 @@ func HandlePersisting(bookPersister bookPersister, logger api.Logger) func(http.
 			return
 		}
 
-		logger.Infof("book persisting response: %v", bkg)
+		logger.Infof("persist book response, book: %v", bkg)
 
 		api.ResponseJSON(http.StatusCreated, bkg, w, logger)
 	}
@@ -110,8 +110,6 @@ func HandleUpdating(bookUpdater bookUpdater, logger api.Logger) func(http.Respon
 		ctx, cancel := context.WithTimeout(context.Background(), api.RequestTimeout)
 		defer cancel()
 
-		logger.Infof("book updating request: %v", r)
-
 		bookID := mux.Vars(r)[bookIDParam]
 
 		var updateBook UpdateBook
@@ -121,12 +119,15 @@ func HandleUpdating(bookUpdater bookUpdater, logger api.Logger) func(http.Respon
 		}
 
 		req := book.NewUpdateBookReq(bookID, updateBook.Title, updateBook.Description, updateBook.ISBN, updateBook.Authors)
+
+		logger.Infof("update book by id request, data: %s", req)
+
 		if err := bookUpdater.Update(ctx, req); err != nil {
 			api.HandleError(err, w, logger)
 			return
 		}
 
-		logger.Infof("book updating response: %v", updateBook)
+		logger.Info("update book by id response: ok")
 
 		api.ResponseJSON(http.StatusOK, nil, w, logger)
 	}
@@ -138,7 +139,7 @@ func HandleListing(booksLister booksLister, logger api.Logger) func(http.Respons
 		ctx, cancel := context.WithTimeout(context.Background(), api.RequestTimeout)
 		defer cancel()
 
-		logger.Infof("book listing request: %v", r)
+		logger.Info("list books request")
 
 		listBooks := api.ParseListRequest(r.URL.Query())
 
@@ -148,7 +149,7 @@ func HandleListing(booksLister booksLister, logger api.Logger) func(http.Respons
 			return
 		}
 
-		logger.Infof("book updating response: %v", page)
+		logger.Infof("list books response, page: %s", page)
 
 		api.ResponseJSON(http.StatusOK, page, w, logger)
 	}

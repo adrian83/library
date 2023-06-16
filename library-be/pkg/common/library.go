@@ -1,6 +1,7 @@
 package common
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -10,6 +11,10 @@ type Page struct {
 	Limit  int64 `json:"limit"`
 	Offset int64 `json:"offset"`
 	Total  int64 `json:"total"`
+}
+
+func (p *Page) String() string {
+	return fmt.Sprintf("Page {limit: %v, offset: %v, total: %v}", p.Limit, p.Offset, p.Total)
 }
 
 func NewPage(limit, offset, total int64) *Page {

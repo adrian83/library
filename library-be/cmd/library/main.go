@@ -1,20 +1,8 @@
 package main
 
 import (
-	"context"
 	"log"
 	"net/http"
-	"os"
-	"os/signal"
-	"strconv"
-	"syscall"
-	"time"
-
-	"github.com/gorilla/handlers"
-	"github.com/gorilla/mux"
-
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"go.uber.org/zap"
 
@@ -25,6 +13,7 @@ import (
 	"github.com/adrian83/library/pkg/common"
 	"github.com/adrian83/library/pkg/config"
 	"github.com/adrian83/library/pkg/storage"
+	"github.com/adrian83/library/pkg/web"
 )
 
 const (
@@ -33,7 +22,7 @@ const (
 	v1Api = "/api/v1"
 )
 
-var mongoConnectionTimeout = 10 * time.Second
+var mongoConnectionTimeoutMs = 5000
 
 func readConfiguration() *config.Config {
 	cfg, err := config.ReadConfiguration(configPrefix)
@@ -59,21 +48,14 @@ func NewLogger() *zap.Logger {
 func main() {
 	cfg := readConfiguration()
 
-	mongoURI := "mongodb://" + cfg.DatabaseHost + ":" + strconv.Itoa(cfg.DatabasePort)
+	connectionLogger := NewLogger()
+	defer connectionLogger.Sync()
+	connection := storage.NewConnection(cfg.DatabaseHost, cfg.DatabasePort, mongoConnectionTimeoutMs, connectionLogger.Sugar())
 
-	client, err := mongo.NewClient(options.Client().ApplyURI(mongoURI))
-	if err != nil {
-		log.Printf("Cannot create mongodb client: %v", true)
-	}
+	connection.Connect()
+	defer connection.Disconnect()
 
-	ctx, cancel := context.WithTimeout(context.Background(), mongoConnectionTimeout)
-	defer cancel()
-
-	if err = client.Connect(ctx); err != nil {
-		log.Printf("Cannot connect to mongodb: %v", true)
-	}
-
-	database := client.Database(cfg.DatabaseName)
+	database := connection.Database(cfg.DatabaseName)
 
 	booksCollection := database.Collection("books")
 	authorCollection := database.Collection("author")
@@ -94,78 +76,33 @@ func main() {
 	authorService := author.NewService(mongoAuthorAdapter, authorServiceLogger.Sugar())
 	bookService := book.NewService(mongoBookAdapter, authorService, bookServiceLogger.Sugar())
 
-	allowedHeaders := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
-	allowedMethods := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS"})
-	allowedOrigins := handlers.AllowedOrigins([]string{"*"})
-
 	bookAPILogger := NewLogger()
 	defer bookAPILogger.Sync()
 	authorAPILogger := NewLogger()
 	defer authorAPILogger.Sync()
 
-	r := createRouter(cfg, authorService, authorAPILogger, bookService, bookAPILogger)
+	routes := web.NewRoutes(
+		web.NewRoute(v1Api+"/books", bookapi.HandleListing(bookService, bookAPILogger.Sugar()), http.MethodGet),
+		web.NewRoute(v1Api+"/books", bookapi.HandlePersisting(bookService, bookAPILogger.Sugar()), http.MethodPost),
+		web.NewRoute(v1Api+"/books/{bookId}", bookapi.HandleUpdating(bookService, bookAPILogger.Sugar()), http.MethodPut),
+		web.NewRoute(v1Api+"/books/{bookId}", bookapi.HandleDeleting(bookService, bookAPILogger.Sugar()), http.MethodDelete),
+		web.NewRoute(v1Api+"/books/{bookId}", bookapi.HandleGetting(bookService, bookAPILogger.Sugar()), http.MethodGet),
+		web.NewRoute(v1Api+"/authors", authorapi.HandleListing(authorService, authorAPILogger.Sugar()), http.MethodGet),
+		web.NewRoute(v1Api+"/authors", authorapi.HandlePersisting(authorService, authorAPILogger.Sugar()), http.MethodPost),
+		web.NewRoute(v1Api+"/authors/{authorId}", authorapi.HandleUpdating(authorService, authorAPILogger.Sugar()), http.MethodPut),
+		web.NewRoute(v1Api+"/authors/{authorId}", authorapi.HandleDeleting(authorService, authorAPILogger.Sugar()), http.MethodDelete),
+		web.NewRoute(v1Api+"/authors/{authorId}", authorapi.HandleGetting(authorService, authorAPILogger.Sugar()), http.MethodGet),
+	)
 
-	http.Handle("/", r)
+	routerLogger := NewLogger()
+	defer routerLogger.Sync()
+	router := web.NewRouter(routes, &cfg.StaticsPath, routerLogger.Sugar())
 
-	router := handlers.CORS(allowedHeaders, allowedMethods, allowedOrigins)(r)
+	serverLogger := NewLogger()
+	defer serverLogger.Sync()
+	server := web.NewServer(cfg.ServerHost, cfg.ServerPort, router, serverLogger.Sugar())
 
-	startServer(cfg, router)
-}
-
-func startServer(cfg *config.Config, router http.Handler) {
-	serverAddress := cfg.ServerHost + ":" + strconv.Itoa(cfg.ServerPort)
-	server := &http.Server{Addr: serverAddress, Handler: router}
-
-	idleConnsClosed := make(chan struct{})
-
-	go func() {
-		sigint := make(chan os.Signal, 1)
-		signal.Notify(sigint, os.Interrupt)
-		signal.Notify(sigint, syscall.SIGTERM)
-
-		<-sigint
-
-		log.Printf("Shutdown: %v", true)
-		// We received an interrupt signal, shut down.
-		if err := server.Shutdown(context.Background()); err != nil {
-			// Error from closing listeners, or context timeout:
-			log.Printf("HTTP server Shutdown: %v", err)
-		}
-
-		close(idleConnsClosed)
-	}()
-
-	if err := server.ListenAndServe(); err != http.ErrServerClosed {
-		// Error starting or closing listener:
-		log.Printf("HTTP server ListenAndServe: %v", err)
-	}
-
-	log.Printf("Exiting: %v", true)
-
-	<-idleConnsClosed
-}
-
-func createRouter(cfg *config.Config,
-	authorService *author.Service,
-	authorAPILogger *zap.Logger,
-	bookService *book.Service,
-	bookAPILogger *zap.Logger) *mux.Router {
-
-	r := mux.NewRouter()
-
-	r.HandleFunc(v1Api+"/books", bookapi.HandleListing(bookService, bookAPILogger.Sugar())).Methods(http.MethodGet)
-	r.HandleFunc(v1Api+"/books", bookapi.HandlePersisting(bookService, bookAPILogger.Sugar())).Methods(http.MethodPost)
-	r.HandleFunc(v1Api+"/books/{bookId}", bookapi.HandleUpdating(bookService, bookAPILogger.Sugar())).Methods(http.MethodPut)
-	r.HandleFunc(v1Api+"/books/{bookId}", bookapi.HandleDeleting(bookService, bookAPILogger.Sugar())).Methods(http.MethodDelete)
-	r.HandleFunc(v1Api+"/books/{bookId}", bookapi.HandleGetting(bookService, bookAPILogger.Sugar())).Methods(http.MethodGet)
-
-	r.HandleFunc(v1Api+"/authors", authorapi.HandleListing(authorService, authorAPILogger.Sugar())).Methods(http.MethodGet)
-	r.HandleFunc(v1Api+"/authors", authorapi.HandlePersisting(authorService, authorAPILogger.Sugar())).Methods(http.MethodPost)
-	r.HandleFunc(v1Api+"/authors/{authorId}", authorapi.HandleUpdating(authorService, authorAPILogger.Sugar())).Methods(http.MethodPut)
-	r.HandleFunc(v1Api+"/authors/{authorId}", authorapi.HandleDeleting(authorService, authorAPILogger.Sugar())).Methods(http.MethodDelete)
-	r.HandleFunc(v1Api+"/authors/{authorId}", authorapi.HandleGetting(authorService, authorAPILogger.Sugar())).Methods(http.MethodGet)
-
-	r.PathPrefix("").Handler(http.StripPrefix("", http.FileServer(http.Dir(cfg.StaticsPath))))
-
-	return r
+	server.Start()
+	server.Wait()
+	server.Stop()
 }

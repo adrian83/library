@@ -47,6 +47,10 @@ type Author struct {
 	CreationDate time.Time `json:"creationDate,omitempty"`
 }
 
+func (a *Author) String() string {
+	return fmt.Sprintf("Author {id: %s, name: %s, desc: %s, created: %s}", a.ID, a.Name, a.Description, a.CreationDate)
+}
+
 func NewAuthor(name, desc string) *Author {
 	return NewAuthorWithID(uuid.New().String(), name, desc)
 }

@@ -1,12 +1,20 @@
 package book
 
-import "github.com/adrian83/library/pkg/api"
+import (
+	"fmt"
+
+	"github.com/adrian83/library/pkg/api"
+)
 
 // CreateBook represents data in request body.
 type CreateBook struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
 	ISBN        string `json:"isbn"`
+}
+
+func (cb *CreateBook) String() string {
+	return fmt.Sprintf("CreateBook {title: %s, desc: %s, isbn: %s}", cb.Title, cb.Description, cb.ISBN)
 }
 
 func (cb *CreateBook) Validate() error {

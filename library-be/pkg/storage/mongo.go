@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -14,7 +15,59 @@ import (
 var ErrNotFound = errors.New("not found")
 
 type logger interface {
-	Infof(template string, args ...interface{})
+	Infof(string, ...interface{})
+	Fatalf(string, ...interface{})
+}
+
+type Connection struct {
+	host                string
+	port                int
+	connectionTimeoutMs int
+	client              *mongo.Client
+	logger              logger
+}
+
+func NewConnection(host string, port, connectionTimeoutMs int, logger logger) *Connection {
+	return &Connection{
+		host:                host,
+		port:                port,
+		connectionTimeoutMs: connectionTimeoutMs,
+		client:              nil,
+		logger:              logger,
+	}
+}
+
+func (c *Connection) Connect() {
+	mongoURI := "mongodb://" + c.host + ":" + strconv.Itoa(c.port) + "/?retryWrites=true&timeoutMS=" + strconv.Itoa(c.connectionTimeoutMs)
+	c.logger.Infof("Connecting to MongoDB on URI: %v", mongoURI)
+
+	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
+	opts := options.Client().ApplyURI(mongoURI).SetServerAPIOptions(serverAPI)
+
+	client, err := mongo.Connect(context.TODO(), opts)
+
+	if err != nil {
+		c.logger.Fatalf("Cannot create MongoDB client: %v", err)
+	}
+
+	var result bson.M
+	if err := client.Database("admin").RunCommand(context.TODO(), bson.D{{Key: "ping", Value: 1}}).Decode(&result); err != nil {
+		c.logger.Fatalf("Cannot ping MongoDB: %v", err)
+	}
+
+	c.logger.Infof("Successfully connected to MongoDB, result: %v", result)
+
+	c.client = client
+}
+
+func (c *Connection) Disconnect() {
+	if err := c.client.Disconnect(context.TODO()); err != nil {
+		c.logger.Fatalf("Cannot disconnect with MongoDB, error: %v", err)
+	}
+}
+
+func (c *Connection) Database(dbName string) *mongo.Database {
+	return c.client.Database(dbName)
 }
 
 // Adapter is a wrapper on MongoDB collection.

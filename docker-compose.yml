@@ -1,18 +1,27 @@
 version: '3'
 services:
   mongo:
-    image: "mongo:3.4"
+    image: "mongo:5.0.14"
     ports:
     - "27017:27017"
-    
+
+
   backend:
     build: ./library-be
+    environment:
+    - SERVER_PORT=7070
+    - SERVER_HOST=0.0.0.0
+    - DATABASE_NAME=library
+    - DATABASE_HOST=mongo
+    - DATABASE_PORT=27017
+    - STATICS_PATH=../../../library-fe/build
     ports:
     - "7070:7070"
     volumes:
     - .:/library-backend
     depends_on:
     - 'mongo'
+
 
   frontend:
     build: ./library-fe

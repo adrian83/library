@@ -1,13 +1,8 @@
-FROM golang:1.17.1-alpine3.14
+FROM golang:1.20-alpine
 
 ADD . /library-be
 WORKDIR /library-be
 
-ENV SERVER_PORT 7070
-ENV SERVER_HOST 0.0.0.0
-ENV DATABASE_NAME library
-ENV DATABASE_HOST mongo
-ENV DATABASE_PORT 27017
-ENV STATICS_PATH '../../../library-fe/build'
+RUN go build -o library cmd/library/main.go
 
-CMD ["go", "run", "cmd/library/main.go"]
+CMD ["./library"]

@@ -9,8 +9,8 @@ compose-up:
 	sudo docker-compose up
 
 deps:
-	echo "starting mongodb image (version 3.4)"
-	docker run -p 27017:27017 -d mongo:3.4
+	echo "starting mongodb image (version 5.0.14)"
+	docker run -p 27017:27017 -d mongo:5.0.14
 
 fe-get:
 	echo "getting frontend dependencies" 
