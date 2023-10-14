@@ -2,7 +2,7 @@ package api
 
 import (
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -39,7 +39,7 @@ func TestHandleError(t *testing.T) {
 			// then
 			resp := w.Result()
 
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			if err != nil {
 				t.Errorf("cannot read response body, error: %v", err)
 			}

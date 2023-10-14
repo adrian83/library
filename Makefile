@@ -2,11 +2,8 @@
 docker:
 	sudo systemctl start docker
 
-compose-build:
-	sudo docker-compose build
-
 compose-up:
-	sudo docker-compose up
+	sudo docker-compose up --build
 
 deps:
 	echo "starting mongodb image (version 5.0.14)"

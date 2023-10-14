@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"strconv"
 	"time"
@@ -38,7 +37,7 @@ type Logger interface {
 
 // UnmarshalReqBody transforms UnmarshalAndValidate into given interface{}.
 func UnmarshalReqBody(rc io.Reader, str interface{}) error {
-	bodyBts, err := ioutil.ReadAll(rc)
+	bodyBts, err := io.ReadAll(rc)
 	if err != nil {
 		return fmt.Errorf("cannot read from Reader, error: %w", err)
 	}

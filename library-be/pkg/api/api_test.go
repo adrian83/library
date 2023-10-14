@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -39,8 +38,8 @@ func TestUnmarshalingBody(t *testing.T) {
 		body io.ReadCloser
 		err  bool
 	}{
-		"valid json body":   {ioutil.NopCloser(strings.NewReader(`{"name":"Jan Kowalski"}`)), false},
-		"invalid json body": {ioutil.NopCloser(strings.NewReader(`not a json`)), true},
+		"valid json body":   {io.NopCloser(strings.NewReader(`{"name":"Jan Kowalski"}`)), false},
+		"invalid json body": {io.NopCloser(strings.NewReader(`not a json`)), true},
 	}
 
 	for name, tData := range testData {
@@ -211,7 +210,7 @@ func (v *TestValidable) Validate() error {
 }
 
 func readJSON(t *testing.T, rc io.Reader) *TestBody {
-	bts, err := ioutil.ReadAll(rc)
+	bts, err := io.ReadAll(rc)
 	if err != nil {
 		t.Errorf("error while reading bytes from response body")
 	}
@@ -225,7 +224,7 @@ func readJSON(t *testing.T, rc io.Reader) *TestBody {
 }
 
 func readText(t *testing.T, rc io.Reader) []byte {
-	bts, err := ioutil.ReadAll(rc)
+	bts, err := io.ReadAll(rc)
 	if err != nil {
 		t.Errorf("error while reading bytes from response body")
 	}

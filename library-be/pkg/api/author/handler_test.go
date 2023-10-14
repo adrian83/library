@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -474,7 +474,7 @@ func TestHandlePersistingValidationError(t *testing.T) {
 // ----- HELPERS -----
 
 func responseBody(t *testing.T, resp *http.Response) []byte {
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf("cannot read response body, error: %v", err)
 	}
