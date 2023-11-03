@@ -15,7 +15,7 @@ const (
 )
 
 type bookPersister interface {
-	Persist(ctx context.Context, req *book.CreateBookReq) (*book.Book, error)
+	Persist(ctx context.Context, req *book.CreateBookCommand) (*book.Book, error)
 }
 
 type booksLister interface {
@@ -23,7 +23,7 @@ type booksLister interface {
 }
 
 type bookUpdater interface {
-	Update(ctx context.Context, req *book.UpdateBookReq) error
+	Update(ctx context.Context, req *book.UpdateBookCommand) error
 }
 
 type bookDeleter interface {
@@ -90,7 +90,7 @@ func HandlePersisting(bookPersister bookPersister, logger api.Logger) func(http.
 
 		logger.Infof("persist book request, data: %s", createBook)
 
-		req := book.NewCreateBookReq(createBook.Title, createBook.Description, createBook.ISBN)
+		req := book.NewCreateBookCommand(createBook.Title, createBook.Description, createBook.ISBN)
 
 		bkg, err := bookPersister.Persist(ctx, req)
 		if err != nil {
@@ -118,7 +118,7 @@ func HandleUpdating(bookUpdater bookUpdater, logger api.Logger) func(http.Respon
 			return
 		}
 
-		req := book.NewUpdateBookReq(bookID, updateBook.Title, updateBook.Description, updateBook.ISBN, updateBook.Authors)
+		req := book.NewUpdateBookCommand(bookID, updateBook.Title, updateBook.Description, updateBook.ISBN, updateBook.Authors)
 
 		logger.Infof("update book by id request, data: %s", req)
 

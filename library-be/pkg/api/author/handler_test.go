@@ -182,7 +182,7 @@ type authorUpdaterMock struct {
 	calls int
 }
 
-func (m *authorUpdaterMock) Update(context.Context, *author.UpdateAuthorReq) error {
+func (m *authorUpdaterMock) Update(context.Context, *author.UpdateAuthorCommand) error {
 	m.calls++
 	return m.err
 }
@@ -359,7 +359,7 @@ type authorPersisterMock struct {
 	calls  int
 }
 
-func (m *authorPersisterMock) Persist(context.Context, *author.CreateAuthorReq) (*author.Author, error) {
+func (m *authorPersisterMock) Persist(context.Context, *author.CreateAuthorCommand) (*author.Author, error) {
 	m.calls++
 	return m.author, m.err
 }

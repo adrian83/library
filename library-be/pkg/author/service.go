@@ -5,16 +5,13 @@ import (
 	"errors"
 	"fmt"
 
-	"go.mongodb.org/mongo-driver/bson"
-
 	"github.com/adrian83/library/pkg/common"
 	"github.com/adrian83/library/pkg/errs"
 	"github.com/adrian83/library/pkg/storage"
 )
 
 const (
-	zeroOffset         int64 = 0
-	maxAuthorsPageSize int64 = 10000
+	zeroOffset int64 = 0
 )
 
 type logger interface {
@@ -22,28 +19,29 @@ type logger interface {
 	Info(...interface{})
 }
 
-type authorStore interface {
-	InsertOne(context.Context, interface{}) error
-	List(context.Context, bson.D, int64, int64) ([]map[string]interface{}, error)
-	FindOne(context.Context, string, interface{}) error
-	UpdateOne(context.Context, string, interface{}) error
-	Count(context.Context, interface{}) (int64, error)
-	DeleteOne(context.Context, string) error
+type authorRepository interface {
+	PersistAuthor(context.Context, *Entity) error
+	UpdateAuthor(context.Context, *Entity) error
+	DeleteAuthor(context.Context, string) error
+	FindAuthor(context.Context, string) (*Entity, error)
+	FindAuthorsByIDs(context.Context, []string) ([]*Entity, error)
+	ListAuthors(context.Context, int64, int64) ([]*Entity, error)
+	CountAllAuthors(context.Context) (int64, error)
 }
 
 type Service struct {
-	store  authorStore
-	logger logger
+	repository authorRepository
+	logger     logger
 }
 
-func NewService(authorStore authorStore, logger logger) *Service {
+func NewService(authorRepository authorRepository, logger logger) *Service {
 	return &Service{
-		store:  authorStore,
-		logger: logger,
+		repository: authorRepository,
+		logger:     logger,
 	}
 }
 
-func (s *Service) Persist(ctx context.Context, createAuthorReq *CreateAuthorReq) (*Author, error) {
+func (s *Service) Persist(ctx context.Context, createAuthorReq *CreateAuthorCommand) (*Author, error) {
 	s.logger.Infof("new persisting author request: %v", createAuthorReq)
 
 	entity := NewEntity(
@@ -53,7 +51,7 @@ func (s *Service) Persist(ctx context.Context, createAuthorReq *CreateAuthorReq)
 		common.NowUTC(),
 	)
 
-	if err := s.store.InsertOne(ctx, &entity); err != nil {
+	if err := s.repository.PersistAuthor(ctx, entity); err != nil {
 		return nil, s.handleError(fmt.Errorf("cannot insert author, error: %w", err))
 	}
 
@@ -64,7 +62,7 @@ func (s *Service) Persist(ctx context.Context, createAuthorReq *CreateAuthorReq)
 	return author, nil
 }
 
-func (s *Service) Update(ctx context.Context, updateAuthorReq *UpdateAuthorReq) error {
+func (s *Service) Update(ctx context.Context, updateAuthorReq *UpdateAuthorCommand) error {
 	s.logger.Infof("new updating author request: %v", updateAuthorReq)
 
 	entity := NewEntity(
@@ -74,7 +72,7 @@ func (s *Service) Update(ctx context.Context, updateAuthorReq *UpdateAuthorReq) 
 		common.NowUTC(),
 	)
 
-	if err := s.store.UpdateOne(ctx, entity.ID, entity); err != nil {
+	if err := s.repository.UpdateAuthor(ctx, entity); err != nil {
 		return s.handleError(fmt.Errorf("cannot update author, error: %w", err))
 	}
 
@@ -86,7 +84,7 @@ func (s *Service) Update(ctx context.Context, updateAuthorReq *UpdateAuthorReq) 
 func (s *Service) Delete(ctx context.Context, authorID string) error {
 	s.logger.Infof("deleting author with id: %v", authorID)
 
-	if err := s.store.DeleteOne(ctx, authorID); err != nil {
+	if err := s.repository.DeleteAuthor(ctx, authorID); err != nil {
 		return s.handleError(fmt.Errorf("cannot delete author, error: %w", err))
 	}
 
@@ -98,67 +96,51 @@ func (s *Service) Delete(ctx context.Context, authorID string) error {
 func (s *Service) Find(ctx context.Context, id string) (*Author, error) {
 	s.logger.Infof("getting author with id: %v", id)
 
-	var entity Entity
-	if err := s.store.FindOne(ctx, id, &entity); err != nil {
+	entity, err := s.repository.FindAuthor(ctx, id)
+	if err != nil {
 		return nil, s.handleError(fmt.Errorf("cannot find author, error: %w", err))
 	}
 
-	author := NewAuthorFromEntity(&entity)
+	author := NewAuthorFromEntity(entity)
 
 	s.logger.Infof("found author: %v", author)
 
 	return author, nil
 }
 
-func (s *Service) FindAuthorsByIDs(ctx context.Context, ids []string) (map[string]*Author, error) {
+func (s *Service) FindAuthorsByIDs(ctx context.Context, ids []string) ([]*Author, error) {
 	s.logger.Infof("getting authors with ids: %v", ids)
 
-	criteria := bson.D{{
-		"_id",
-		bson.D{{
-			"$in",
-			ids,
-		}},
-	}}
-
-	maps, err := s.store.List(ctx, criteria, zeroOffset, maxAuthorsPageSize)
+	entities, err := s.repository.FindAuthorsByIDs(ctx, ids)
 	if err != nil {
 		return nil, s.handleError(fmt.Errorf("cannot list authors, error: %w", err))
 	}
 
-	authorsMap := make(map[string]*Author)
-
-	for _, m := range maps {
-		entity, err := NewEntityFromDoc(m)
-		if err != nil {
-			return nil, s.handleError(fmt.Errorf("cannot transform document to entity, error: %w", err))
-		}
-
+	authors := make([]*Author, len(entities))
+	for i, entity := range entities {
 		author := NewAuthorFromEntity(entity)
-		authorsMap[author.ID] = author
+		authors[i] = author
 	}
 
-	s.logger.Infof("found authors: %v", authorsMap)
+	s.logger.Infof("found authors: %v", authors)
 
-	return authorsMap, nil
+	return authors, nil
 }
 
 func (s *Service) List(ctx context.Context, listReq *common.ListRequest) (*AuthorsPage, error) {
 	s.logger.Infof("listing authors with parameters: %v", listReq)
 
-	filter := bson.D{}
-
-	maps, err := s.store.List(ctx, filter, listReq.Offset, listReq.Limit)
+	entities, err := s.repository.ListAuthors(ctx, listReq.Offset, listReq.Limit)
 	if err != nil {
 		return nil, s.handleError(fmt.Errorf("cannot list authors, error: %w", err))
 	}
 
-	authors, err := s.mapsToAuthors(maps)
-	if err != nil {
-		return nil, s.handleError(fmt.Errorf("cannot transform documents to authors, error: %w", err))
+	authors := make([]*Author, len(entities))
+	for i, entity := range entities {
+		authors[i] = NewAuthorFromEntity(entity)
 	}
 
-	count, err := s.store.Count(ctx, filter)
+	count, err := s.repository.CountAllAuthors(ctx)
 	if err != nil {
 		return nil, s.handleError(fmt.Errorf("cannot get authors count, error: %w", err))
 	}
@@ -168,22 +150,6 @@ func (s *Service) List(ctx context.Context, listReq *common.ListRequest) (*Autho
 	s.logger.Infof("found authors list: %v", page)
 
 	return page, nil
-}
-
-func (s *Service) mapsToAuthors(maps []map[string]interface{}) ([]*Author, error) {
-	authors := make([]*Author, 0)
-
-	for _, m := range maps {
-		entity, err := NewEntityFromDoc(m)
-		if err != nil {
-			return nil, err
-		}
-
-		author := NewAuthorFromEntity(entity)
-		authors = append(authors, author)
-	}
-
-	return authors, nil
 }
 
 func (s *Service) handleError(err error) error {

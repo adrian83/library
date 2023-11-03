@@ -12,7 +12,7 @@ Simple CRUD application written in [Go](https://golang.org/) and [JavaScript (Re
 - [docker compose](https://docs.docker.com/compose/)
 
 #### Steps
-1. Run `docker-compose up`
+1. Run `docker-compose up --build`
 2. Navigate in browser to `localhost:3000`
 
 ### Running locally

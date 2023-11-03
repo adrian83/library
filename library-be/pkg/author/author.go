@@ -17,6 +17,14 @@ type Entity struct {
 	CreationDate time.Time `bson:"creationDate,omitempty"`
 }
 
+func (e *Entity) DocID() string {
+	return e.ID
+}
+
+func (e *Entity) Empty() bool {
+	return e.ID == "" && e.Name == "" && e.Description == "" && time.Time.IsZero(e.CreationDate)
+}
+
 func NewEntity(id, name, desc string, date time.Time) *Entity {
 	return &Entity{
 		ID:           id,
@@ -57,7 +65,7 @@ func NewAuthor(name, desc string) *Author {
 
 func NewAuthorFromEntity(entity *Entity) *Author {
 	return &Author{
-		ID:           entity.ID,
+		ID:           entity.DocID(),
 		Name:         entity.Name,
 		Description:  entity.Description,
 		CreationDate: entity.CreationDate,
@@ -104,26 +112,26 @@ func NewAuthorsPage(authors Authors, limit, offset, total int64) *AuthorsPage {
 	}
 }
 
-type CreateAuthorReq struct {
+type CreateAuthorCommand struct {
 	Name        string
 	Description string
 }
 
-func NewCreateAuthorReq(name, desc string) *CreateAuthorReq {
-	return &CreateAuthorReq{
+func NewCreateAuthorCommand(name, desc string) *CreateAuthorCommand {
+	return &CreateAuthorCommand{
 		Name:        name,
 		Description: desc,
 	}
 }
 
-type UpdateAuthorReq struct {
-	*CreateAuthorReq
+type UpdateAuthorCommand struct {
+	*CreateAuthorCommand
 	ID string
 }
 
-func NewUpdateAuthorReq(id, name, desc string) *UpdateAuthorReq {
-	return &UpdateAuthorReq{
-		CreateAuthorReq: NewCreateAuthorReq(name, desc),
-		ID:              id,
+func NewUpdateAuthorCommand(id, name, desc string) *UpdateAuthorCommand {
+	return &UpdateAuthorCommand{
+		CreateAuthorCommand: NewCreateAuthorCommand(name, desc),
+		ID:                  id,
 	}
 }

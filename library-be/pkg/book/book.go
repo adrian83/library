@@ -20,6 +20,10 @@ type Entity struct {
 	CreationDate time.Time `bson:"creationDate,omitempty"`
 }
 
+func (e *Entity) DocID() string {
+	return e.ID
+}
+
 func NewEntity(id, title, desc, isbn string, authors []string, date time.Time) *Entity {
 	return &Entity{
 		ID:           id,
@@ -63,40 +67,40 @@ func NewBooksPage(books Books, limit, offset, total int64) *BooksPage {
 	}
 }
 
-type CreateBookReq struct {
+type CreateBookCommand struct {
 	Title       string
 	Description string
 	ISBN        string
 }
 
-func (cbr *CreateBookReq) String() string {
-	return fmt.Sprintf("CreateBookReq {title: %s, desc: %s, isbn: %s}", cbr.Title, cbr.Description, cbr.ISBN)
+func (c *CreateBookCommand) String() string {
+	return fmt.Sprintf("CreateBookReq {title: %s, desc: %s, isbn: %s}", c.Title, c.Description, c.ISBN)
 }
 
-func NewCreateBookReq(title, desc, isbn string) *CreateBookReq {
-	return &CreateBookReq{
+func NewCreateBookCommand(title, desc, isbn string) *CreateBookCommand {
+	return &CreateBookCommand{
 		Title:       title,
 		Description: desc,
 		ISBN:        isbn,
 	}
 }
 
-type UpdateBookReq struct {
-	*CreateBookReq
+type UpdateBookCommand struct {
+	*CreateBookCommand
 	ID      string
 	Authors []string
 }
 
-func (ubr *UpdateBookReq) String() string {
-	return fmt.Sprintf("UpdateBookReq {id: %s, title: %s, desc: %s, isbn: %s, authors: %s}", ubr.ID,
-		ubr.CreateBookReq.Title, ubr.CreateBookReq.Description, ubr.CreateBookReq.ISBN, ubr.Authors)
+func (c *UpdateBookCommand) String() string {
+	return fmt.Sprintf("UpdateBookReq {id: %s, title: %s, desc: %s, isbn: %s, authors: %s}", c.ID,
+		c.CreateBookCommand.Title, c.CreateBookCommand.Description, c.CreateBookCommand.ISBN, c.Authors)
 }
 
-func NewUpdateBookReq(id, title, desc, isbn string, authors []string) *UpdateBookReq {
-	return &UpdateBookReq{
-		CreateBookReq: NewCreateBookReq(title, desc, isbn),
-		ID:            id,
-		Authors:       authors,
+func NewUpdateBookCommand(id, title, desc, isbn string, authors []string) *UpdateBookCommand {
+	return &UpdateBookCommand{
+		CreateBookCommand: NewCreateBookCommand(title, desc, isbn),
+		ID:                id,
+		Authors:           authors,
 	}
 }
 

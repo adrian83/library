@@ -192,7 +192,7 @@ type bookUpdaterMock struct {
 	calls int
 }
 
-func (m *bookUpdaterMock) Update(context.Context, *book.UpdateBookReq) error {
+func (m *bookUpdaterMock) Update(context.Context, *book.UpdateBookCommand) error {
 	m.calls++
 	return m.err
 }
@@ -390,7 +390,7 @@ type bookPersisterMock struct {
 	calls int
 }
 
-func (m *bookPersisterMock) Persist(context.Context, *book.CreateBookReq) (*book.Book, error) {
+func (m *bookPersisterMock) Persist(context.Context, *book.CreateBookCommand) (*book.Book, error) {
 	m.calls++
 	return m.book, m.err
 }

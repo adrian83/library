@@ -45,11 +45,18 @@ func NewLogger() *zap.Logger {
 	return logger
 }
 
+func checkLoggerSync(logger *zap.Logger) {
+	err := logger.Sync()
+	if err != nil {
+		panic(err)
+	}
+}
+
 func main() {
 	cfg := readConfiguration()
 
 	connectionLogger := NewLogger()
-	defer connectionLogger.Sync()
+	defer checkLoggerSync(connectionLogger)
 	connection := storage.NewConnection(cfg.DatabaseHost, cfg.DatabasePort, mongoConnectionTimeoutMs, connectionLogger.Sugar())
 
 	connection.Connect()
@@ -60,26 +67,29 @@ func main() {
 	booksCollection := database.Collection("books")
 	authorCollection := database.Collection("author")
 
-	bookAdapterLogger := NewLogger()
-	defer bookAdapterLogger.Sync()
-	authorAdapterLogger := NewLogger()
-	defer authorAdapterLogger.Sync()
+	bookDocumentCollectionLogger := NewLogger()
+	defer checkLoggerSync(bookDocumentCollectionLogger)
+	authorDocumentCollectionLogger := NewLogger()
+	defer checkLoggerSync(authorDocumentCollectionLogger)
 
-	mongoBookAdapter := storage.NewAdapter(booksCollection, bookAdapterLogger.Sugar())
-	mongoAuthorAdapter := storage.NewAdapter(authorCollection, authorAdapterLogger.Sugar())
+	mongoAuthorDocCollection := storage.NewDocCollection[*author.Entity](authorCollection, authorDocumentCollectionLogger.Sugar())
+	mongoBookDocCollection := storage.NewDocCollection[*book.Entity](booksCollection, bookDocumentCollectionLogger.Sugar())
+
+	authorRepository := author.NewAuthorRepository(mongoAuthorDocCollection)
+	bookRepository := book.NewBookRepository(*mongoBookDocCollection)
 
 	bookServiceLogger := NewLogger()
-	defer bookServiceLogger.Sync()
+	defer checkLoggerSync(bookServiceLogger)
 	authorServiceLogger := NewLogger()
-	defer authorServiceLogger.Sync()
+	defer checkLoggerSync(authorServiceLogger)
 
-	authorService := author.NewService(mongoAuthorAdapter, authorServiceLogger.Sugar())
-	bookService := book.NewService(mongoBookAdapter, authorService, bookServiceLogger.Sugar())
+	authorService := author.NewService(authorRepository, authorServiceLogger.Sugar())
+	bookService := book.NewService(bookRepository, authorService, bookServiceLogger.Sugar())
 
 	bookAPILogger := NewLogger()
-	defer bookAPILogger.Sync()
+	defer checkLoggerSync(bookAPILogger)
 	authorAPILogger := NewLogger()
-	defer authorAPILogger.Sync()
+	defer checkLoggerSync(authorAPILogger)
 
 	routes := web.NewRoutes(
 		web.NewRoute(v1Api+"/books", bookapi.HandleListing(bookService, bookAPILogger.Sugar()), http.MethodGet),
@@ -95,11 +105,11 @@ func main() {
 	)
 
 	routerLogger := NewLogger()
-	defer routerLogger.Sync()
+	defer checkLoggerSync(routerLogger)
 	router := web.NewRouter(routes, &cfg.StaticsPath, routerLogger.Sugar())
 
 	serverLogger := NewLogger()
-	defer serverLogger.Sync()
+	defer checkLoggerSync(serverLogger)
 	server := web.NewServer(cfg.ServerHost, cfg.ServerPort, router, serverLogger.Sugar())
 
 	server.Start()
