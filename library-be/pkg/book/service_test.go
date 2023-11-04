@@ -179,8 +179,10 @@ func TestDelete(t *testing.T) {
 
 	service := NewService(&bookStore, &authorService, &logger)
 
+	deleteBookCommand := NewDeleteBookCommand(bookHamlet.ID)
+
 	// when
-	err := service.Delete(context.TODO(), bookHamlet.ID)
+	err := service.Delete(context.TODO(), deleteBookCommand)
 
 	// then
 	assert.NoError(t, err)
@@ -194,8 +196,10 @@ func TestDeleteError(t *testing.T) {
 
 	service := NewService(&bookStore, &authorService, &logger)
 
+	deleteBookCommand := NewDeleteBookCommand(bookFaust.ID)
+
 	// when
-	err := service.Delete(context.TODO(), bookFaust.ID)
+	err := service.Delete(context.TODO(), deleteBookCommand)
 
 	// then
 	assert.Error(t, err)
@@ -213,8 +217,10 @@ func TestFind(t *testing.T) {
 
 	service := NewService(&bookStore, &authorService, &logger)
 
+	findBookQuery := NewFindBookQuery(bookFaust.ID)
+
 	// when
-	book, err := service.Find(context.TODO(), bookFaust.ID)
+	book, err := service.Find(context.TODO(), findBookQuery)
 
 	// then
 	assert.NoError(t, err)
@@ -242,8 +248,10 @@ func TestFindBookWithoutAuthor(t *testing.T) {
 
 	service := NewService(&bookStore, &authorService, &logger)
 
+	findBookQuery := NewFindBookQuery(bookFaust.ID)
+
 	// when
-	book, err := service.Find(context.TODO(), bookFaust.ID)
+	book, err := service.Find(context.TODO(), findBookQuery)
 
 	// then
 	assert.NoError(t, err)
@@ -264,8 +272,10 @@ func TestFindErrorWhileGettingBook(t *testing.T) {
 
 	service := NewService(&bookStore, &authorService, &logger)
 
+	findBookQuery := NewFindBookQuery(bookFaust.ID)
+
 	// when
-	book, err := service.Find(context.TODO(), bookFaust.ID)
+	book, err := service.Find(context.TODO(), findBookQuery)
 
 	// then
 	assert.Error(t, err)
@@ -282,8 +292,10 @@ func TestFindErrorWhileGettingAuthors(t *testing.T) {
 
 	service := NewService(&bookStore, &authorService, &logger)
 
+	findBookQuery := NewFindBookQuery(bookFaust.ID)
+
 	// when
-	book, err := service.Find(context.TODO(), bookFaust.ID)
+	book, err := service.Find(context.TODO(), findBookQuery)
 
 	// then
 	assert.Error(t, err)
@@ -303,10 +315,10 @@ func TestList(t *testing.T) {
 
 	service := NewService(&bookStore, &authorService, &logger)
 
-	listReq := common.NewListRequest(0, 10, "_id")
+	listBooksQuery := NewListBooksQuery(common.NewListQuery(0, 10, "_id"))
 
 	// when
-	booksPage, err := service.List(context.TODO(), listReq)
+	booksPage, err := service.List(context.TODO(), listBooksQuery)
 
 	// then
 	assert.NoError(t, err)
@@ -334,10 +346,10 @@ func TestListErrorWhileListingBooks(t *testing.T) {
 
 	service := NewService(&bookStore, &authorService, &logger)
 
-	listReq := common.NewListRequest(0, 10, "_id")
+	listBooksQuery := NewListBooksQuery(common.NewListQuery(0, 10, "_id"))
 
 	// when
-	booksPage, err := service.List(context.TODO(), listReq)
+	booksPage, err := service.List(context.TODO(), listBooksQuery)
 
 	// then
 	assert.Error(t, err)
@@ -354,10 +366,10 @@ func TestListErrorWhileGettingAuthors(t *testing.T) {
 
 	service := NewService(&bookStore, &authorService, &logger)
 
-	listReq := common.NewListRequest(0, 10, "_id")
+	listBooksQuery := NewListBooksQuery(common.NewListQuery(0, 10, "_id"))
 
 	// when
-	booksPage, err := service.List(context.TODO(), listReq)
+	booksPage, err := service.List(context.TODO(), listBooksQuery)
 
 	// then
 	assert.Error(t, err)
@@ -375,10 +387,10 @@ func TestListErrorWhileCountingBooks(t *testing.T) {
 
 	service := NewService(&bookStore, &authorService, &logger)
 
-	listReq := common.NewListRequest(0, 10, "_id")
+	listBooksQuery := NewListBooksQuery(common.NewListQuery(0, 10, "_id"))
 
 	// when
-	booksPage, err := service.List(context.TODO(), listReq)
+	booksPage, err := service.List(context.TODO(), listBooksQuery)
 
 	// then
 	assert.Error(t, err)

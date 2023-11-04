@@ -49,7 +49,7 @@ type authorListerMock struct {
 	calls int
 }
 
-func (m *authorListerMock) List(ctx context.Context, listAuthors *common.ListRequest) (*author.AuthorsPage, error) {
+func (m *authorListerMock) List(ctx context.Context, listAuthors *common.ListQuery) (*author.AuthorsPage, error) {
 	m.calls++
 	return m.page, m.err
 }
@@ -298,7 +298,7 @@ type authorDeleterMock struct {
 	calls int
 }
 
-func (m *authorDeleterMock) Delete(ctx context.Context, authorID string) error {
+func (m *authorDeleterMock) Delete(ctx context.Context, command *author.DeleteAuthorCommand) error {
 	m.calls++
 	return m.err
 }

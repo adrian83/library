@@ -46,20 +46,20 @@ type Service struct {
 }
 
 // Persist stores book and authors into database.
-func (s *Service) Persist(ctx context.Context, createBookReq *CreateBookCommand) (*Book, error) {
-	s.logger.Infof("new persisting book request: %v", createBookReq)
+func (s *Service) Persist(ctx context.Context, command *CreateBookCommand) (*Book, error) {
+	s.logger.Infof("persisting book command: %v", command)
 
 	entity := NewEntity(
 		common.NewID(),
-		createBookReq.Title,
-		createBookReq.Description,
-		createBookReq.ISBN,
+		command.Title,
+		command.Description,
+		command.ISBN,
 		nil,
 		common.NowUTC(),
 	)
 
 	if err := s.repository.PersistBook(ctx, entity); err != nil {
-		return nil, s.handleError(fmt.Errorf("cannot inser book, error: %w", err))
+		return nil, s.handleError(fmt.Errorf("cannot persist book, error: %w", err))
 	}
 
 	book := NewBookFromEntity(entity)
@@ -70,15 +70,15 @@ func (s *Service) Persist(ctx context.Context, createBookReq *CreateBookCommand)
 }
 
 // Update updates book in database.
-func (s *Service) Update(ctx context.Context, updateBookReq *UpdateBookCommand) error {
-	s.logger.Infof("new updating book request: %v", updateBookReq)
+func (s *Service) Update(ctx context.Context, command *UpdateBookCommand) error {
+	s.logger.Infof("updating book command: %v", command)
 
 	entity := NewEntity(
-		updateBookReq.ID,
-		updateBookReq.Title,
-		updateBookReq.Description,
-		updateBookReq.ISBN,
-		updateBookReq.Authors,
+		command.ID,
+		command.Title,
+		command.Description,
+		command.ISBN,
+		command.Authors,
 		common.NowUTC(),
 	)
 
@@ -91,10 +91,10 @@ func (s *Service) Update(ctx context.Context, updateBookReq *UpdateBookCommand) 
 	return nil
 }
 
-func (s *Service) Delete(ctx context.Context, bookID string) error {
-	s.logger.Infof("deleting book with id: %v", bookID)
+func (s *Service) Delete(ctx context.Context, command *DeleteBookCommand) error {
+	s.logger.Infof("delete book command: %v", command)
 
-	if err := s.repository.DeleteBook(ctx, bookID); err != nil {
+	if err := s.repository.DeleteBook(ctx, command.ID); err != nil {
 		return s.handleError(fmt.Errorf("cannot delete book, error: %w", err))
 	}
 
@@ -103,10 +103,10 @@ func (s *Service) Delete(ctx context.Context, bookID string) error {
 	return nil
 }
 
-func (s *Service) Find(ctx context.Context, id string) (*Book, error) {
-	s.logger.Infof("getting book with id: %v", id)
+func (s *Service) Find(ctx context.Context, query *FindBookQuery) (*Book, error) {
+	s.logger.Infof("find book query: %v", query)
 
-	entity, err := s.repository.FindBook(ctx, id)
+	entity, err := s.repository.FindBook(ctx, query.ID)
 	if err != nil {
 		return nil, s.handleError(fmt.Errorf("cannot find book, error: %w", err))
 	}
@@ -131,10 +131,10 @@ func (s *Service) Find(ctx context.Context, id string) (*Book, error) {
 	return book, nil
 }
 
-func (s *Service) List(ctx context.Context, listReq *common.ListRequest) (*BooksPage, error) {
-	s.logger.Infof("listing books with parameters: %v", listReq)
+func (s *Service) List(ctx context.Context, query *ListBooksQuery) (*BooksPage, error) {
+	s.logger.Infof("list books query: %v", query)
 
-	entities, err := s.repository.ListBooks(ctx, listReq.Offset, listReq.Limit)
+	entities, err := s.repository.ListBooks(ctx, query.Offset, query.Limit)
 	if err != nil {
 		return nil, s.handleError(fmt.Errorf("cannot list books, error: %w", err))
 	}
@@ -175,7 +175,7 @@ func (s *Service) List(ctx context.Context, listReq *common.ListRequest) (*Books
 		return nil, s.handleError(fmt.Errorf("cannot get books count, error: %w", err))
 	}
 
-	page := NewBooksPage(books, listReq.Limit, listReq.Offset, count)
+	page := NewBooksPage(books, query.Limit, query.Offset, count)
 
 	s.logger.Infof("found books list: %v", page)
 

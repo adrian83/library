@@ -26,7 +26,7 @@ func TestNewListRequestCreation(t *testing.T) {
 	var offset, limit int64 = 15, 10
 
 	// when
-	req := NewListRequest(offset, limit, sort)
+	req := NewListQuery(offset, limit, sort)
 
 	// then
 	assert.Equal(t, limit, req.Limit)

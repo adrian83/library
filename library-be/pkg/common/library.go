@@ -25,16 +25,16 @@ func NewPage(limit, offset, total int64) *Page {
 	}
 }
 
-// ListRequest is a structure that contains data used for listing entities.
-type ListRequest struct {
+// ListQuery is a structure that contains data used for listing entities.
+type ListQuery struct {
 	Offset int64
 	Limit  int64
 	Sort   string
 }
 
-// NewListRequest is a constructor for ListRequest.
-func NewListRequest(offset, limit int64, sort string) *ListRequest {
-	return &ListRequest{
+// NewListQuery is a constructor for ListRequest.
+func NewListQuery(offset, limit int64, sort string) *ListQuery {
+	return &ListQuery{
 		Offset: offset,
 		Limit:  limit,
 		Sort:   sort,

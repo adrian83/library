@@ -2,6 +2,7 @@ package book
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/adrian83/library/pkg/author"
@@ -12,12 +13,12 @@ import (
 )
 
 type Entity struct {
-	ID           string    `bson:"_id,omitempty"`
-	Title        string    `bson:"title,omitempty"`
-	Authors      []string  `bson:"authors,omitempty"`
+	ID           string    `bson:"_id"`
+	Title        string    `bson:"title"`
+	Authors      []string  `bson:"authors"`
 	Description  string    `json:"description"`
 	ISBN         string    `json:"isbn"`
-	CreationDate time.Time `bson:"creationDate,omitempty"`
+	CreationDate time.Time `bson:"creationDate"`
 }
 
 func (e *Entity) DocID() string {
@@ -92,8 +93,8 @@ type UpdateBookCommand struct {
 }
 
 func (c *UpdateBookCommand) String() string {
-	return fmt.Sprintf("UpdateBookReq {id: %s, title: %s, desc: %s, isbn: %s, authors: %s}", c.ID,
-		c.CreateBookCommand.Title, c.CreateBookCommand.Description, c.CreateBookCommand.ISBN, c.Authors)
+	return fmt.Sprintf("UpdateBookCommand {id: %s, title: %s, desc: %s, isbn: %s, authors: [%s]}", c.ID,
+		c.CreateBookCommand.Title, c.CreateBookCommand.Description, c.CreateBookCommand.ISBN, strings.Join(c.Authors, ","))
 }
 
 func NewUpdateBookCommand(id, title, desc, isbn string, authors []string) *UpdateBookCommand {
@@ -101,6 +102,44 @@ func NewUpdateBookCommand(id, title, desc, isbn string, authors []string) *Updat
 		CreateBookCommand: NewCreateBookCommand(title, desc, isbn),
 		ID:                id,
 		Authors:           authors,
+	}
+}
+
+type DeleteBookCommand struct {
+	ID string
+}
+
+func (c *DeleteBookCommand) String() string {
+	return fmt.Sprintf("DeleteBookCommand {id: %s}", c.ID)
+}
+
+func NewDeleteBookCommand(id string) *DeleteBookCommand {
+	return &DeleteBookCommand{
+		ID: id,
+	}
+}
+
+type FindBookQuery struct {
+	ID string
+}
+
+func (c *FindBookQuery) String() string {
+	return fmt.Sprintf("FindBookQuery {id: %s}", c.ID)
+}
+
+func NewFindBookQuery(id string) *FindBookQuery {
+	return &FindBookQuery{
+		ID: id,
+	}
+}
+
+type ListBooksQuery struct {
+	*common.ListQuery
+}
+
+func NewListBooksQuery(listQuery *common.ListQuery) *ListBooksQuery {
+	return &ListBooksQuery{
+		listQuery,
 	}
 }
 

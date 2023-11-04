@@ -145,8 +145,10 @@ func TestDeleteAuthor(t *testing.T) {
 
 	service := NewService(&authorStore, &logger)
 
+	deleteAuthorCommand := NewDeleteAuthorCommand(authorShakespeare.ID)
+
 	// when
-	err := service.Delete(context.TODO(), authorShakespeare.ID)
+	err := service.Delete(context.TODO(), deleteAuthorCommand)
 
 	// then
 	assert.NoError(t, err)
@@ -159,8 +161,10 @@ func TestDeleteAuthorError(t *testing.T) {
 
 	service := NewService(&authorStore, &logger)
 
+	deleteAuthorCommand := NewDeleteAuthorCommand(authorShakespeare.ID)
+
 	// when
-	err := service.Delete(context.TODO(), authorShakespeare.ID)
+	err := service.Delete(context.TODO(), deleteAuthorCommand)
 
 	// then
 	assert.Error(t, err)
@@ -252,7 +256,7 @@ func TestListAuthors(t *testing.T) {
 
 	service := NewService(&authorStore, &logger)
 
-	listReq := common.NewListRequest(0, 10, "_id")
+	listReq := common.NewListQuery(0, 10, "_id")
 
 	// when
 	authorsPage, err := service.List(context.TODO(), listReq)
@@ -269,7 +273,7 @@ func TestListAuthorsErrorWhileListing(t *testing.T) {
 
 	service := NewService(&authorStore, &logger)
 
-	listReq := common.NewListRequest(0, 10, "_id")
+	listReq := common.NewListQuery(0, 10, "_id")
 
 	// when
 	authorsPage, err := service.List(context.TODO(), listReq)
@@ -288,7 +292,7 @@ func TestListAuthorsErrorWhileCounting(t *testing.T) {
 
 	service := NewService(&authorStore, &logger)
 
-	listReq := common.NewListRequest(0, 10, "_id")
+	listReq := common.NewListQuery(0, 10, "_id")
 
 	// when
 	authorsPage, err := service.List(context.TODO(), listReq)

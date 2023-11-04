@@ -41,13 +41,13 @@ func NewService(authorRepository authorRepository, logger logger) *Service {
 	}
 }
 
-func (s *Service) Persist(ctx context.Context, createAuthorReq *CreateAuthorCommand) (*Author, error) {
-	s.logger.Infof("new persisting author request: %v", createAuthorReq)
+func (s *Service) Persist(ctx context.Context, command *CreateAuthorCommand) (*Author, error) {
+	s.logger.Infof("persist author command: %v", command)
 
 	entity := NewEntity(
 		common.NewID(),
-		createAuthorReq.Name,
-		createAuthorReq.Description,
+		command.Name,
+		command.Description,
 		common.NowUTC(),
 	)
 
@@ -62,13 +62,13 @@ func (s *Service) Persist(ctx context.Context, createAuthorReq *CreateAuthorComm
 	return author, nil
 }
 
-func (s *Service) Update(ctx context.Context, updateAuthorReq *UpdateAuthorCommand) error {
-	s.logger.Infof("new updating author request: %v", updateAuthorReq)
+func (s *Service) Update(ctx context.Context, command *UpdateAuthorCommand) error {
+	s.logger.Infof("new updating author request: %v", command)
 
 	entity := NewEntity(
-		updateAuthorReq.ID,
-		updateAuthorReq.Name,
-		updateAuthorReq.Description,
+		command.ID,
+		command.Name,
+		command.Description,
 		common.NowUTC(),
 	)
 
@@ -81,10 +81,10 @@ func (s *Service) Update(ctx context.Context, updateAuthorReq *UpdateAuthorComma
 	return nil
 }
 
-func (s *Service) Delete(ctx context.Context, authorID string) error {
-	s.logger.Infof("deleting author with id: %v", authorID)
+func (s *Service) Delete(ctx context.Context, command *DeleteAuthorCommand) error {
+	s.logger.Infof("delete author command: %v", command)
 
-	if err := s.repository.DeleteAuthor(ctx, authorID); err != nil {
+	if err := s.repository.DeleteAuthor(ctx, command.ID); err != nil {
 		return s.handleError(fmt.Errorf("cannot delete author, error: %w", err))
 	}
 
@@ -127,7 +127,7 @@ func (s *Service) FindAuthorsByIDs(ctx context.Context, ids []string) ([]*Author
 	return authors, nil
 }
 
-func (s *Service) List(ctx context.Context, listReq *common.ListRequest) (*AuthorsPage, error) {
+func (s *Service) List(ctx context.Context, listReq *common.ListQuery) (*AuthorsPage, error) {
 	s.logger.Infof("listing authors with parameters: %v", listReq)
 
 	entities, err := s.repository.ListAuthors(ctx, listReq.Offset, listReq.Limit)

@@ -13,7 +13,6 @@ import (
 
 	"github.com/adrian83/library/pkg/author"
 	"github.com/adrian83/library/pkg/book"
-	"github.com/adrian83/library/pkg/common"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -59,7 +58,7 @@ type booksListerMock struct {
 	calls int
 }
 
-func (m *booksListerMock) List(ctx context.Context, listBooks *common.ListRequest) (*book.BooksPage, error) {
+func (m *booksListerMock) List(ctx context.Context, listBooksQuery *book.ListBooksQuery) (*book.BooksPage, error) {
 	m.calls++
 	return m.page, m.err
 }
@@ -129,7 +128,7 @@ type bookGetterMock struct {
 	calls int
 }
 
-func (m *bookGetterMock) Find(ctx context.Context, id string) (*book.Book, error) {
+func (m *bookGetterMock) Find(ctx context.Context, query *book.FindBookQuery) (*book.Book, error) {
 	m.calls++
 	return m.book, m.err
 }
@@ -329,7 +328,7 @@ type bookDeleterMock struct {
 	calls int
 }
 
-func (m *bookDeleterMock) Delete(ctx context.Context, bookID string) error {
+func (m *bookDeleterMock) Delete(ctx context.Context, command *book.DeleteBookCommand) error {
 	m.calls++
 	return m.err
 }

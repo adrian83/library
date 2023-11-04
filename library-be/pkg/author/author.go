@@ -117,6 +117,10 @@ type CreateAuthorCommand struct {
 	Description string
 }
 
+func (c *CreateAuthorCommand) String() string {
+	return fmt.Sprintf("Author {name: %s, description: %s,}", c.Name, c.Description)
+}
+
 func NewCreateAuthorCommand(name, desc string) *CreateAuthorCommand {
 	return &CreateAuthorCommand{
 		Name:        name,
@@ -129,9 +133,27 @@ type UpdateAuthorCommand struct {
 	ID string
 }
 
+func (c *UpdateAuthorCommand) String() string {
+	return fmt.Sprintf("UpdateAuthorCommand {id: %s, name: %s, description: %s}", c.ID, c.Name, c.Description)
+}
+
 func NewUpdateAuthorCommand(id, name, desc string) *UpdateAuthorCommand {
 	return &UpdateAuthorCommand{
 		CreateAuthorCommand: NewCreateAuthorCommand(name, desc),
 		ID:                  id,
+	}
+}
+
+type DeleteAuthorCommand struct {
+	ID string
+}
+
+func (c *DeleteAuthorCommand) String() string {
+	return fmt.Sprintf("DeleteAuthorCommand {id: %s}", c.ID)
+}
+
+func NewDeleteAuthorCommand(id string) *DeleteAuthorCommand {
+	return &DeleteAuthorCommand{
+		ID: id,
 	}
 }

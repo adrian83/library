@@ -20,7 +20,7 @@ type authorPersister interface {
 }
 
 type authorDeleter interface {
-	Delete(ctx context.Context, authorID string) error
+	Delete(context.Context, *author.DeleteAuthorCommand) error
 }
 
 type authorUpdater interface {
@@ -28,11 +28,11 @@ type authorUpdater interface {
 }
 
 type authorGetter interface {
-	Find(ctx context.Context, id string) (*author.Author, error)
+	Find(context.Context, string) (*author.Author, error)
 }
 
 type authorLister interface {
-	List(ctx context.Context, listAuthors *common.ListRequest) (*author.AuthorsPage, error)
+	List(context.Context, *common.ListQuery) (*author.AuthorsPage, error)
 }
 
 // HandleListing is a handler / controller for listing authors.
@@ -117,7 +117,9 @@ func HandleDeleting(authorDeleter authorDeleter, logger api.Logger) func(http.Re
 
 		authorID := mux.Vars(r)[authorIDParam]
 
-		if err := authorDeleter.Delete(ctx, authorID); err != nil {
+		deleteAuthorCommand := author.NewDeleteAuthorCommand(authorID)
+
+		if err := authorDeleter.Delete(ctx, deleteAuthorCommand); err != nil {
 			api.HandleError(err, w, logger)
 			return
 		}

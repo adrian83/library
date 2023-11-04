@@ -6,7 +6,6 @@ import (
 
 	"github.com/adrian83/library/pkg/api"
 	"github.com/adrian83/library/pkg/book"
-	"github.com/adrian83/library/pkg/common"
 	"github.com/gorilla/mux"
 )
 
@@ -19,7 +18,7 @@ type bookPersister interface {
 }
 
 type booksLister interface {
-	List(ctx context.Context, listBooks *common.ListRequest) (*book.BooksPage, error)
+	List(ctx context.Context, listBooks *book.ListBooksQuery) (*book.BooksPage, error)
 }
 
 type bookUpdater interface {
@@ -27,11 +26,11 @@ type bookUpdater interface {
 }
 
 type bookDeleter interface {
-	Delete(ctx context.Context, bookID string) error
+	Delete(ctx context.Context, command *book.DeleteBookCommand) error
 }
 
 type bookGetter interface {
-	Find(ctx context.Context, id string) (*book.Book, error)
+	Find(ctx context.Context, query *book.FindBookQuery) (*book.Book, error)
 }
 
 func HandleGetting(bookGetter bookGetter, logger api.Logger) func(http.ResponseWriter, *http.Request) {
@@ -41,9 +40,11 @@ func HandleGetting(bookGetter bookGetter, logger api.Logger) func(http.ResponseW
 
 		bookID := mux.Vars(r)[bookIDParam]
 
+		findBookQuery := book.NewFindBookQuery(bookID)
+
 		logger.Infof("get book by id request, id: %s", bookID)
 
-		bkg, err := bookGetter.Find(ctx, bookID)
+		bkg, err := bookGetter.Find(ctx, findBookQuery)
 		if err != nil {
 			api.HandleError(err, w, logger)
 			return
@@ -65,7 +66,9 @@ func HandleDeleting(bookDeleter bookDeleter, logger api.Logger) func(http.Respon
 
 		logger.Infof("delete book by id request, id: %s", bookID)
 
-		if err := bookDeleter.Delete(ctx, bookID); err != nil {
+		deleteBookCommand := book.NewDeleteBookCommand(bookID)
+
+		if err := bookDeleter.Delete(ctx, deleteBookCommand); err != nil {
 			api.HandleError(err, w, logger)
 			return
 		}
@@ -142,8 +145,9 @@ func HandleListing(booksLister booksLister, logger api.Logger) func(http.Respons
 		logger.Info("list books request")
 
 		listBooks := api.ParseListRequest(r.URL.Query())
+		listBooksQuery := book.NewListBooksQuery(listBooks)
 
-		page, err := booksLister.List(ctx, listBooks)
+		page, err := booksLister.List(ctx, listBooksQuery)
 		if err != nil {
 			api.HandleError(err, w, logger)
 			return
