@@ -76,7 +76,7 @@ func main() {
 	mongoBookDocCollection := storage.NewDocCollection[*book.Entity](booksCollection, bookDocumentCollectionLogger.Sugar())
 
 	authorRepository := author.NewAuthorRepository(mongoAuthorDocCollection)
-	bookRepository := book.NewBookRepository(*mongoBookDocCollection)
+	bookRepository := book.NewBookRepository(mongoBookDocCollection)
 
 	bookServiceLogger := NewLogger()
 	defer checkLoggerSync(bookServiceLogger)

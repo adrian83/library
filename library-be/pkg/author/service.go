@@ -52,18 +52,18 @@ func (s *Service) Persist(ctx context.Context, command *CreateAuthorCommand) (*A
 	)
 
 	if err := s.repository.PersistAuthor(ctx, entity); err != nil {
-		return nil, s.handleError(fmt.Errorf("cannot insert author, error: %w", err))
+		return nil, s.handleError(fmt.Errorf("cannot persist author, error: %w", err))
 	}
 
 	author := NewAuthorFromEntity(entity)
 
-	s.logger.Infof("persisted author: %v", author)
+	s.logger.Infof("author persisted successfully: %v", author)
 
 	return author, nil
 }
 
 func (s *Service) Update(ctx context.Context, command *UpdateAuthorCommand) error {
-	s.logger.Infof("new updating author request: %v", command)
+	s.logger.Infof("update author command: %v", command)
 
 	entity := NewEntity(
 		command.ID,
@@ -93,27 +93,27 @@ func (s *Service) Delete(ctx context.Context, command *DeleteAuthorCommand) erro
 	return nil
 }
 
-func (s *Service) Find(ctx context.Context, id string) (*Author, error) {
-	s.logger.Infof("getting author with id: %v", id)
+func (s *Service) Find(ctx context.Context, query *FindAuthorQuery) (*Author, error) {
+	s.logger.Infof("find author query: %v", query)
 
-	entity, err := s.repository.FindAuthor(ctx, id)
+	entity, err := s.repository.FindAuthor(ctx, query.ID)
 	if err != nil {
 		return nil, s.handleError(fmt.Errorf("cannot find author, error: %w", err))
 	}
 
 	author := NewAuthorFromEntity(entity)
 
-	s.logger.Infof("found author: %v", author)
+	s.logger.Infof("author found successfully: %v", author)
 
 	return author, nil
 }
 
-func (s *Service) FindAuthorsByIDs(ctx context.Context, ids []string) ([]*Author, error) {
-	s.logger.Infof("getting authors with ids: %v", ids)
+func (s *Service) FindAuthorsByIDs(ctx context.Context, query *FindAuthorsQuery) ([]*Author, error) {
+	s.logger.Infof("find authors query: %v", query.IDs)
 
-	entities, err := s.repository.FindAuthorsByIDs(ctx, ids)
+	entities, err := s.repository.FindAuthorsByIDs(ctx, query.IDs)
 	if err != nil {
-		return nil, s.handleError(fmt.Errorf("cannot list authors, error: %w", err))
+		return nil, s.handleError(fmt.Errorf("cannot get authors, error: %w", err))
 	}
 
 	authors := make([]*Author, len(entities))
@@ -122,15 +122,15 @@ func (s *Service) FindAuthorsByIDs(ctx context.Context, ids []string) ([]*Author
 		authors[i] = author
 	}
 
-	s.logger.Infof("found authors: %v", authors)
+	s.logger.Infof("authors found successfully: %v", authors)
 
 	return authors, nil
 }
 
-func (s *Service) List(ctx context.Context, listReq *common.ListQuery) (*AuthorsPage, error) {
-	s.logger.Infof("listing authors with parameters: %v", listReq)
+func (s *Service) List(ctx context.Context, query *ListAuthorsQuery) (*AuthorsPage, error) {
+	s.logger.Infof("list authors query: %v", query)
 
-	entities, err := s.repository.ListAuthors(ctx, listReq.Offset, listReq.Limit)
+	entities, err := s.repository.ListAuthors(ctx, query.Offset, query.Limit)
 	if err != nil {
 		return nil, s.handleError(fmt.Errorf("cannot list authors, error: %w", err))
 	}
@@ -145,9 +145,9 @@ func (s *Service) List(ctx context.Context, listReq *common.ListQuery) (*Authors
 		return nil, s.handleError(fmt.Errorf("cannot get authors count, error: %w", err))
 	}
 
-	page := NewAuthorsPage(authors, listReq.Limit, listReq.Offset, count)
+	page := NewAuthorsPage(authors, query.Limit, query.Offset, count)
 
-	s.logger.Infof("found authors list: %v", page)
+	s.logger.Infof("authors listed successfully: %v", page)
 
 	return page, nil
 }

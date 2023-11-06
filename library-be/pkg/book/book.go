@@ -18,11 +18,15 @@ type Entity struct {
 	Authors      []string  `bson:"authors"`
 	Description  string    `json:"description"`
 	ISBN         string    `json:"isbn"`
-	CreationDate time.Time `bson:"creationDate"`
+	CreationDate time.Time `bson:"creationDate,omitempty"`
 }
 
 func (e *Entity) DocID() string {
 	return e.ID
+}
+
+func (e *Entity) Empty() bool {
+	return e.ID == "" && e.Title == "" && e.Description == "" && e.ISBN == "" && e.Authors == nil && e.CreationDate.IsZero()
 }
 
 func NewEntity(id, title, desc, isbn string, authors []string, date time.Time) *Entity {
@@ -75,7 +79,7 @@ type CreateBookCommand struct {
 }
 
 func (c *CreateBookCommand) String() string {
-	return fmt.Sprintf("CreateBookReq {title: %s, desc: %s, isbn: %s}", c.Title, c.Description, c.ISBN)
+	return fmt.Sprintf("CreateBookCommand {title: %s, desc: %s, isbn: %s}", c.Title, c.Description, c.ISBN)
 }
 
 func NewCreateBookCommand(title, desc, isbn string) *CreateBookCommand {
@@ -137,6 +141,10 @@ type ListBooksQuery struct {
 	*common.ListQuery
 }
 
+func (c *ListBooksQuery) String() string {
+	return fmt.Sprintf("ListBooksQuery {offset: %v, limit: %v, sort: %v}", c.Offset, c.Limit, c.Sort)
+}
+
 func NewListBooksQuery(listQuery *common.ListQuery) *ListBooksQuery {
 	return &ListBooksQuery{
 		listQuery,
@@ -145,10 +153,10 @@ func NewListBooksQuery(listQuery *common.ListQuery) *ListBooksQuery {
 
 type Book struct {
 	ID           string         `json:"id"`
-	Title        string         `json:"title,omitempty"`
-	Description  string         `json:"description,omitempty"`
-	ISBN         string         `json:"isbn,omitempty"`
-	Authors      author.Authors `json:"authors,omitempty"`
+	Title        string         `json:"title"`
+	Description  string         `json:"description"`
+	ISBN         string         `json:"isbn"`
+	Authors      author.Authors `json:"authors"`
 	CreationDate time.Time      `json:"creationDate,omitempty"`
 }
 

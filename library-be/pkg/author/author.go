@@ -2,6 +2,7 @@ package author
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/adrian83/library/pkg/common"
@@ -11,9 +12,9 @@ import (
 )
 
 type Entity struct {
-	ID           string    `bson:"_id,omitempty"`
-	Name         string    `bson:"name,omitempty"`
-	Description  string    `bson:"description,omitempty"`
+	ID           string    `bson:"_id"`
+	Name         string    `bson:"name"`
+	Description  string    `bson:"description"`
 	CreationDate time.Time `bson:"creationDate,omitempty"`
 }
 
@@ -50,8 +51,8 @@ func NewEntityFromDoc(doc map[string]interface{}) (*Entity, error) {
 
 type Author struct {
 	ID           string    `json:"id"`
-	Name         string    `json:"name,omitempty"`
-	Description  string    `json:"description,omitempty"`
+	Name         string    `json:"name"`
+	Description  string    `json:"description"`
 	CreationDate time.Time `json:"creationDate,omitempty"`
 }
 
@@ -155,5 +156,47 @@ func (c *DeleteAuthorCommand) String() string {
 func NewDeleteAuthorCommand(id string) *DeleteAuthorCommand {
 	return &DeleteAuthorCommand{
 		ID: id,
+	}
+}
+
+type FindAuthorQuery struct {
+	ID string
+}
+
+func (c *FindAuthorQuery) String() string {
+	return fmt.Sprintf("FindAuthorQuery {id: %s}", c.ID)
+}
+
+func NewFindAuthorQuery(id string) *FindAuthorQuery {
+	return &FindAuthorQuery{
+		ID: id,
+	}
+}
+
+type FindAuthorsQuery struct {
+	IDs []string
+}
+
+func (c *FindAuthorsQuery) String() string {
+	return fmt.Sprintf("FindAuthorsQuery {id: %s}", strings.Join(c.IDs, ","))
+}
+
+func NewFindAuthorsQuery(ids []string) *FindAuthorsQuery {
+	return &FindAuthorsQuery{
+		IDs: ids,
+	}
+}
+
+type ListAuthorsQuery struct {
+	*common.ListQuery
+}
+
+func (c *ListAuthorsQuery) String() string {
+	return fmt.Sprintf("ListAuthorsQuery {offset: %v, limit: %v, sort: %v}", c.Offset, c.Limit, c.Sort)
+}
+
+func NewListAuthorsQuery(listQuery *common.ListQuery) *ListAuthorsQuery {
+	return &ListAuthorsQuery{
+		listQuery,
 	}
 }

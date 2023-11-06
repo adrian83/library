@@ -32,7 +32,7 @@ type ListQuery struct {
 	Sort   string
 }
 
-// NewListQuery is a constructor for ListRequest.
+// NewListQuery is a constructor for ListQuery.
 func NewListQuery(offset, limit int64, sort string) *ListQuery {
 	return &ListQuery{
 		Offset: offset,

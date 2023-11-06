@@ -12,7 +12,6 @@ import (
 	"testing"
 
 	"github.com/adrian83/library/pkg/author"
-	"github.com/adrian83/library/pkg/common"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -49,7 +48,7 @@ type authorListerMock struct {
 	calls int
 }
 
-func (m *authorListerMock) List(ctx context.Context, listAuthors *common.ListQuery) (*author.AuthorsPage, error) {
+func (m *authorListerMock) List(ctx context.Context, listAuthors *author.ListAuthorsQuery) (*author.AuthorsPage, error) {
 	m.calls++
 	return m.page, m.err
 }
@@ -119,7 +118,7 @@ type authorGetterMock struct {
 	calls  int
 }
 
-func (m *authorGetterMock) Find(ctx context.Context, id string) (*author.Author, error) {
+func (m *authorGetterMock) Find(context.Context, *author.FindAuthorQuery) (*author.Author, error) {
 	m.calls++
 	return m.author, m.err
 }

@@ -17,7 +17,7 @@ type logger interface {
 }
 
 type authorService interface {
-	FindAuthorsByIDs(context.Context, []string) ([]*author.Author, error)
+	FindAuthorsByIDs(context.Context, *author.FindAuthorsQuery) ([]*author.Author, error)
 }
 
 type bookRepository interface {
@@ -47,7 +47,7 @@ type Service struct {
 
 // Persist stores book and authors into database.
 func (s *Service) Persist(ctx context.Context, command *CreateBookCommand) (*Book, error) {
-	s.logger.Infof("persisting book command: %v", command)
+	s.logger.Infof("persist book command: %v", command)
 
 	entity := NewEntity(
 		common.NewID(),
@@ -64,14 +64,14 @@ func (s *Service) Persist(ctx context.Context, command *CreateBookCommand) (*Boo
 
 	book := NewBookFromEntity(entity)
 
-	s.logger.Infof("persisted book: %v", book)
+	s.logger.Infof("book persisted successfully: %v", book)
 
 	return book, nil
 }
 
 // Update updates book in database.
 func (s *Service) Update(ctx context.Context, command *UpdateBookCommand) error {
-	s.logger.Infof("updating book command: %v", command)
+	s.logger.Infof("update book command: %v", command)
 
 	entity := NewEntity(
 		command.ID,
@@ -113,20 +113,21 @@ func (s *Service) Find(ctx context.Context, query *FindBookQuery) (*Book, error)
 
 	book := NewBookFromEntity(entity)
 
-	s.logger.Infof("found book: %v", book)
+	s.logger.Infof("found book successfully: %v", book)
 
 	if len(entity.Authors) == 0 {
 		return book, nil
 	}
 
-	authors, err := s.authorService.FindAuthorsByIDs(ctx, entity.Authors)
+	findAuthorsQuery := author.NewFindAuthorsQuery(entity.Authors)
+	authors, err := s.authorService.FindAuthorsByIDs(ctx, findAuthorsQuery)
 	if err != nil {
-		return nil, s.handleError(fmt.Errorf("cannod find authors by ids, error: %w", err))
+		return nil, s.handleError(fmt.Errorf("cannot find authors by ids, error: %w", err))
 	}
 
 	book.Authors = authors
 
-	s.logger.Infof("found book with authors: %v", book)
+	s.logger.Infof("found book with authors successfully: %v", book)
 
 	return book, nil
 }
@@ -144,7 +145,8 @@ func (s *Service) List(ctx context.Context, query *ListBooksQuery) (*BooksPage, 
 		authorIDs = append(authorIDs, bookEntity.Authors...)
 	}
 
-	authorEntities, err := s.authorService.FindAuthorsByIDs(ctx, authorIDs)
+	findAuthorsQuery := author.NewFindAuthorsQuery(authorIDs)
+	authorEntities, err := s.authorService.FindAuthorsByIDs(ctx, findAuthorsQuery)
 	if err != nil {
 		return nil, s.handleError(fmt.Errorf("cannot find authors, error: %w", err))
 	}
@@ -177,7 +179,7 @@ func (s *Service) List(ctx context.Context, query *ListBooksQuery) (*BooksPage, 
 
 	page := NewBooksPage(books, query.Limit, query.Offset, count)
 
-	s.logger.Infof("found books list: %v", page)
+	s.logger.Infof("found books successfully: %v", page)
 
 	return page, nil
 }

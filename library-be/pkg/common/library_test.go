@@ -19,17 +19,17 @@ func TestNewPageCreation(t *testing.T) {
 	assert.Equal(t, offset, page.Offset)
 }
 
-func TestNewListRequestCreation(t *testing.T) {
+func TestNewListQueryCreation(t *testing.T) {
 	// given
 	sort := "name"
 
 	var offset, limit int64 = 15, 10
 
 	// when
-	req := NewListQuery(offset, limit, sort)
+	query := NewListQuery(offset, limit, sort)
 
 	// then
-	assert.Equal(t, limit, req.Limit)
-	assert.Equal(t, offset, req.Offset)
-	assert.Equal(t, sort, req.Sort)
+	assert.Equal(t, limit, query.Limit)
+	assert.Equal(t, offset, query.Offset)
+	assert.Equal(t, sort, query.Sort)
 }

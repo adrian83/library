@@ -92,7 +92,7 @@ type Validable interface {
 	Validate() error
 }
 
-func ParseListRequest(params map[string][]string) *common.ListQuery {
+func ParseListQuery(params map[string][]string) *common.ListQuery {
 	limit, offset, sort := defaultLimit, defaultOffset, defaultSort
 
 	limits := params[paramLimit]

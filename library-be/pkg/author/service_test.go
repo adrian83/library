@@ -72,17 +72,17 @@ func TestPersistAuthor(t *testing.T) {
 
 	service := NewService(&authorStore, &logger)
 
-	createAuthorReq := NewCreateAuthorCommand(authorShakespeare.Name, authorShakespeare.Description)
+	createAuthorCommand := NewCreateAuthorCommand(authorShakespeare.Name, authorShakespeare.Description)
 
 	// when
-	author, err := service.Persist(context.TODO(), createAuthorReq)
+	author, err := service.Persist(context.TODO(), createAuthorCommand)
 
 	// then
 	assert.NoError(t, err)
 	assert.NotNil(t, author)
 	assert.NotEmpty(t, author.ID)
-	assert.Equal(t, createAuthorReq.Name, author.Name)
-	assert.Equal(t, createAuthorReq.Description, author.Description)
+	assert.Equal(t, createAuthorCommand.Name, author.Name)
+	assert.Equal(t, createAuthorCommand.Description, author.Description)
 }
 
 func TestPersistAuthorError(t *testing.T) {
@@ -92,10 +92,10 @@ func TestPersistAuthorError(t *testing.T) {
 
 	service := NewService(&authorStore, &logger)
 
-	createAuthorReq := NewCreateAuthorCommand(authorShakespeare.Name, authorShakespeare.Description)
+	createAuthorCommand := NewCreateAuthorCommand(authorShakespeare.Name, authorShakespeare.Description)
 
 	// when
-	author, err := service.Persist(context.TODO(), createAuthorReq)
+	author, err := service.Persist(context.TODO(), createAuthorCommand)
 
 	// then
 	assert.Error(t, err)
@@ -111,10 +111,10 @@ func TestUpdateAuthor(t *testing.T) {
 
 	service := NewService(&authorStore, &logger)
 
-	updateAuthorReq := NewUpdateAuthorCommand(authorShakespeare.ID, authorShakespeare.Name, authorShakespeare.Description)
+	updateAuthorCommand := NewUpdateAuthorCommand(authorShakespeare.ID, authorShakespeare.Name, authorShakespeare.Description)
 
 	// when
-	err := service.Update(context.TODO(), updateAuthorReq)
+	err := service.Update(context.TODO(), updateAuthorCommand)
 
 	// then
 	assert.NoError(t, err)
@@ -127,10 +127,10 @@ func TestUpdateAuthorError(t *testing.T) {
 
 	service := NewService(&authorStore, &logger)
 
-	updateAuthorReq := NewUpdateAuthorCommand(authorShakespeare.ID, authorShakespeare.Name, authorShakespeare.Description)
+	updateAuthorCommand := NewUpdateAuthorCommand(authorShakespeare.ID, authorShakespeare.Name, authorShakespeare.Description)
 
 	// when
-	err := service.Update(context.TODO(), updateAuthorReq)
+	err := service.Update(context.TODO(), updateAuthorCommand)
 
 	// then
 	assert.Error(t, err)
@@ -179,8 +179,10 @@ func TestFindAuthor(t *testing.T) {
 
 	service := NewService(&authorStore, &logger)
 
+	findAuthorQuery := NewFindAuthorQuery(authorShakespeare.ID)
+
 	// when
-	author, err := service.Find(context.TODO(), authorShakespeare.ID)
+	author, err := service.Find(context.TODO(), findAuthorQuery)
 
 	// then
 	assert.NoError(t, err)
@@ -194,8 +196,10 @@ func TestFindAuthorError(t *testing.T) {
 
 	service := NewService(&authorStore, &logger)
 
+	findAuthorQuery := NewFindAuthorQuery(authorShakespeare.ID)
+
 	// when
-	author, err := service.Find(context.TODO(), authorShakespeare.ID)
+	author, err := service.Find(context.TODO(), findAuthorQuery)
 
 	// then
 	assert.Error(t, err)
@@ -211,8 +215,10 @@ func TestFindAuthorsByIDs(t *testing.T) {
 
 	service := NewService(&authorStore, &logger)
 
+	findAuthorsQuery := NewFindAuthorsQuery([]string{authorShakespeare.ID, authorGoethe.ID})
+
 	// when
-	authors, err := service.FindAuthorsByIDs(context.TODO(), []string{authorShakespeare.ID, authorGoethe.ID})
+	authors, err := service.FindAuthorsByIDs(context.TODO(), findAuthorsQuery)
 
 	// then
 	assert.NoError(t, err)
@@ -239,8 +245,10 @@ func TestFindAuthorsByIDsError(t *testing.T) {
 
 	service := NewService(&authorStore, &logger)
 
+	findAuthorsQuery := NewFindAuthorsQuery([]string{authorShakespeare.ID, authorGoethe.ID})
+
 	// when
-	authorsMap, err := service.FindAuthorsByIDs(context.TODO(), []string{authorShakespeare.ID, authorGoethe.ID})
+	authorsMap, err := service.FindAuthorsByIDs(context.TODO(), findAuthorsQuery)
 
 	// then
 	assert.Error(t, err)
@@ -256,10 +264,10 @@ func TestListAuthors(t *testing.T) {
 
 	service := NewService(&authorStore, &logger)
 
-	listReq := common.NewListQuery(0, 10, "_id")
+	listAuthorsQuery := NewListAuthorsQuery(common.NewListQuery(0, 10, "_id"))
 
 	// when
-	authorsPage, err := service.List(context.TODO(), listReq)
+	authorsPage, err := service.List(context.TODO(), listAuthorsQuery)
 
 	// then
 	assert.NoError(t, err)
@@ -273,10 +281,10 @@ func TestListAuthorsErrorWhileListing(t *testing.T) {
 
 	service := NewService(&authorStore, &logger)
 
-	listReq := common.NewListQuery(0, 10, "_id")
+	listAuthorsQuery := NewListAuthorsQuery(common.NewListQuery(0, 10, "_id"))
 
 	// when
-	authorsPage, err := service.List(context.TODO(), listReq)
+	authorsPage, err := service.List(context.TODO(), listAuthorsQuery)
 
 	// then
 	assert.Error(t, err)
@@ -292,10 +300,10 @@ func TestListAuthorsErrorWhileCounting(t *testing.T) {
 
 	service := NewService(&authorStore, &logger)
 
-	listReq := common.NewListQuery(0, 10, "_id")
+	listAuthorsQuery := NewListAuthorsQuery(common.NewListQuery(0, 10, "_id"))
 
 	// when
-	authorsPage, err := service.List(context.TODO(), listReq)
+	authorsPage, err := service.List(context.TODO(), listAuthorsQuery)
 
 	// then
 	assert.Error(t, err)

@@ -11,29 +11,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var (
-	authorShakespeare = author.NewAuthor("William Shakespeare", "Shakespeare was born and "+
-		"raised in Stratford-upon-Avon, Warwickshire. At the age...")
-	authorGoethe = author.NewAuthor("Johann Wolfgang von Goethe", "Johann Wolfgang von Goethe "+
-		"was a German writer and statesman. His works...")
-
-	bookHamlet = NewBook("Hamlet", "The Tragedy of Hamlet, Prince of Denmark, often shortened to Hamlet, "+
-		"is a tragedy written by William Shakespeare sometime between 1599 and 1601. It is...",
-		"isbn-abc-def-ghi", author.NewAuthors(authorShakespeare))
-	bookFaust = NewBook("Faust", "Faust is a tragic play in two parts by Johann Wolfgang von Goethe, "+
-		"usually known in English as Faust, Part One and Faust, Part Two. Although rarely staged in its "+
-		"entirety, it is the play...",
-		"isbn-mno-prs-tuv", author.NewAuthors(authorGoethe))
-	bookWithoutAuthor = NewBook("Just a title", "Just a description", "isbn-def-ghi-jkl", nil)
-
-	entityHamlet = NewEntity(bookHamlet.ID, bookHamlet.Title, bookHamlet.Description, bookHamlet.ISBN,
-		[]string{authorShakespeare.ID}, bookHamlet.CreationDate)
-	entityFaust = NewEntity(bookFaust.ID, bookFaust.Title, bookFaust.Description, bookFaust.ISBN,
-		[]string{authorGoethe.ID}, bookFaust.CreationDate)
-	entityWithoutAuthor = NewEntity(bookWithoutAuthor.ID, bookWithoutAuthor.Title, bookWithoutAuthor.Description,
-		bookWithoutAuthor.ISBN, []string{}, bookWithoutAuthor.CreationDate)
-)
-
 type loggerMock struct {
 	t *testing.T
 }
@@ -51,7 +28,7 @@ type authorServiceMock struct {
 	findAuthorsByIDsErr    error
 }
 
-func (m *authorServiceMock) FindAuthorsByIDs(context.Context, []string) ([]*author.Author, error) {
+func (m *authorServiceMock) FindAuthorsByIDs(context.Context, *author.FindAuthorsQuery) ([]*author.Author, error) {
 	return m.findAuthorsByIDsResult, m.findAuthorsByIDsErr
 }
 
@@ -101,18 +78,18 @@ func TestPersist(t *testing.T) {
 
 	service := NewService(&bookStore, &authorService, &logger)
 
-	createBookReq := NewCreateBookCommand(bookHamlet.Title, bookHamlet.Description, bookHamlet.ISBN)
+	createBookCommand := NewCreateBookCommand(bookHamlet.Title, bookHamlet.Description, bookHamlet.ISBN)
 
 	// when
-	book, err := service.Persist(context.TODO(), createBookReq)
+	book, err := service.Persist(context.TODO(), createBookCommand)
 
 	// then
 	assert.NoError(t, err)
 	assert.NotNil(t, book)
 	assert.NotEmpty(t, book.ID)
-	assert.Equal(t, createBookReq.Title, book.Title)
-	assert.Equal(t, createBookReq.Description, book.Description)
-	assert.Equal(t, createBookReq.ISBN, book.ISBN)
+	assert.Equal(t, createBookCommand.Title, book.Title)
+	assert.Equal(t, createBookCommand.Description, book.Description)
+	assert.Equal(t, createBookCommand.ISBN, book.ISBN)
 }
 
 func TestPersistError(t *testing.T) {
@@ -123,10 +100,10 @@ func TestPersistError(t *testing.T) {
 
 	service := NewService(&bookStore, &authorService, &logger)
 
-	createBookReq := NewCreateBookCommand(bookHamlet.Title, bookHamlet.Description, bookHamlet.ISBN)
+	createBookCommand := NewCreateBookCommand(bookHamlet.Title, bookHamlet.Description, bookHamlet.ISBN)
 
 	// when
-	book, err := service.Persist(context.TODO(), createBookReq)
+	book, err := service.Persist(context.TODO(), createBookCommand)
 
 	// then
 	assert.Error(t, err)
@@ -143,10 +120,10 @@ func TestUpdate(t *testing.T) {
 
 	service := NewService(&bookStore, &authorService, &logger)
 
-	updateBookReq := NewUpdateBookCommand("abc", bookHamlet.Title, bookHamlet.Description, bookHamlet.ISBN, []string{"1"})
+	updateBookCommand := NewUpdateBookCommand("abc", bookHamlet.Title, bookHamlet.Description, bookHamlet.ISBN, []string{"1"})
 
 	// when
-	err := service.Update(context.TODO(), updateBookReq)
+	err := service.Update(context.TODO(), updateBookCommand)
 
 	// then
 	assert.NoError(t, err)
@@ -160,10 +137,10 @@ func TestUpdateError(t *testing.T) {
 
 	service := NewService(&bookStore, &authorService, &logger)
 
-	updateBookReq := NewUpdateBookCommand("abc", bookHamlet.Title, bookHamlet.Description, bookHamlet.ISBN, []string{"1"})
+	updateBookCommand := NewUpdateBookCommand("abc", bookHamlet.Title, bookHamlet.Description, bookHamlet.ISBN, []string{"1"})
 
 	// when
-	err := service.Update(context.TODO(), updateBookReq)
+	err := service.Update(context.TODO(), updateBookCommand)
 
 	// then
 	assert.Error(t, err)

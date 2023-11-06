@@ -14,23 +14,23 @@ const (
 )
 
 type bookPersister interface {
-	Persist(ctx context.Context, req *book.CreateBookCommand) (*book.Book, error)
+	Persist(context.Context, *book.CreateBookCommand) (*book.Book, error)
 }
 
 type booksLister interface {
-	List(ctx context.Context, listBooks *book.ListBooksQuery) (*book.BooksPage, error)
+	List(context.Context, *book.ListBooksQuery) (*book.BooksPage, error)
 }
 
 type bookUpdater interface {
-	Update(ctx context.Context, req *book.UpdateBookCommand) error
+	Update(context.Context, *book.UpdateBookCommand) error
 }
 
 type bookDeleter interface {
-	Delete(ctx context.Context, command *book.DeleteBookCommand) error
+	Delete(context.Context, *book.DeleteBookCommand) error
 }
 
 type bookGetter interface {
-	Find(ctx context.Context, query *book.FindBookQuery) (*book.Book, error)
+	Find(context.Context, *book.FindBookQuery) (*book.Book, error)
 }
 
 func HandleGetting(bookGetter bookGetter, logger api.Logger) func(http.ResponseWriter, *http.Request) {
@@ -93,9 +93,9 @@ func HandlePersisting(bookPersister bookPersister, logger api.Logger) func(http.
 
 		logger.Infof("persist book request, data: %s", createBook)
 
-		req := book.NewCreateBookCommand(createBook.Title, createBook.Description, createBook.ISBN)
+		createBookCommand := book.NewCreateBookCommand(createBook.Title, createBook.Description, createBook.ISBN)
 
-		bkg, err := bookPersister.Persist(ctx, req)
+		bkg, err := bookPersister.Persist(ctx, createBookCommand)
 		if err != nil {
 			api.HandleError(err, w, logger)
 			return
@@ -121,11 +121,11 @@ func HandleUpdating(bookUpdater bookUpdater, logger api.Logger) func(http.Respon
 			return
 		}
 
-		req := book.NewUpdateBookCommand(bookID, updateBook.Title, updateBook.Description, updateBook.ISBN, updateBook.Authors)
+		updateBookCommand := book.NewUpdateBookCommand(bookID, updateBook.Title, updateBook.Description, updateBook.ISBN, updateBook.Authors)
 
-		logger.Infof("update book by id request, data: %s", req)
+		logger.Infof("update book by id request, data: %s", updateBookCommand)
 
-		if err := bookUpdater.Update(ctx, req); err != nil {
+		if err := bookUpdater.Update(ctx, updateBookCommand); err != nil {
 			api.HandleError(err, w, logger)
 			return
 		}
@@ -142,9 +142,10 @@ func HandleListing(booksLister booksLister, logger api.Logger) func(http.Respons
 		ctx, cancel := context.WithTimeout(context.Background(), api.RequestTimeout)
 		defer cancel()
 
-		logger.Info("list books request")
+		listBooks := api.ParseListQuery(r.URL.Query())
 
-		listBooks := api.ParseListRequest(r.URL.Query())
+		logger.Info("list books request, data: %v", listBooks)
+
 		listBooksQuery := book.NewListBooksQuery(listBooks)
 
 		page, err := booksLister.List(ctx, listBooksQuery)

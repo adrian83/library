@@ -4,18 +4,26 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/adrian83/library/pkg/storage"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-func NewBookRepository(collection storage.DocCollection[*Entity]) *BookRepository {
+type docCollection interface {
+	InsertOne(context.Context, *Entity) error
+	UpdateOne(context.Context, *Entity) error
+	FindOne(context.Context, string, *Entity) error
+	DeleteOne(context.Context, string) error
+	List(context.Context, bson.D, int64, int64) ([]map[string]interface{}, error)
+	Count(context.Context, interface{}) (int64, error)
+}
+
+func NewBookRepository(collection docCollection) *BookRepository {
 	return &BookRepository{
 		collection: collection,
 	}
 }
 
 type BookRepository struct {
-	collection storage.DocCollection[*Entity]
+	collection docCollection
 }
 
 func (r *BookRepository) PersistBook(ctx context.Context, entity *Entity) error {

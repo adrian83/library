@@ -6,7 +6,6 @@ import (
 
 	"github.com/adrian83/library/pkg/api"
 	"github.com/adrian83/library/pkg/author"
-	"github.com/adrian83/library/pkg/common"
 
 	"github.com/gorilla/mux"
 )
@@ -28,11 +27,11 @@ type authorUpdater interface {
 }
 
 type authorGetter interface {
-	Find(context.Context, string) (*author.Author, error)
+	Find(context.Context, *author.FindAuthorQuery) (*author.Author, error)
 }
 
 type authorLister interface {
-	List(context.Context, *common.ListQuery) (*author.AuthorsPage, error)
+	List(context.Context, *author.ListAuthorsQuery) (*author.AuthorsPage, error)
 }
 
 // HandleListing is a handler / controller for listing authors.
@@ -41,17 +40,17 @@ func HandleListing(authorLister authorLister, logger api.Logger) func(http.Respo
 		ctx, cancel := context.WithTimeout(context.Background(), api.RequestTimeout)
 		defer cancel()
 
-		logger.Infof("authors listing request: %v", r)
+		//logger.Infof("list authors request: %v", r)
 
-		listAuthors := api.ParseListRequest(r.URL.Query())
-
-		page, err := authorLister.List(ctx, listAuthors)
+		listAuthors := api.ParseListQuery(r.URL.Query())
+		listAuthorsQuery := author.NewListAuthorsQuery(listAuthors)
+		page, err := authorLister.List(ctx, listAuthorsQuery)
 		if err != nil {
 			api.HandleError(err, w, logger)
 			return
 		}
 
-		logger.Infof("authors listing result: %v", page)
+		logger.Infof("list authors result: %v", page)
 
 		api.ResponseJSON(http.StatusOK, page, w, logger)
 	}
@@ -63,17 +62,17 @@ func HandleGetting(authorGetter authorGetter, logger api.Logger) func(http.Respo
 		ctx, cancel := context.WithTimeout(context.Background(), api.RequestTimeout)
 		defer cancel()
 
-		logger.Infof("author getting request: %v", r)
+		//logger.Infof("get author request: %v", r)
 
 		authorID := mux.Vars(r)[authorIDParam]
-
-		athr, err := authorGetter.Find(ctx, authorID)
+		findAuthorQuery := author.NewFindAuthorQuery(authorID)
+		athr, err := authorGetter.Find(ctx, findAuthorQuery)
 		if err != nil {
 			api.HandleError(err, w, logger)
 			return
 		}
 
-		logger.Infof("author getting result: %v", athr)
+		logger.Infof("get author result: %v", athr)
 
 		api.ResponseJSON(http.StatusOK, athr, w, logger)
 	}
@@ -85,23 +84,22 @@ func HandleUpdating(authorUpdater authorUpdater, logger api.Logger) func(http.Re
 		ctx, cancel := context.WithTimeout(context.Background(), api.RequestTimeout)
 		defer cancel()
 
-		logger.Infof("author updating request: %v", r)
+		//logger.Infof("update author request: %v", r)
 
 		authorID := mux.Vars(r)[authorIDParam]
-
 		var updateAuthor UpdateAuthor
 		if err := api.UnmarshalAndValidate(r.Body, &updateAuthor); err != nil {
 			api.HandleError(err, w, logger)
 			return
 		}
 
-		req := author.NewUpdateAuthorCommand(authorID, updateAuthor.Name, updateAuthor.Description)
-		if err := authorUpdater.Update(ctx, req); err != nil {
+		updateAuthorCommand := author.NewUpdateAuthorCommand(authorID, updateAuthor.Name, updateAuthor.Description)
+		if err := authorUpdater.Update(ctx, updateAuthorCommand); err != nil {
 			api.HandleError(err, w, logger)
 			return
 		}
 
-		logger.Infof("author updating result: %v", req)
+		logger.Infof("update author result: %v", updateAuthorCommand)
 
 		api.ResponseJSON(http.StatusOK, nil, w, logger)
 	}
@@ -113,18 +111,16 @@ func HandleDeleting(authorDeleter authorDeleter, logger api.Logger) func(http.Re
 		ctx, cancel := context.WithTimeout(context.Background(), api.RequestTimeout)
 		defer cancel()
 
-		logger.Infof("author deleting request: %v", r)
+		//logger.Infof("delete author request: %v", r)
 
 		authorID := mux.Vars(r)[authorIDParam]
-
 		deleteAuthorCommand := author.NewDeleteAuthorCommand(authorID)
-
 		if err := authorDeleter.Delete(ctx, deleteAuthorCommand); err != nil {
 			api.HandleError(err, w, logger)
 			return
 		}
 
-		logger.Info("author deleting done")
+		logger.Info("delete author done")
 
 		api.ResponseJSON(http.StatusOK, nil, w, logger)
 	}
@@ -136,7 +132,7 @@ func HandlePersisting(authorPersister authorPersister, logger api.Logger) func(h
 		ctx, cancel := context.WithTimeout(context.Background(), api.RequestTimeout)
 		defer cancel()
 
-		logger.Infof("author persisting request: %v", r)
+		//logger.Infof("persist author request: %v", r)
 
 		var createAuthor CreateAuthor
 		if err := api.UnmarshalAndValidate(r.Body, &createAuthor); err != nil {
@@ -144,15 +140,14 @@ func HandlePersisting(authorPersister authorPersister, logger api.Logger) func(h
 			return
 		}
 
-		req := author.NewCreateAuthorCommand(createAuthor.Name, createAuthor.Description)
-
-		athr, err := authorPersister.Persist(ctx, req)
+		createAuthorCommand := author.NewCreateAuthorCommand(createAuthor.Name, createAuthor.Description)
+		athr, err := authorPersister.Persist(ctx, createAuthorCommand)
 		if err != nil {
 			api.HandleError(err, w, logger)
 			return
 		}
 
-		logger.Infof("author persiting result: %v", athr)
+		logger.Infof("persist author result: %v", athr)
 
 		api.ResponseJSON(http.StatusCreated, athr, w, logger)
 	}

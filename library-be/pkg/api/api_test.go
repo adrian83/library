@@ -129,7 +129,7 @@ func TestTextResponses(t *testing.T) {
 	}
 }
 
-func TestParseListRequest(t *testing.T) {
+func TestParseListQuery(t *testing.T) {
 	// given
 	testData := map[string]struct {
 		input  map[string][]string
@@ -160,12 +160,12 @@ func TestParseListRequest(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			// when
-			listReq := ParseListRequest(data.input)
+			listQuery := ParseListQuery(data.input)
 
 			// then
-			assert.Equal(t, data.offset, listReq.Offset)
-			assert.Equal(t, data.limit, listReq.Limit)
-			assert.Equal(t, data.sort, listReq.Sort)
+			assert.Equal(t, data.offset, listQuery.Offset)
+			assert.Equal(t, data.limit, listQuery.Limit)
+			assert.Equal(t, data.sort, listQuery.Sort)
 		})
 	}
 }
