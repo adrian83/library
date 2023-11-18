@@ -8,4 +8,4 @@ RUN npm --version
 RUN npm install
 #RUN npm install react-scripts@latest
 
-CMD ["npm", "run", "start"]
+CMD ["npm", "start"]

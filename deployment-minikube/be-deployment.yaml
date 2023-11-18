@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: library-be-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: library-be
+  template:
+    metadata:
+      labels:
+        app: library-be
+    spec:
+      containers:
+      - name: library-be
+        image: library/library-backend:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 7070
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "256Mi"
+            cpu: "250m"
+        env:
+        - name: SERVER_PORT
+          value: "7070"
+        - name: SERVER_HOST
+          value: "0.0.0.0"
+        - name: DATABASE_NAME
+          value: "library"
+        - name: STATICS_PATH
+          value: "../../../library-fe/build"
+        - name: DATABASE_HOST
+          value: "mongodb.default.svc.cluster.local"
+        - name: DATABASE_PORT
+          value: "27017"

@@ -13,6 +13,10 @@ fe-get:
 	echo "getting frontend dependencies" 
 	cd library-fe && npm install
 
+fe-update:
+	echo "getting frontend dependencies" 
+	cd library-fe && npm update --save && npm install
+
 fe-run: 
 	echo "running frontend"
 	cd library-fe && npm run start

@@ -30,3 +30,8 @@ Simple CRUD application written in [Go](https://golang.org/) and [JavaScript (Re
 3. Start frontend: `make fe-all`
 4. Navigate in browser to `localhost:3000`
 
+
+### Running in Minikube
+
+[Here (work in progress)](deployment-minikube/)
+
