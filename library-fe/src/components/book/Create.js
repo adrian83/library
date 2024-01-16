@@ -60,7 +60,7 @@ class CreateBook extends Base {
     render() {
 
         if(this.state && this.state.book) {
-            var editUrl = editBookUrl(this.state.book.id);
+            var editUrl = editBookUrl(this.state.book.id, true);
             return (<Redirect to={editUrl} />);
         }
 

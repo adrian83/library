@@ -35,6 +35,7 @@ function headers() {
 }
 
 function buildUrl(path){
+    console.log("URL", process.env.REACT_APP_BACKEND_HOST);
     return process.env.REACT_APP_BACKEND_HOST + path;
 }
 

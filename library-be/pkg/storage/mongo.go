@@ -20,6 +20,8 @@ type logger interface {
 }
 
 type Connection struct {
+	username            string
+	password            string
 	host                string
 	port                int
 	connectionTimeoutMs int
@@ -27,8 +29,10 @@ type Connection struct {
 	logger              logger
 }
 
-func NewConnection(host string, port, connectionTimeoutMs int, logger logger) *Connection {
+func NewConnection(username, password, host string, port, connectionTimeoutMs int, logger logger) *Connection {
 	return &Connection{
+		username:            username,
+		password:            password,
 		host:                host,
 		port:                port,
 		connectionTimeoutMs: connectionTimeoutMs,
@@ -38,9 +42,7 @@ func NewConnection(host string, port, connectionTimeoutMs int, logger logger) *C
 }
 
 func (c *Connection) Connect() {
-	mongoURI := "mongodb://" + c.host + ":" + strconv.Itoa(c.port) + "/?retryWrites=true&timeoutMS=" + strconv.Itoa(c.connectionTimeoutMs)
-	c.logger.Infof("Connecting to MongoDB on URI: %v", mongoURI)
-
+	mongoURI := "mongodb://" + c.username + ":" + c.password + "@" + c.host + ":" + strconv.Itoa(c.port) + "/?authSource=admin&retryWrites=true&timeoutMS=" + strconv.Itoa(c.connectionTimeoutMs)
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 	opts := options.Client().ApplyURI(mongoURI).SetServerAPIOptions(serverAPI)
 
@@ -50,12 +52,7 @@ func (c *Connection) Connect() {
 		c.logger.Fatalf("Cannot create MongoDB client: %v", err)
 	}
 
-	var result bson.M
-	if err := client.Database("admin").RunCommand(context.TODO(), bson.D{{Key: "ping", Value: 1}}).Decode(&result); err != nil {
-		c.logger.Fatalf("Cannot ping MongoDB: %v", err)
-	}
-
-	c.logger.Infof("Successfully connected to MongoDB, result: %v", result)
+	c.logger.Infof("Successfully connected to MongoDB")
 
 	c.client = client
 }

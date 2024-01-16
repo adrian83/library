@@ -7,7 +7,7 @@ compose-up:
 
 deps:
 	echo "starting mongodb image (version 5.0.14)"
-	docker run -p 27017:27017 -d mongo:5.0.14
+	docker run -p 27017:27017 -e MONGO_INITDB_ROOT_USERNAME=lib_user -e MONGO_INITDB_ROOT_PASSWORD=lib_pass -d mongo:5.0.14
 
 fe-get:
 	echo "getting frontend dependencies" 
@@ -39,6 +39,8 @@ be-run: export SERVER_HOST=0.0.0.0
 be-run: export DATABASE_NAME=library
 be-run: export DATABASE_HOST=localhost
 be-run: export DATABASE_PORT=27017
+be-run: export DATABASE_USER=lib_user
+be-run: export DATABASE_PASSWORD=lib_pass
 be-run: export STATICS_PATH=../../../library-fe/build
 
 be-run: 

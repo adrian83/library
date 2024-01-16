@@ -53,7 +53,7 @@ class CreateAuthor extends Base {
     render() {
 
         if(this.state && this.state.author) {
-            var editUrl = editAuthorUrl(this.state.author.id);
+            var editUrl = editAuthorUrl(this.state.author.id, true);
             return (<Redirect to={editUrl} />);
         }
 

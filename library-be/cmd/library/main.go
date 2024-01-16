@@ -57,7 +57,7 @@ func main() {
 
 	connectionLogger := NewLogger()
 	defer checkLoggerSync(connectionLogger)
-	connection := storage.NewConnection(cfg.DatabaseHost, cfg.DatabasePort, mongoConnectionTimeoutMs, connectionLogger.Sugar())
+	connection := storage.NewConnection(cfg.DatabaseUser, cfg.DatabasePass, cfg.DatabaseHost, cfg.DatabasePort, mongoConnectionTimeoutMs, connectionLogger.Sugar())
 
 	connection.Connect()
 	defer connection.Disconnect()

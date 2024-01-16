@@ -10,6 +10,7 @@ import SelectAuthors from '../author/Select';
 
 import { execPut, execGet } from '../../web/ajax';
 import { bookBeUrl } from '../../web/url';
+import { urlParamValue } from '../../web/params';
 
 class UpdateBook extends Base {
 
@@ -21,6 +22,7 @@ class UpdateBook extends Base {
         this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
         this.handleIsbnChange = this.handleIsbnChange.bind(this);
         this.addAuthor = this.addAuthor.bind(this);
+        this.showInfoIfNew = this.showInfoIfNew.bind(this);
     }
 
     handleTitleChange(event) {
@@ -60,6 +62,13 @@ class UpdateBook extends Base {
         event.preventDefault();
     }
 
+    showInfoIfNew() {
+        var isNew = urlParamValue("new");
+        if(isNew) {
+            this.registerInfo("Book created")
+        }
+    }
+
     componentDidMount() {
         const self = this;
         const bookId = this.props.match.params.bookId;
@@ -70,6 +79,7 @@ class UpdateBook extends Base {
                 self.setState({book: data});
                 self.setState({authors: data.authors});
             })
+            .then(_ => self.showInfoIfNew())
             .catch(error => self.registerError(error));
     }
 

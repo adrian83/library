@@ -3,9 +3,13 @@ kind: Service
 metadata:
   name: library-be-service
 spec:
+  type: LoadBalancer
   selector:
-    app.kubernetes.io/name: library-be
+    app: library-be
   ports:
     - protocol: TCP
       port: 7070
       targetPort: 7070
+      #nodePort: 30000
+
+  

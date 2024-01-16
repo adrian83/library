@@ -16,6 +16,8 @@ var (
 	dbName      = "lib"
 	dbHost      = "db.host"
 	dbPort      = 7654
+	dbUser      = "admin"
+	dbPass      = "secret"
 	staticsPath = "/some/path"
 )
 
@@ -35,6 +37,8 @@ func TestReadingConfiguration(t *testing.T) {
 	assert.Equal(t, dbHost, config.DatabaseHost)
 	assert.Equal(t, dbPort, config.DatabasePort)
 	assert.Equal(t, staticsPath, config.StaticsPath)
+	assert.Equal(t, dbPass, config.DatabasePass)
+	assert.Equal(t, dbUser, config.DatabaseUser)
 
 	stringRepr := config.String()
 
@@ -44,6 +48,8 @@ func TestReadingConfiguration(t *testing.T) {
 	assert.Contains(t, stringRepr, dbHost)
 	assert.Contains(t, stringRepr, fmt.Sprintf("%v", dbPort))
 	assert.Contains(t, stringRepr, staticsPath)
+	assert.Contains(t, stringRepr, dbUser)
+	assert.Contains(t, stringRepr, dbPass)
 }
 
 func TestReadingConfigurationError(t *testing.T) {
@@ -67,4 +73,6 @@ func setEnvVars() {
 	os.Setenv("DATABASE_HOST", dbHost)
 	os.Setenv("DATABASE_PORT", fmt.Sprintf("%v", dbPort))
 	os.Setenv("STATICS_PATH", staticsPath)
+	os.Setenv("DATABASE_PASSWORD", dbPass)
+	os.Setenv("DATABASE_USER", dbUser)
 }

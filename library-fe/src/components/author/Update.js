@@ -7,6 +7,7 @@ import Base from '../Base';
 
 import { execPut, execGet } from '../../web/ajax';
 import { authorBeUrl } from '../../web/url';
+import { urlParamValue } from '../../web/params';
 
 class UpdateAuthor extends Base {
 
@@ -16,6 +17,7 @@ class UpdateAuthor extends Base {
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleNameChange = this.handleNameChange.bind(this);
         this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
+        this.showInfoIfNew = this.showInfoIfNew.bind(this);
     }
 
     handleNameChange(event) {
@@ -46,6 +48,13 @@ class UpdateAuthor extends Base {
         event.preventDefault();
     }
 
+    showInfoIfNew() {
+        var isNew = urlParamValue("new");
+        if(isNew) {
+            this.registerInfo("Author created")
+        }
+    }
+
     componentDidMount() {
         const self = this;
         const authorId = this.props.match.params.authorId;
@@ -53,6 +62,7 @@ class UpdateAuthor extends Base {
         execGet(authorBeUrl(authorId))
             .then(response => response.json())
             .then(data => self.setState({author: data}))
+            .then(_ => self.showInfoIfNew())
             .catch(error => self.registerError(error));
     }
 

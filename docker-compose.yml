@@ -4,16 +4,21 @@ services:
     image: "mongo:5.0.14"
     ports:
     - "27017:27017"
-
+    environment:
+    - MONGO_INITDB_ROOT_USERNAME=lib_user
+    - MONGO_INITDB_ROOT_PASSWORD=lib_pass
 
   backend:
-    build: ./library-be
+    build: 
+      context: ./library-be
     environment:
     - SERVER_PORT=7070
     - SERVER_HOST=0.0.0.0
     - DATABASE_NAME=library
     - DATABASE_HOST=mongo
     - DATABASE_PORT=27017
+    - DATABASE_USER=lib_user
+    - DATABASE_PASSWORD=lib_pass
     - STATICS_PATH=../../../library-fe/build
     ports:
     - "7070:7070"
@@ -24,7 +29,10 @@ services:
 
 
   frontend:
-    build: ./library-fe
+    build: 
+      context: ./library-fe
+      args:
+        - BE_HOST=http://localhost:7070
     stdin_open: true
     ports:
     - "3000:3000"

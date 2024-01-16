@@ -33,5 +33,5 @@ Simple CRUD application written in [Go](https://golang.org/) and [JavaScript (Re
 
 ### Running in Minikube
 
-[Here (work in progress)](deployment-minikube/)
+[Here](deployment-minikube/)
 

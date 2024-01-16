@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: library-fe-deployment
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: library-fe
@@ -16,35 +16,12 @@ spec:
       - name: library-fe
         image: library/library-frontend:latest
         imagePullPolicy: Never
-    
-        livenessProbe:
-          httpGet:
-            host: 0.0.0.0
-            path: /
-            port: 3000
-          initialDelaySeconds: 60
-          periodSeconds: 10
-        startupProbe:
-          httpGet:
-            host: 0.0.0.0
-            path: /
-            port: 3000
-          initialDelaySeconds: 60
-          failureThreshold: 60
-          periodSeconds: 10
-
-
         ports:
         - containerPort: 3000
-          hostPort: 3000
-
         resources:
           requests:
-            memory: "2048Mi"
-            cpu: "1000m"
+            memory: "1024Mi"
+            cpu: "500m"
           limits:
-            memory: "2048Mi"
-            cpu: "1000m"
-        env:
-        - name: REACT_APP_BACKEND_HOST
-          value: "library-be.default.svc.cluster.local:7070"
+            memory: "1024Mi"
+            cpu: "500m"

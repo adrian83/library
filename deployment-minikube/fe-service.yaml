@@ -3,10 +3,10 @@ kind: Service
 metadata:
   name: library-fe-service
 spec:
+  type: LoadBalancer
   selector:
-    app.kubernetes.io/name: library-fe-deployment
+    app: library-fe
   ports:
     - protocol: TCP
-      port: 3000  # Port, pod którym będzie dostępna aplikacja na zewnątrz
-      targetPort: 3000  # Port, na którym aplikacja działa wewnątrz kontenera
-  type: LoadBalancer
+      port: 3000
+      targetPort: 3000

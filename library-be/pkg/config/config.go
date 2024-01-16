@@ -13,6 +13,8 @@ type Config struct {
 	DatabaseName string `envconfig:"DATABASE_NAME"`
 	DatabaseHost string `envconfig:"DATABASE_HOST"`
 	DatabasePort int    `envconfig:"DATABASE_PORT"`
+	DatabaseUser string `envconfig:"DATABASE_USER"`
+	DatabasePass string `envconfig:"DATABASE_PASSWORD"`
 	StaticsPath  string `envconfig:"STATICS_PATH"`
 }
 

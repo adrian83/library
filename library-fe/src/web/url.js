@@ -23,12 +23,14 @@ export function createAuthorUrl() {
     return `/authors/create/`;
 }
 
-export function editBookUrl(bookId) {
-    return `/books/edit/${bookId}`;
+export function editBookUrl(bookId, isNew=false) {
+    var baseUrl = `/books/edit/${bookId}`;
+    return isNew ? baseUrl + "?new=" + isNew : baseUrl;
 }
 
-export function editAuthorUrl(authorId) {
-    return `/authors/edit/${authorId}`;
+export function editAuthorUrl(authorId, isNew=false) {
+    var baseUrl = `/authors/edit/${authorId}`;
+    return isNew ? baseUrl + "?new=" + isNew : baseUrl;
 }
 
 export function showBookUrl(bookId) {

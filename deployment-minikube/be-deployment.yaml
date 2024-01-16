@@ -38,3 +38,10 @@ spec:
           value: "mongodb.default.svc.cluster.local"
         - name: DATABASE_PORT
           value: "27017"
+        - name: DATABASE_USER
+          value: "root"
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongodb
+              key: mongodb-root-password
